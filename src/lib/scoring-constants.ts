@@ -247,6 +247,13 @@ export const REWARDS: Reward[] = [
   { id: 'double_referral', title: '2× referral bonus', description: 'Earn 100 pts per referral', icon: '✖️', requiredTier: 'Platinum', category: 'discount' },
 ];
 
+export const QUICK_WIN_IDS = [
+  'daily_checkin',
+  'installer_review',
+  'energy_bill',
+  'health_quiz',
+];
+
 export const TIER_ORDER: TierName[] = ['Entry', 'Silver', 'Gold', 'Platinum'];
 
 export function tierRank(name: TierName): number {

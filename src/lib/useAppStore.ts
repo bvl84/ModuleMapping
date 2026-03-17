@@ -21,7 +21,7 @@ export function useAppStore() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_PROFILE);
   const [selectedPlan, setSelectedPlan] = useState<PlanCategory | null>(null);
   const [selectedUpgradeId, setSelectedUpgradeId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'planning'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'planning' | 'scoring'>('dashboard');
 
   const selectPlan = useCallback((planId: PlanCategory | null) => {
     setSelectedPlan(planId);

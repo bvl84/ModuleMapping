@@ -11,6 +11,7 @@ import { DevicesPanel } from './dashboard/DevicesPanel';
 import { ProfileCustomization } from './dashboard/ProfileCustomization';
 import { PlanningOverview } from './planning/PlanningOverview';
 import { PlanDetail } from './planning/PlanDetail';
+import { ScoringBreakdown } from './scoring/ScoringBreakdown';
 
 export function HomePage() {
   const {
@@ -93,6 +94,9 @@ export function HomePage() {
             onBack={() => selectPlan(null)}
           />
         )}
+
+        {/* ═══════ SCORING ═══════ */}
+        {activeTab === 'scoring' && <ScoringBreakdown />}
       </div>
     </div>
   );
