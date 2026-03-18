@@ -1,11 +1,12 @@
 'use client';
 
-type TabId = 'dashboard' | 'planning' | 'scoring';
+type TabId = 'dashboard' | 'planning' | 'scoring' | 'config';
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'dashboard', label: 'Dashboard' },
   { id: 'planning', label: 'Energy Planning' },
   { id: 'scoring', label: 'Scoring' },
+  { id: 'config', label: 'Config Profiles' },
 ];
 
 interface TabNavProps {

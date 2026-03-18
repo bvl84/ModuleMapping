@@ -97,6 +97,17 @@ export function HomePage() {
 
         {/* ═══════ SCORING ═══════ */}
         {activeTab === 'scoring' && <ScoringBreakdown />}
+
+        {/* ═══════ CONFIG PROFILES ═══════ */}
+        {activeTab === 'config' && (
+          <div className="rounded-xl overflow-hidden border border-gray-200" style={{ height: 'calc(100vh - 160px)' }}>
+            <iframe
+              src="/config-profiles.html"
+              className="w-full h-full border-0"
+              title="Config Profiles"
+            />
+          </div>
+        )}
       </div>
     </div>
   );
