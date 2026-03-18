@@ -98,14 +98,24 @@ export function HomePage() {
         {/* ═══════ SCORING ═══════ */}
         {activeTab === 'scoring' && <ScoringBreakdown />}
 
-        {/* ═══════ CONFIG PROFILES ═══════ */}
-        {activeTab === 'config' && (
+        {/* ═══════ CINCH WF ═══════ */}
+        {activeTab === 'cinch' && (
           <div className="rounded-xl overflow-hidden border border-gray-200" style={{ height: 'calc(100vh - 160px)' }}>
-            <iframe
-              src="/config-profiles.html"
-              className="w-full h-full border-0"
-              title="Config Profiles"
-            />
+            <iframe src="/config-cinch.html" className="w-full h-full border-0" title="Cinch WF" />
+          </div>
+        )}
+
+        {/* ═══════ GREENTECH WF ═══════ */}
+        {activeTab === 'greentech' && (
+          <div className="rounded-xl overflow-hidden border border-gray-200" style={{ height: 'calc(100vh - 160px)' }}>
+            <iframe src="/config-greentech.html" className="w-full h-full border-0" title="GreenTech WF" />
+          </div>
+        )}
+
+        {/* ═══════ SOLUTIONS BUILDER WF ═══════ */}
+        {activeTab === 'solutions' && (
+          <div className="rounded-xl overflow-hidden border border-gray-200" style={{ height: 'calc(100vh - 160px)' }}>
+            <iframe src="/config-solutions-builder.html" className="w-full h-full border-0" title="Solutions Builder WF" />
           </div>
         )}
       </div>

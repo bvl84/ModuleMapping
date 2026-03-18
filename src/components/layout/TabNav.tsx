@@ -1,12 +1,14 @@
 'use client';
 
-type TabId = 'dashboard' | 'planning' | 'scoring' | 'config';
+type TabId = 'dashboard' | 'planning' | 'scoring' | 'cinch' | 'greentech' | 'solutions';
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'dashboard', label: 'Dashboard' },
   { id: 'planning', label: 'Energy Planning' },
   { id: 'scoring', label: 'Scoring' },
-  { id: 'config', label: 'Config Profiles' },
+  { id: 'cinch', label: 'Cinch WF' },
+  { id: 'greentech', label: 'GreenTech WF' },
+  { id: 'solutions', label: 'Solutions Builder WF' },
 ];
 
 interface TabNavProps {
