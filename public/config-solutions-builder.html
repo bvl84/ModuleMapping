@@ -29,83 +29,64 @@ body {
 .indent-4 { padding-left: 96px; }
 .collapsible { cursor: pointer; user-select: none; }
 .collapsible:hover { background: #2a2d2e; }
-.collapsible::before { content: '▼ '; font-size: 10px; color: #858585; }
-.collapsible.collapsed::before { content: '▶ '; }
+.collapsible::before { content: '\25BC '; font-size: 10px; color: #858585; }
+.collapsible.collapsed::before { content: '\25B6 '; }
 .collapsible-content { overflow: hidden; }
 .collapsible-content.hidden { display: none; }
-.collapsed-hint { color: #858585; font-style: italic; display: none; }
-.collapsible.collapsed + .collapsible-content + .collapsed-hint,
-.collapsible.collapsed ~ .collapsed-hint { display: inline; }
-.divider { border: none; border-top: 1px solid #333; margin: 16px 0; }
 </style>
 </head>
 <body>
-
-<div class="line comment">// Solutions Builder WF — Config Profile</div>
-<div class="line">&nbsp;</div>
-
-<div class="line collapsible" onclick="tog(this)"><span class="bracket">{</span> <span class="key">"SolutionsBuilder"</span><span class="punct">:</span> <span class="bracket">{</span></div>
-<div class="collapsible-content">
-<div class="line indent-1"><span class="key">"WF_Type"</span><span class="punct">:</span> <span class="str">"WF"</span><span class="punct">,</span></div>
-<div class="line indent-1"><span class="key">"Client_ID"</span><span class="punct">:</span> <span class="str">"{clientID}"</span><span class="punct">,</span></div>
-<div class="line indent-1"><span class="key">"BC"</span><span class="punct">:</span> <span class="str">"HomeComfort"</span><span class="punct">,</span></div>
-<div class="line indent-1"><span class="key">"BackgroundImage"</span><span class="punct">:</span> <span class="str">"{1-6}"</span><span class="punct">,</span></div>
-<div class="line indent-1 collapsible" onclick="tog(this)"><span class="key">"Module"</span><span class="punct">:</span> <span class="bracket">[</span></div>
-<div class="collapsible-content">
-
-<div class="line indent-2 collapsible" onclick="tog(this)"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Contact"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">0</span></div>
-<div class="collapsible-content">
-<div class="line indent-3"><span class="key">"Functions"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Form Validation"</span><span class="punct">,</span> <span class="str">"Input Masking (phone)"</span><span class="punct">,</span> <span class="str">"Navigation (Next)"</span><span class="bracket">]</span></div>
-<div class="line indent-3"><span class="key">"Fields"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"First Name"</span><span class="punct">,</span> <span class="str">"Last Name"</span><span class="punct">,</span> <span class="str">"Email"</span><span class="punct">,</span> <span class="str">"Phone Number"</span><span class="bracket">]</span></div>
-<div class="line indent-2"><span class="bracket">}</span><span class="punct">,</span></div>
-</div>
-
-<div class="line indent-2 collapsible" onclick="tog(this)"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Verify Home"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">1</span></div>
-<div class="collapsible-content">
-<div class="line indent-3"><span class="key">"Functions"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Address Autocomplete"</span><span class="punct">,</span> <span class="str">"Address Verification (Zillow)"</span><span class="punct">,</span> <span class="str">"Property Data Population"</span><span class="punct">,</span> <span class="str">"Map Pin Display"</span><span class="punct">,</span> <span class="str">"Occupied Toggle"</span><span class="bracket">]</span></div>
-<div class="line indent-3"><span class="key">"Fields"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Property Address"</span><span class="punct">,</span> <span class="str">"Property Occupied"</span><span class="bracket">]</span></div>
-<div class="line indent-3"><span class="key">"Ext_Fields"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Year Built"</span><span class="punct">,</span> <span class="str">"Square Footage"</span><span class="punct">,</span> <span class="str">"Bedrooms"</span><span class="punct">,</span> <span class="str">"Bathrooms"</span><span class="punct">,</span> <span class="str">"Map"</span><span class="bracket">]</span></div>
-<div class="line indent-2"><span class="bracket">}</span><span class="punct">,</span></div>
-</div>
-
-<div class="line indent-2 collapsible" onclick="tog(this)"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Additional Details"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">2</span></div>
-<div class="collapsible-content">
-<div class="line indent-3"><span class="key">"Functions"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"System Type Selection (Heat Pump, Ductless Room, Multi-Room Ductless, AC + Furnace)"</span><span class="punct">,</span> <span class="str">"Efficiency Tier (Good/Best)"</span><span class="punct">,</span> <span class="str">"SqFt Input"</span><span class="punct">,</span> <span class="str">"Whole House Toggle"</span><span class="punct">,</span> <span class="str">"System Rating Details (modal)"</span><span class="bracket">]</span></div>
-<div class="line indent-3"><span class="key">"Fields"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Heating/Cooling SqFt"</span><span class="punct">,</span> <span class="str">"Whole House"</span><span class="punct">,</span> <span class="str">"System Type"</span><span class="punct">,</span> <span class="str">"Efficiency Tier"</span><span class="bracket">]</span></div>
-<div class="line indent-2"><span class="bracket">}</span><span class="punct">,</span></div>
-</div>
-
-<div class="line indent-2 collapsible" onclick="tog(this)"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Summary"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">3</span></div>
-<div class="collapsible-content">
-<div class="line indent-3"><span class="key">"Functions"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"PDF Generation (3-page)"</span><span class="punct">,</span> <span class="str">"Email Delivery"</span><span class="punct">,</span> <span class="str">"SFDC Web-to-Case"</span><span class="punct">,</span> <span class="str">"Combine &amp; Save (add-ons)"</span><span class="bracket">]</span></div>
-<div class="line indent-3"><span class="key">"Fields"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Contacts"</span><span class="punct">,</span> <span class="str">"Additional Details"</span><span class="punct">,</span> <span class="str">"Customer Notes"</span><span class="punct">,</span> <span class="str">"Recommend System"</span><span class="punct">,</span> <span class="str">"Price"</span><span class="punct">,</span> <span class="str">"Property Details"</span><span class="bracket">]</span></div>
-<div class="line indent-2"><span class="bracket">}</span><span class="punct">,</span></div>
-</div>
-
-<div class="line indent-2"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Scheduling"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-false">false</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">4</span> <span class="bracket">}</span><span class="punct">,</span></div>
-<div class="line indent-2"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"PDF"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span> <span class="bracket">}</span><span class="punct">,</span></div>
-<div class="line indent-2"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Email"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span> <span class="bracket">}</span></div>
-
-<div class="line indent-1"><span class="bracket">]</span></div>
-</div>
-
-<div class="line"><span class="bracket">}</span> <span class="bracket">}</span></div>
-
+<div id="config-content"></div>
 <script>
-function tog(el) {
-  const content = el.nextElementSibling;
-  if (content && content.classList.contains('collapsible-content')) {
-    el.classList.toggle('collapsed');
-    content.classList.toggle('hidden');
-  }
-}
-document.querySelectorAll('.indent-2.collapsible, .indent-3.collapsible, .indent-4.collapsible').forEach(function(el) {
-  var content = el.nextElementSibling;
-  if (content && content.classList.contains('collapsible-content')) {
-    el.classList.add('collapsed');
-    content.classList.add('hidden');
-  }
-});
+var DEFAULT_CONFIG = {
+  name: "SolutionsBuilder",
+  comments: ["Solutions Builder WF \u2014 Config Profile"],
+  sections: [
+    {
+      wfType: "WF",
+      clientId: "{clientID}",
+      bc: "HomeComfort",
+      backgroundImage: "{1-6}",
+      moduleName: "Module",
+      entries: [
+        {
+          nameId: "Contact", display: true, sort: 0,
+          details: {
+            Functions: ["Form Validation", "Input Masking (phone)", "Navigation (Next)"],
+            Fields: ["First Name", "Last Name", "Email", "Phone Number"]
+          }
+        },
+        {
+          nameId: "Verify Home", display: true, sort: 1,
+          details: {
+            Functions: ["Address Autocomplete", "Address Verification (Zillow)", "Property Data Population", "Map Pin Display", "Occupied Toggle"],
+            Fields: ["Property Address", "Property Occupied"],
+            Ext_Fields: ["Year Built", "Square Footage", "Bedrooms", "Bathrooms", "Map"]
+          }
+        },
+        {
+          nameId: "Additional Details", display: true, sort: 2,
+          details: {
+            Functions: ["System Type Selection (Heat Pump, Ductless Room, Multi-Room Ductless, AC + Furnace)", "Efficiency Tier (Good/Best)", "SqFt Input", "Whole House Toggle", "System Rating Details (modal)"],
+            Fields: ["Heating/Cooling SqFt", "Whole House", "System Type", "Efficiency Tier"]
+          }
+        },
+        {
+          nameId: "Summary", display: true, sort: 3,
+          details: {
+            Functions: ["PDF Generation (3-page)", "Email Delivery", "SFDC Web-to-Case", "Combine & Save (add-ons)"],
+            Fields: ["Contacts", "Additional Details", "Customer Notes", "Recommend System", "Price", "Property Details"]
+          }
+        },
+        { nameId: "Scheduling", display: false, sort: 4 },
+        { nameId: "PDF", display: true },
+        { nameId: "Email", display: true }
+      ]
+    }
+  ]
+};
 </script>
+<script src="config-renderer.js"></script>
+<script>renderConfig(DEFAULT_CONFIG, 'config-solutions-builder');</script>
 </body>
 </html>
