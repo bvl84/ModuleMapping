@@ -70,7 +70,7 @@
   var MERGE_KEYS = { Functions: 1, Fields: 1, Ext_Fields: 1 };
   var FLATTEN_KEYS = { entries: 1, details: 1 };
 
-  var WF_TYPE_LABELS = { WF: 'Workflow', WO: 'Work Order', QO: 'Quote', SJ: 'Search Jobs' };
+  var WF_TYPE_LABELS = { WF: 'Direct/Indirect', WO: 'Work Order', QO: 'Quote', SJ: 'Search Jobs' };
 
   function backendFlowLabel(sec) {
     var typeLabel = WF_TYPE_LABELS[sec.wfType] || sec.wfType;
