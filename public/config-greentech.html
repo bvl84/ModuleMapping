@@ -27,22 +27,17 @@ body {
 .indent-2 { padding-left: 48px; }
 .indent-3 { padding-left: 72px; }
 .indent-4 { padding-left: 96px; }
-.collapsible { cursor: pointer; user-select: none; }
-.collapsible:hover { background: #2a2d2e; }
-.collapsible::before { content: '\25BC '; font-size: 10px; color: #858585; }
-.collapsible.collapsed::before { content: '\25B6 '; }
-.collapsible-content { overflow: hidden; }
-.collapsible-content.hidden { display: none; }
 </style>
 </head>
 <body>
 <div id="config-content"></div>
 <script>
 var DEFAULT_CONFIG = {
-  name: "NewWorkProposal",
-  comments: ["GreenTech WF \u2014 Config Profile", "GreenTechRenewables"],
+  "meta title": "Create HVAC Work Proposals | GreenTech Renewables",
+  "meta description": "Build residential HVAC proposals fast. Add contacts, verify property data, select systems, set your markup, and submit directly to Motili \u2014 all in one tool.",
   sections: [
     {
+      wfName: "GreenTech",
       wfType: "WF",
       clientId: "{clientID}",
       bc: "GreenTechRenewables",
@@ -52,36 +47,31 @@ var DEFAULT_CONFIG = {
         {
           nameId: "Contact Information", display: true, sort: 0,
           details: {
-            Functions: ["Form Validation", "Contact Type (Homeowner/Property manager)", "Primary Contact Toggle", "Multi-Contact Support"],
-            Fields: ["Contact Type", "First Name", "Last Name", "Email", "Phone", "Primary Contact"]
+            Functions: ["Form Validation", "Contact Type (Homeowner/Property manager)", "Primary Contact Toggle", "First Name", "Last Name", "Email", "Phone", "Existing contact Query", "Add/Remove Additional Contacts"]
           }
         },
         {
           nameId: "Verify Home", display: true, sort: 1,
           details: {
-            Functions: ["Manual Address Entry", "Zillow Verification", "Property Data Population", "Map Pin", "Occupied Toggle"],
-            Fields: ["Address Line 1", "Address Line 2", "City", "State", "Zip", "Occupied"],
-            Ext_Fields: ["Year Built", "Beds", "Baths", "Num Systems", "SqFt", "Map"]
+            Functions: ["Manual Address Entry", "Address Verification (Smarty)", "Property Address", "Map Pin Display", "Occupied Toggle", "Year Built", "Square Footage", "# of Bedrooms", "# of Bathrooms", "# of systems"]
           }
         },
         {
           nameId: "Additional Details", display: true, sort: 2,
           details: {
-            Functions: ["System Selection (HP Standard, HP Cold Climate, Dual Fuel, Ductless)", "Conditional: Dual Fuel \u2192 AFUE", "Conditional: Ductless \u2192 Num Rooms", "Ductwork (Yes/No)"],
-            Fields: ["New HVAC System", "Dual Fuel Efficiency", "Num Rooms", "Ductwork"]
+            Functions: ["System Selection", "Conditional: Dual Fuel Efficiency \u2192 AFUE", "Conditional: Ductless \u2192 # Rooms", "Ductwork (Yes/No)", "New HVAC System"]
           }
         },
         {
           nameId: "Summary", display: true, sort: 3,
           details: {
-            Functions: ["Contacts Display (editable)", "Recommended System (AHRI#, carousel)", "Markup Pricing (Margin/Mark Up)", "Price Visibility Toggle", "Customer Notes", "Property Details (editable)"]
+            Functions: ["Contacts Display", "Recommended System", "Markup Pricing", "Price Visibility Toggle", "Customer Notes", "Property Details"]
           }
         },
-        { nameId: "Submission", display: true },
-        { nameId: "Landing", display: true }
       ]
     },
     {
+      wfName: "GreenTech — Search Jobs",
       wfType: "SJ",
       clientId: "{clientID}",
       bc: "GreenTechRenewables",

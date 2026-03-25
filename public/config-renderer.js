@@ -2,6 +2,7 @@
   'use strict';
 
   var _data, _defaults, _key, _editMode = false;
+  var INDENT = '    ';
 
   window.renderConfig = function (defaults, storageKey) {
     _defaults = defaults;
@@ -13,7 +14,7 @@
   };
 
   function load() {
-    try { var s = localStorage.getItem(_key); if (s) return JSON.parse(s); } catch (e) { /* ignore */ }
+    try { var s = localStorage.getItem(_key); if (s) return JSON.parse(s); } catch (e) {}
     return clone(_defaults);
   }
 
@@ -35,172 +36,255 @@
     return s.split('.').map(function (k) { return isNaN(k) ? k : +k; });
   }
 
-  // --- HTML helpers ---
-
   function esc(t) {
     return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
-  function sp(cls, raw) {
-    return '<span class="' + cls + '">' + raw + '</span>';
+  function sp(cls, text) {
+    return '<span class="' + cls + '">' + text + '</span>';
   }
 
-  function ev(cls, display, path) {
+  function ed(cls, display, path) {
     return '<span class="' + cls + ' editable" data-path="' + path.join('.') + '">' + esc(display) + '</span>';
   }
 
-  // --- Value rendering ---
+  function pad(depth) {
+    var s = '';
+    for (var i = 0; i < depth; i++) s += INDENT;
+    return s;
+  }
 
-  function renderVal(val, path) {
-    if (typeof val === 'string') return ev('str', '"' + val + '"', path);
-    if (typeof val === 'boolean') return ev(val ? 'bool-true' : 'bool-false', '' + val, path);
-    if (typeof val === 'number') return ev('num', '' + val, path);
+  function line(depth, content) {
+    return '<div class="line">' + pad(depth) + content + '</div>';
+  }
+
+  function renderValue(val, path) {
+    if (val === null) return ed('num', 'null', path);
+    if (typeof val === 'boolean') return ed(val ? 'bool-true' : 'bool-false', '' + val, path);
+    if (typeof val === 'number') return ed('num', '' + val, path);
+    if (typeof val === 'string') return ed('str', val, path);
     return esc('' + val);
   }
 
-  function renderArr(arr, path) {
-    var h = sp('bracket', '[');
-    for (var i = 0; i < arr.length; i++) {
-      if (i) h += sp('punct', ',') + ' ';
-      h += renderVal(arr[i], path.concat([i]));
-      h += '<span class="eb rm" data-rm="' + path.concat([i]).join('.') + '">\u00d7</span>';
+  var HIDDEN_KEYS = { Options: 1, Config: 1, actions: 1 };
+  var MERGE_KEYS = { Functions: 1, Fields: 1, Ext_Fields: 1 };
+  var FLATTEN_KEYS = { entries: 1, details: 1 };
+
+  var WF_TYPE_LABELS = { WF: 'Workflow', WO: 'Work Order', QO: 'Quote', SJ: 'Search Jobs' };
+
+  function backendFlowLabel(sec) {
+    var typeLabel = WF_TYPE_LABELS[sec.wfType] || sec.wfType;
+    var modName = sec.moduleName || '';
+    var suffix = modName.replace(/^Module_?/, '');
+    if (suffix) return typeLabel + ' - ' + suffix;
+    return typeLabel;
+  }
+
+  function renderBackendSection(sec, path, depth) {
+    var h = '';
+    var label = backendFlowLabel(sec);
+
+    if (sec.entries) {
+      var names = sec.entries.map(function (ent, ei) {
+        return ed('str', ent.nameId, path.concat(['entries', ei, 'nameId']));
+      });
+      h += line(depth, sp('key', esc(label)) + sp('punct', ':') + ' ' + names.join(sp('punct', ' \u2192 ')));
     }
-    h += sp('bracket', ']');
-    h += '<span class="eb add" data-add="' + path.join('.') + '">+</span>';
+
     return h;
   }
 
-  function renderObj(obj, path) {
-    var ks = Object.keys(obj), h = sp('bracket', '{') + ' ';
-    for (var i = 0; i < ks.length; i++) {
-      if (i) h += sp('punct', ',') + ' ';
-      h += sp('key', esc('"' + ks[i] + '"')) + sp('punct', ':') + ' ' + renderVal(obj[ks[i]], path.concat([ks[i]]));
+  function renderSection(sec, path, depth) {
+    var h = '';
+
+    if (sec.wfName != null) {
+      h += line(depth, sp('key', 'wfName') + sp('punct', ':') + ' ' + ed('str', sec.wfName, path.concat(['wfName'])));
     }
-    return h + ' ' + sp('bracket', '}');
+
+    var wfLabel = WF_TYPE_LABELS[sec.wfType] || sec.wfType;
+    h += line(depth, sp('key', 'wfType') + sp('punct', ':') + ' ' + ed('str', wfLabel, path.concat(['wfType'])));
+
+    h += line(depth, sp('key', 'clientId') + sp('punct', ':') + ' ' + ed('str', sec.clientId, path.concat(['clientId'])));
+
+    h += line(depth + 1, sp('key', 'meta title') + sp('punct', ':') + ' ' + ed('str', _data['meta title'] || '', ['meta title']));
+    h += line(depth + 1, sp('key', 'meta description') + sp('punct', ':') + ' ' + ed('str', _data['meta description'] || '', ['meta description']));
+
+    h += line(depth + 1, sp('key', 'BC') + sp('punct', ':') + ' ' + ed('str', sec.bc, path.concat(['bc'])));
+    h += line(depth + 1, sp('key', 'backgroundImage') + sp('punct', ':') + ' ' + ed('str', sec.backgroundImage, path.concat(['backgroundImage'])));
+    h += '<div class="line">\u00a0</div>';
+
+    var modLabel = sec.moduleName || 'Module';
+    h += line(depth, sp('key', esc(modLabel)) + sp('punct', ':'));
+
+    if (sec.entries) {
+      for (var i = 0; i < sec.entries.length; i++) {
+        if (i > 0) h += '<div class="line">\u00a0</div>';
+        h += renderEntry(sec.entries[i], path.concat(['entries', i]), depth + 1);
+      }
+    }
+
+    return h;
   }
 
-  function renderDetailLine(indent, key, val, path) {
-    var h = '<div class="line indent-' + indent + '">' +
-      sp('key', esc('"' + key + '"')) + sp('punct', ':') + ' ';
-    if (Array.isArray(val)) h += renderArr(val, path);
-    else if (val && typeof val === 'object') h += renderObj(val, path);
-    else h += renderVal(val, path);
-    return h + '</div>';
+  function renderEntry(entry, path, depth) {
+    var h = '';
+    var ks = Object.keys(entry);
+    for (var i = 0; i < ks.length; i++) {
+      var k = ks[i];
+      if (k === 'details' || k === 'actions' || k === 'subModules') continue;
+      h += renderNode(k, entry[k], path.concat([k]), depth);
+    }
+
+    if (entry.details) {
+      var detPath = path.concat(['details']);
+      var merged = [];
+      var mergeKeys = Object.keys(entry.details).filter(function (dk) { return MERGE_KEYS[dk]; });
+      mergeKeys.forEach(function (dk) {
+        var arr = entry.details[dk];
+        if (Array.isArray(arr)) {
+          arr.forEach(function (v, vi) {
+            merged.push({ val: v, path: detPath.concat([dk, vi]) });
+          });
+        }
+      });
+      var subMods = entry.subModules || [];
+      var totalCount = merged.length + subMods.length;
+
+      if (totalCount > 0) {
+        var items = merged.map(function (m) { return renderValue(m.val, m.path); });
+        h += '<div class="line collapsible collapsed">' + pad(depth + 1) +
+          sp('key', 'components') + sp('punct', ':') + ' ' +
+          sp('punct', '(' + totalCount + ' items)') +
+          '</div>';
+        h += '<div class="collapsible-content hidden">';
+        for (var mi = 0; mi < items.length; mi++) {
+          h += line(depth + 2, items[mi]);
+        }
+        for (var si = 0; si < subMods.length; si++) {
+          h += line(depth + 2, ed('str', subMods[si], path.concat(['subModules', si])));
+        }
+        h += '</div>';
+      }
+
+      var otherKeys = Object.keys(entry.details).filter(function (dk) {
+        return !MERGE_KEYS[dk] && !HIDDEN_KEYS[dk];
+      });
+      otherKeys.forEach(function (dk) {
+        h += renderNode(dk, entry.details[dk], detPath.concat([dk]), depth + 1);
+      });
+    } else if (entry.subModules && entry.subModules.length > 0) {
+      h += '<div class="line collapsible collapsed">' + pad(depth + 1) +
+        sp('key', 'components') + sp('punct', ':') + ' ' +
+        sp('punct', '(' + entry.subModules.length + ' items)') +
+        '</div>';
+      h += '<div class="collapsible-content hidden">';
+      for (var si = 0; si < entry.subModules.length; si++) {
+        h += line(depth + 2, ed('str', entry.subModules[si], path.concat(['subModules', si])));
+      }
+      h += '</div>';
+    }
+
+    return h;
   }
 
-  // --- Entry header ---
+  function renderNode(key, val, path, depth) {
+    var h = '';
+    var keyHtml = key !== null ? sp('key', esc(key)) + sp('punct', ':') + ' ' : '';
 
-  function renderEntryHeader(entry, path, hasDetails) {
-    var h = sp('bracket', '{') + ' ';
-    h += sp('key', '"NameID"') + sp('punct', ':') + ' ' + renderVal(entry.nameId, path.concat(['nameId'])) + sp('punct', ',') + ' ';
-    h += sp('key', '"Display"') + sp('punct', ':') + ' ' + renderVal(entry.display, path.concat(['display']));
-    if (entry.sort != null)
-      h += sp('punct', ',') + ' ' + sp('key', '"Sort"') + sp('punct', ':') + ' ' + renderVal(entry.sort, path.concat(['sort']));
-    if (!hasDetails && entry.actions)
-      h += sp('punct', ',') + ' ' + sp('key', '"actions"') + sp('punct', ':') + ' ' + renderArr(entry.actions, path.concat(['actions']));
-    if (!hasDetails) h += ' ' + sp('bracket', '}');
+    if (HIDDEN_KEYS[key]) return '';
+
+    if (val === null || typeof val === 'boolean' || typeof val === 'number' || typeof val === 'string') {
+      h += line(depth, keyHtml + renderValue(val, path));
+    } else if (Array.isArray(val)) {
+      var allPrimitive = val.every(function (v) {
+        return v === null || typeof v !== 'object';
+      });
+
+      if (allPrimitive && val.length > 0) {
+        var items = val.map(function (v, i) {
+          return renderValue(v, path.concat([i]));
+        });
+        h += line(depth, keyHtml + items.join(sp('punct', ', ')));
+      } else if (val.length === 0) {
+        h += line(depth, keyHtml + sp('punct', '(empty)'));
+      } else {
+        var isFlat = (key === 'entries' || key === 'sections');
+        if (!isFlat && key !== null) h += line(depth, keyHtml);
+        var childDepth = isFlat ? depth : depth + 1;
+        for (var i = 0; i < val.length; i++) {
+          if (isFlat && typeof val[i] === 'object' && val[i] !== null) {
+            if (i > 0) h += '<div class="line">\u00a0</div>';
+            if (key === 'entries') {
+              h += renderEntry(val[i], path.concat([i]), childDepth);
+            } else if (key === 'sections') {
+              var secObj = val[i];
+              if (secObj.wfType && secObj.wfType !== 'WF') {
+                // skip here; backend sections rendered as a group after the loop
+              } else {
+                h += renderSection(secObj, path.concat([i]), childDepth);
+              }
+            } else {
+              var oKeys = Object.keys(val[i]);
+              for (var j = 0; j < oKeys.length; j++) {
+                h += renderNode(oKeys[j], val[i][oKeys[j]], path.concat([i, oKeys[j]]), childDepth);
+              }
+            }
+          } else {
+            h += renderNode(null, val[i], path.concat([i]), childDepth);
+            if (i < val.length - 1 && typeof val[i] === 'object' && val[i] !== null) {
+              h += '<div class="line">\u00a0</div>';
+            }
+          }
+        }
+      }
+    } else if (typeof val === 'object') {
+      if (key !== null) h += line(depth, keyHtml);
+      var ks = Object.keys(val);
+      for (var i = 0; i < ks.length; i++) {
+        h += renderNode(ks[i], val[ks[i]], path.concat([ks[i]]), depth + 1);
+      }
+    }
+
     return h;
   }
 
   // --- Main render ---
 
+  var SKIP_TOP_LEVEL = { 'meta title': 1, 'meta description': 1, sections: 1 };
+
   function render() {
     var h = '';
+    var ks = Object.keys(_data);
+    for (var i = 0; i < ks.length; i++) {
+      if (SKIP_TOP_LEVEL[ks[i]]) continue;
+      h += renderNode(ks[i], _data[ks[i]], [ks[i]], 0);
+    }
+    h += renderNode('sections', _data.sections, ['sections'], 0);
 
-    _data.comments.forEach(function (c, i) {
-      h += '<div class="line comment">// ' + ev('ct', c, ['comments', i]) + '</div>';
-    });
-    h += '<div class="line">\u00a0</div>';
-
-    h += '<div class="line collapsible">' +
-      sp('bracket', '{') + ' ' +
-      ev('key', '"' + _data.name + '"', ['name']) +
-      sp('punct', ':') + ' ' + sp('bracket', '{') +
-      '</div>';
-    h += '<div class="collapsible-content">';
-
-    _data.sections.forEach(function (sec, si) {
-      if (si) h += '<div class="line indent-1">\u00a0</div>';
-      h += renderSection(sec, si);
-    });
-
-    h += '</div>';
-    h += '<div class="line">' + sp('bracket', '}') + '</div>';
+    var backends = [];
+    if (_data.sections) {
+      _data.sections.forEach(function (sec, si) {
+        if (sec.wfType && sec.wfType !== 'WF') {
+          backends.push({ sec: sec, idx: si });
+        }
+      });
+    }
+    if (backends.length > 0) {
+      h += line(0, sp('key', 'Backend Systems') + sp('punct', ':'));
+      backends.forEach(function (b) {
+        h += renderBackendSection(b.sec, ['sections', b.idx], 1);
+      });
+    }
 
     document.getElementById('config-content').innerHTML = h;
-    applyCollapse();
-  }
-
-  function renderSection(sec, si) {
-    var h = '', sp_ = ['sections', si];
-    var meta = [['WF_Type', 'wfType'], ['Client_ID', 'clientId'], ['BC', 'bc'], ['BackgroundImage', 'backgroundImage']];
-
-    meta.forEach(function (m) {
-      h += '<div class="line indent-1">' +
-        sp('key', esc('"' + m[0] + '"')) + sp('punct', ':') + ' ' +
-        renderVal(sec[m[1]], sp_.concat([m[1]])) + sp('punct', ',') +
-        '</div>';
-    });
-
-    h += '<div class="line indent-1 collapsible">' +
-      ev('key', '"' + sec.moduleName + '"', sp_.concat(['moduleName'])) +
-      sp('punct', ':') + ' ' + sp('bracket', '[') +
-      '</div>';
-    h += '<div class="collapsible-content">';
-
-    sec.entries.forEach(function (ent, ei) {
-      var ep = sp_.concat(['entries', ei]);
-      var hasD = ent.details && Object.keys(ent.details).length > 0;
-      var comma = ei < sec.entries.length - 1 ? sp('punct', ',') : '';
-
-      if (hasD) {
-        h += '<div class="line indent-2 collapsible">' + renderEntryHeader(ent, ep, true) + '</div>';
-        h += '<div class="collapsible-content">';
-        Object.keys(ent.details).forEach(function (dk) {
-          h += renderDetailLine(3, dk, ent.details[dk], ep.concat(['details', dk]));
-        });
-        h += '<div class="line indent-2">' + sp('bracket', '}') + comma + '</div>';
-        h += '</div>';
-      } else {
-        h += '<div class="line indent-2">' + renderEntryHeader(ent, ep, false) + comma + '</div>';
-      }
-    });
-
-    h += '<div class="line indent-1">' + sp('bracket', ']') +
-      (si < _data.sections.length - 1 ? sp('punct', ',') : '') + '</div>';
-    h += '</div>';
-    return h;
-  }
-
-  // --- Collapse ---
-
-  function applyCollapse() {
-    document.querySelectorAll('.indent-2.collapsible, .indent-3.collapsible, .indent-4.collapsible').forEach(function (el) {
-      var c = el.nextElementSibling;
-      if (c && c.classList.contains('collapsible-content')) {
-        el.classList.add('collapsed');
-        c.classList.add('hidden');
-      }
-    });
   }
 
   // --- Click handling ---
 
   document.addEventListener('click', function (e) {
     if (_editMode) {
-      var rm = e.target.closest('.rm');
-      if (rm) {
-        var p = parsePath(rm.dataset.rm), idx = p.pop();
-        getPath(p).splice(idx, 1);
-        save(); render(); return;
-      }
-      var add = e.target.closest('.add');
-      if (add) {
-        getPath(parsePath(add.dataset.add)).push('New Item');
-        save(); render(); return;
-      }
-      var ed = e.target.closest('.editable');
-      if (ed) { startEdit(ed); return; }
+      var edEl = e.target.closest('.editable');
+      if (edEl) { startEdit(edEl); return; }
     }
 
     var cl = e.target.closest('.collapsible');
@@ -274,7 +358,7 @@
       render();
     });
 
-    btn('Export', function () {
+    btn('Export JSON', function () {
       var a = document.createElement('a');
       a.href = URL.createObjectURL(new Blob([JSON.stringify(_data, null, 2)], { type: 'application/json' }));
       a.download = _key + '.json';
@@ -310,18 +394,17 @@
         'font-family:inherit;font-size:12px;cursor:pointer;border-radius:3px;transition:background .15s}' +
       '#config-toolbar button:hover{background:#3a3a3a}' +
       '#config-toolbar button.active{background:#0e639c;border-color:#1177bb;color:#fff}' +
-      '.eb{display:none}' +
-      '.edit-mode .eb{display:inline}' +
+      '.collapsible{cursor:pointer;user-select:none}' +
+      '.collapsible:hover{background:#2a2d2e}' +
+      '.collapsible::before{content:"\\25BC ";font-size:10px;color:#858585}' +
+      '.collapsible.collapsed::before{content:"\\25B6 "}' +
+      '.collapsible-content{overflow:hidden}' +
+      '.collapsible-content.hidden{display:none}' +
       '.edit-mode .editable{cursor:text;border-bottom:1px dashed rgba(255,255,255,.25);transition:background .1s}' +
       '.edit-mode .editable:hover{background:rgba(255,255,255,.06)}' +
       '.edit-mode .bool-true.editable,.edit-mode .bool-false.editable{cursor:pointer}' +
-      '.rm{color:#f44747;cursor:pointer;margin-left:2px;font-size:11px}' +
-      '.rm:hover{color:#ff6b6b}' +
-      '.add{color:#4ec9b0;cursor:pointer;margin-left:4px;font-size:13px;font-weight:bold}' +
-      '.add:hover{color:#6ee7c0}' +
       '.inline-edit{background:#1e1e1e;color:inherit;border:1px solid #0e639c;' +
-        'font-family:inherit;font-size:inherit;padding:0 4px;outline:none;border-radius:2px;max-width:90vw}' +
-      '.ct{color:inherit}';
+        'font-family:inherit;font-size:inherit;padding:0 4px;outline:none;border-radius:2px;max-width:90vw}';
     document.head.appendChild(s);
   }
 

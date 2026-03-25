@@ -27,22 +27,17 @@ body {
 .indent-2 { padding-left: 48px; }
 .indent-3 { padding-left: 72px; }
 .indent-4 { padding-left: 96px; }
-.collapsible { cursor: pointer; user-select: none; }
-.collapsible:hover { background: #2a2d2e; }
-.collapsible::before { content: '\25BC '; font-size: 10px; color: #858585; }
-.collapsible.collapsed::before { content: '\25B6 '; }
-.collapsible-content { overflow: hidden; }
-.collapsible-content.hidden { display: none; }
 </style>
 </head>
 <body>
 <div id="config-content"></div>
 <script>
 var DEFAULT_CONFIG = {
-  name: "SolutionsBuilder",
-  comments: ["Solutions Builder WF \u2014 Config Profile"],
+  "meta title": "Find Your HVAC Upgrade | Daikin Solutions Builder",
+  "meta description": "Answer a few questions about your home and get personalized heating and cooling recommendations. Compare Daikin heat pumps, furnaces, and ductless systems \u2014 no appointment needed.",
   sections: [
     {
+      wfName: "Solutions Builder",
       wfType: "WF",
       clientId: "{clientID}",
       bc: "HomeComfort",
@@ -52,35 +47,27 @@ var DEFAULT_CONFIG = {
         {
           nameId: "Contact", display: true, sort: 0,
           details: {
-            Functions: ["Form Validation", "Input Masking (phone)", "Navigation (Next)"],
-            Fields: ["First Name", "Last Name", "Email", "Phone Number"]
+            Functions: ["Form Validation", "First Name", "Last Name", "Email", "Phone Number"]
           }
         },
         {
           nameId: "Verify Home", display: true, sort: 1,
           details: {
-            Functions: ["Address Autocomplete", "Address Verification (Zillow)", "Property Data Population", "Map Pin Display", "Occupied Toggle"],
-            Fields: ["Property Address", "Property Occupied"],
-            Ext_Fields: ["Year Built", "Square Footage", "Bedrooms", "Bathrooms", "Map"]
+            Functions: ["Address Autocomplete", "Address Verification (Smarty)", "Property Address", "Map Pin Display", "Occupied Toggle", "Year Built", "Square Footage", "Bedrooms", "Bathrooms"]
           }
         },
         {
           nameId: "Additional Details", display: true, sort: 2,
           details: {
-            Functions: ["System Type Selection (Heat Pump, Ductless Room, Multi-Room Ductless, AC + Furnace)", "Efficiency Tier (Good/Best)", "SqFt Input", "Whole House Toggle", "System Rating Details (modal)"],
-            Fields: ["Heating/Cooling SqFt", "Whole House", "System Type", "Efficiency Tier"]
+            Functions: ["System Type Selection", "Efficiency/Quality Tier", "SqFt Input", "Whole House Toggle"]
           }
         },
         {
           nameId: "Summary", display: true, sort: 3,
           details: {
-            Functions: ["PDF Generation (3-page)", "Email Delivery", "SFDC Web-to-Case", "Combine & Save (add-ons)"],
-            Fields: ["Contacts", "Additional Details", "Customer Notes", "Recommend System", "Price", "Property Details"]
+            Functions: ["PDF Generation", "Email Delivery", "Restart", "Add-Ons", "Contact Information", "Property Details", "Recommend System"]
           }
-        },
-        { nameId: "Scheduling", display: false, sort: 4 },
-        { nameId: "PDF", display: true },
-        { nameId: "Email", display: true }
+        }
       ]
     }
   ]

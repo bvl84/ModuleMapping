@@ -27,22 +27,17 @@ body {
 .indent-2 { padding-left: 48px; }
 .indent-3 { padding-left: 72px; }
 .indent-4 { padding-left: 96px; }
-.collapsible { cursor: pointer; user-select: none; }
-.collapsible:hover { background: #2a2d2e; }
-.collapsible::before { content: '\25BC '; font-size: 10px; color: #858585; }
-.collapsible.collapsed::before { content: '\25B6 '; }
-.collapsible-content { overflow: hidden; }
-.collapsible-content.hidden { display: none; }
 </style>
 </head>
 <body>
 <div id="config-content"></div>
 <script>
 var DEFAULT_CONFIG = {
-  name: "HVACUpgradeTool",
-  comments: ["Cinch WF \u2014 Config Profile", "HomeWarranty"],
+  "meta title": "Replace Your HVAC System | Cinch Home Services",
+  "meta description": "Find your perfect HVAC replacement in minutes. See system matches, upfront pricing, and schedule a free in-home inspection \u2014 covered by your Cinch home warranty.",
   sections: [
     {
+      wfName: "Cinch",
       wfType: "WF",
       clientId: "{clientID}",
       bc: "HomeWarranty",
@@ -89,15 +84,13 @@ var DEFAULT_CONFIG = {
           details: {
             Functions: ["Direct Scheduler", "Calendar (date + time slots)", "Job Creation"],
             Config: { jobType: "Inspection", estTime: "1hr", tz: "MDT" }
-          }
-        },
-        { nameId: "Support", display: true },
-        { nameId: "PDF", display: false },
-        { nameId: "Email", display: false },
-        { nameId: "Job Creation", display: true }
+          },
+          subModules: ["Support", "PDF", "Email", "Job Creation"]
+        }
       ]
     },
     {
+      wfName: "Cinch — Inspection",
       wfType: "WO",
       clientId: "{clientID}",
       bc: "HomeWarranty",
@@ -112,6 +105,7 @@ var DEFAULT_CONFIG = {
       ]
     },
     {
+      wfName: "Cinch — Quote",
       wfType: "QO",
       clientId: "{clientID}",
       bc: "HomeWarranty",
@@ -132,6 +126,7 @@ var DEFAULT_CONFIG = {
       ]
     },
     {
+      wfName: "Cinch — Replacement",
       wfType: "WO",
       clientId: "{clientID}",
       bc: "HomeWarranty",

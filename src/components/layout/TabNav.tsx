@@ -15,7 +15,7 @@ interface TabNavProps {
 
 export function TabNav({ activeTab, onTabChange }: TabNavProps) {
   return (
-    <div className="flex gap-0 border-b border-gray-700 mb-6">
+    <div className="flex gap-0 border-b border-gray-600 mb-0">
       {TABS.map((tab) => (
         <button
           key={tab.id}
