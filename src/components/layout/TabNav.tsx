@@ -3,9 +3,9 @@
 type TabId = 'cinch' | 'greentech' | 'solutions';
 
 const TABS: { id: TabId; label: string }[] = [
-  { id: 'cinch', label: 'Cinch WF' },
-  { id: 'greentech', label: 'GreenTech WF' },
-  { id: 'solutions', label: 'Solutions Builder WF' },
+  { id: 'cinch', label: 'Cinch' },
+  { id: 'greentech', label: 'GreenTech' },
+  { id: 'solutions', label: 'Solutions Builder' },
 ];
 
 interface TabNavProps {

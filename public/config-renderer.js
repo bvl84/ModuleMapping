@@ -213,8 +213,8 @@
         var childDepth = isFlat ? depth : depth + 1;
         for (var i = 0; i < val.length; i++) {
           if (isFlat && typeof val[i] === 'object' && val[i] !== null) {
-            if (i > 0) h += '<div class="line">\u00a0</div>';
             if (key === 'entries') {
+              if (i > 0) h += '<div class="line">\u00a0</div>';
               h += renderEntry(val[i], path.concat([i]), childDepth);
             } else if (key === 'sections') {
               var secObj = val[i];
@@ -270,6 +270,7 @@
       });
     }
     if (backends.length > 0) {
+      h += '<div class="line">\u00a0</div>';
       h += line(0, sp('key', 'Backend Systems') + sp('punct', ':'));
       backends.forEach(function (b) {
         h += renderBackendSection(b.sec, ['sections', b.idx], 1);

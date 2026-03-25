@@ -11,6 +11,7 @@ export function HomePage() {
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-[#1e1e1e]">
       <div className="flex-shrink-0 px-6 pt-4">
+        <h1 className="text-xl font-semibold text-gray-100 mb-3">Module Mapper 3000</h1>
         <TabNav activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
 
