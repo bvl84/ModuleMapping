@@ -1,11 +1,12 @@
 'use client';
 
-type TabId = 'cinch' | 'greentech' | 'solutions';
+type TabId = 'cinch' | 'greentech' | 'solutions' | 'comparison';
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'cinch', label: 'Cinch' },
   { id: 'greentech', label: 'GreenTech' },
   { id: 'solutions', label: 'Solutions Builder' },
+  { id: 'comparison', label: 'Comparison' },
 ];
 
 interface TabNavProps {

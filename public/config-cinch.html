@@ -45,14 +45,14 @@ var DEFAULT_CONFIG = {
       moduleName: "Module",
       entries: [
         {
-          nameId: "Contact", display: true, sort: 0,
+          nameId: "Basic Information", display: true, sort: 0,
           details: {
             Functions: ["Form Validation", "Input Masking", "Email Verification (Cinch Identity)"],
             Fields: ["First Name", "Last Name", "Email", "Phone Number"]
           }
         },
         {
-          nameId: "Verify Home", display: true, sort: 1,
+          nameId: "Property Details", display: true, sort: 1,
           details: {
             Functions: ["Address Autocomplete", "Zillow Verification", "Property Data Population", "Map Pin", "Occupied Toggle"],
             Fields: ["Property Address", "Property Occupied"],
@@ -80,7 +80,7 @@ var DEFAULT_CONFIG = {
           }
         },
         {
-          nameId: "Scheduling", display: true, sort: 5,
+          nameId: "Schedule Inspection", display: true, sort: 5,
           details: {
             Functions: ["Direct Scheduler", "Calendar (date + time slots)", "Job Creation"],
             Config: { jobType: "Inspection", estTime: "1hr", tz: "MDT" }

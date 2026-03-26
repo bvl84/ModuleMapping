@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { TabNav } from './layout/TabNav';
 
-type TabId = 'cinch' | 'greentech' | 'solutions';
+type TabId = 'cinch' | 'greentech' | 'solutions' | 'comparison';
 
 export function HomePage() {
   const [activeTab, setActiveTab] = useState<TabId>('cinch');
@@ -25,6 +25,10 @@ export function HomePage() {
 
       {activeTab === 'solutions' && (
         <iframe src="/config-solutions-builder.html" className="flex-1 w-full border-0" title="Solutions Builder WF" />
+      )}
+
+      {activeTab === 'comparison' && (
+        <iframe src="/comparison.html" className="flex-1 w-full border-0" title="Workflow Module Comparison" />
       )}
     </div>
   );

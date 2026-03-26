@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workflow Module Comparison</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    /* ── accent colors (high contrast for dark bg) ── */
+    --cinch:    #5CC0F0;
+    --cinch-lt: #132D3E;
+    --gt:       #72D43E;
+    --gt-lt:    #17351D;
+    --sb:       #A89DF5;
+    --sb-lt:    #231F42;
+
+    /* ── dark-mode surfaces — ACCESSIBLE contrast ── */
+    --bg:       #1e1e1e;
+    --surface:  #14171E;
+    --surface2: #1C2029;
+    --ink:      #F0F1F4;
+    --ink2:     #B4BAC6;
+    --ink3:     #7E8594;
+    --rule:     #2A2F3A;
+    --radius:   10px;
+  }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 48px 32px 80px;
+  }
+
+  /* ── Header ── */
+  .header {
+    max-width: 1800px;
+    margin: 0 auto 40px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    border-bottom: 1.5px solid var(--ink3);
+    padding-bottom: 20px;
+  }
+  .header-left h1 { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; color: var(--ink); }
+  .header-left p { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--ink2); margin-top: 6px; letter-spacing: 0.04em; }
+  .header-meta { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--ink2); text-align: right; line-height: 1.8; }
+
+  /* ── Column headers — wider grid ── */
+  .col-headers { max-width: 1800px; margin: 0 auto 8px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .col-label { padding: 16px 18px; border-radius: var(--radius); position: relative; overflow: hidden; }
+  .col-label::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .col-label-cinch { background: var(--cinch-lt); }
+  .col-label-cinch::before { background: var(--cinch); }
+  .col-label-gt { background: var(--gt-lt); }
+  .col-label-gt::before { background: var(--gt); }
+  .col-label-sb { background: var(--sb-lt); }
+  .col-label-sb::before { background: var(--sb); }
+
+  .col-wf-name { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+  .col-wf-name.cinch { color: var(--cinch); }
+  .col-wf-name.gt    { color: var(--gt); }
+  .col-wf-name.sb    { color: var(--sb); }
+  .col-meta { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--ink2); margin-top: 4px; line-height: 1.7; }
+  .col-meta span { display: block; }
+
+  /* ── Rows — wider grid ── */
+  .rows-wrap { max-width: 1800px; margin: 0 auto; display: flex; flex-direction: column; gap: 6px; }
+  .module-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; align-items: stretch; }
+
+  .sort-label { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+  .sort-num { font-family: 'DM Mono', monospace; font-size: 24px; font-weight: 500; color: var(--ink2); line-height: 1; }
+  .sort-tag { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--ink3); letter-spacing: 0.06em; text-transform: uppercase; }
+
+  /* ── Cells ── */
+  .cell { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); border-left-width: 3px; overflow: hidden; transition: transform 0.15s ease, box-shadow 0.15s ease; display: flex; flex-direction: column; }
+  .cell:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+  .cell-cinch { border-left-color: var(--cinch); }
+  .cell-gt    { border-left-color: var(--gt); }
+  .cell-sb    { border-left-color: var(--sb); }
+
+  .cell.empty { background: transparent; border-color: var(--rule); border-left-color: var(--rule); border-style: dashed; display: flex; align-items: center; justify-content: center; min-height: 80px; }
+  .empty-text { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--ink3); }
+
+  .cell-screenshot {
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+    background: #0A0C10;
+    border-bottom: 1px solid var(--rule);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-in;
+    position: relative;
+  }
+  .cell-screenshot::after {
+    content: '🔍 Click to enlarge';
+    position: absolute;
+    bottom: 8px;
+    right: 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    background: rgba(0,0,0,0.5);
+    padding: 3px 8px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+  .cell-screenshot:hover::after { opacity: 1; }
+  .cell-screenshot img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    transition: transform 0.35s ease;
+  }
+  .cell:hover .cell-screenshot img { transform: scale(1.03); }
+
+  /* ── Lightbox overlay ── */
+  .lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0,0,0,0.92);
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+    padding: 32px;
+  }
+  .lightbox.active { display: flex; }
+  .lightbox img {
+    max-width: 95vw;
+    max-height: 92vh;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 0 60px rgba(0,0,0,0.6);
+  }
+  .lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 28px;
+    font-size: 32px;
+    color: #fff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    opacity: 0.7;
+    transition: opacity 0.15s;
+  }
+  .lightbox-close:hover { opacity: 1; }
+
+  /* ── Cell body — ACCESSIBLE sizes ── */
+  .cell-body { padding: 14px 16px; flex: 1; }
+  .cell-name { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 3px; color: var(--ink); }
+  .cell-name-sub { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--ink3); margin-bottom: 6px; }
+  .cell-count { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--ink2); margin-bottom: 8px; }
+
+  /* ── Pills — ACCESSIBLE sizes ── */
+  .pill-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .pill { font-family: 'DM Mono', monospace; font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 500; }
+  .pill-display-cinch { background: var(--cinch-lt); color: var(--cinch); }
+  .pill-display-gt    { background: var(--gt-lt);    color: var(--gt); }
+  .pill-display-sb    { background: var(--sb-lt);    color: var(--sb); }
+  .pill-sort { background: var(--surface2); color: var(--ink2); border: 1px solid var(--rule); }
+
+  /* ── Components — ACCESSIBLE sizes ── */
+  .components-wrap { border-top: 1px solid var(--rule); padding-top: 10px; }
+  .components-label { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--ink3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .component-tag { display: inline-block; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--ink2); background: var(--surface2); border: 1px solid var(--rule); border-radius: 4px; padding: 2px 8px; margin: 3px 3px 0 0; line-height: 1.7; }
+
+  /* ── Summary — ACCESSIBLE sizes ── */
+  .summary { max-width: 1800px; margin: 24px auto 0; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .summary-card { padding: 16px 20px; border-radius: var(--radius); border: 1px solid var(--rule); background: var(--surface); display: flex; justify-content: space-between; align-items: center; }
+  .summary-wf { font-size: 16px; font-weight: 600; }
+  .summary-wf.cinch { color: var(--cinch); }
+  .summary-wf.gt    { color: var(--gt); }
+  .summary-wf.sb    { color: var(--sb); }
+  .summary-stats { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--ink2); text-align: right; line-height: 1.8; }
+
+  /* ── Backend section — ACCESSIBLE sizes ── */
+  .backend-section { max-width: 1800px; margin: 32px auto 0; border-top: 1.5px solid var(--ink3); padding-top: 24px; }
+  .backend-title { font-size: 14px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink2); margin-bottom: 16px; }
+  .backend-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .backend-card { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); padding: 16px 18px; border-top: 3px solid var(--rule); }
+  .backend-card.cinch { border-top-color: var(--cinch); }
+  .backend-card.gt    { border-top-color: var(--gt); }
+  .backend-card.sb    { border-top-color: var(--sb); }
+  .backend-wf { font-size: 15px; font-weight: 600; margin-bottom: 10px; }
+  .backend-wf.cinch { color: var(--cinch); }
+  .backend-wf.gt    { color: var(--gt); }
+  .backend-wf.sb    { color: var(--sb); }
+  .pipeline { margin-bottom: 12px; }
+  .pipeline:last-child { margin-bottom: 0; }
+  .pipeline-name { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--ink3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+  .pipeline-steps { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+  .step-tag { font-family: 'DM Mono', monospace; font-size: 12px; padding: 3px 9px; border-radius: 4px; background: var(--surface2); border: 1px solid var(--rule); color: var(--ink); }
+  .step-arrow { font-size: 12px; color: var(--ink3); }
+
+  /* ── Module Match Summary ── */
+  .match-summary { max-width: 1800px; margin: 0 auto 28px; }
+  .match-summary-title { font-size: 14px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink2); margin-bottom: 12px; }
+  .match-table { width: 100%; border-collapse: collapse; font-family: 'DM Mono', monospace; font-size: 12px; }
+  .match-table th { text-align: left; padding: 8px 12px; color: var(--ink3); font-weight: 500; border-bottom: 1px solid var(--rule); text-transform: uppercase; letter-spacing: 0.06em; font-size: 11px; }
+  .match-table td { padding: 6px 12px; border-bottom: 1px solid var(--rule); color: var(--ink2); }
+  .match-table tr:last-child td { border-bottom: none; }
+  .match-tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 500; }
+  .match-yes { background: rgba(114,212,62,0.15); color: var(--gt); }
+  .match-partial { background: rgba(168,157,245,0.15); color: var(--sb); }
+  .match-no { background: rgba(255,80,80,0.12); color: #f06060; }
+  .match-na { color: var(--ink3); }
+</style>
+</head>
+<body>
+
+<div class="match-summary">
+  <div class="match-summary-title">Module Name Alignment</div>
+  <table class="match-table">
+    <thead>
+      <tr>
+        <th>Cinch</th>
+        <th>GreenTech</th>
+        <th>Solutions Builder</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Basic Information</td>
+        <td>Contact Information</td>
+        <td>Basic Information</td>
+      </tr>
+      <tr>
+        <td>Property Details</td>
+        <td>Verify Home</td>
+        <td>Property Details</td>
+      </tr>
+      <tr>
+        <td>HVAC Goals</td>
+        <td class="match-na">—</td>
+        <td class="match-na">—</td>
+      </tr>
+      <tr>
+        <td>Current System</td>
+        <td>Additional Details</td>
+        <td>System Upgrade</td>
+      </tr>
+      <tr>
+        <td>Your Match</td>
+        <td>Summary</td>
+        <td>Summary</td>
+      </tr>
+      <tr>
+        <td>Schedule Inspection</td>
+        <td class="match-na">—</td>
+        <td class="match-na">—</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="col-headers">
+  <div class="col-label col-label-cinch">
+    <div class="col-wf-name cinch">Cinch</div>
+    <div class="col-meta">
+      <span>BC: HomeWarranty</span>
+      <span>clientId: {clientID}</span>
+      <span>6 modules · 42 components</span>
+    </div>
+  </div>
+  <div class="col-label col-label-gt">
+    <div class="col-wf-name gt">GreenTech</div>
+    <div class="col-meta">
+      <span>BC: GreenTechRenewables</span>
+      <span>clientId: {clientID}</span>
+      <span>4 modules · 30 components</span>
+    </div>
+  </div>
+  <div class="col-label col-label-sb">
+    <div class="col-wf-name sb">Solutions Builder</div>
+    <div class="col-meta">
+      <span>BC: HomeComfort</span>
+      <span>clientId: {clientID}</span>
+      <span>4 modules · 25 components</span>
+    </div>
+  </div>
+</div>
+
+<div class="rows-wrap">
+
+  <!-- Row 1: Basic Information / Contact Information / Basic Information -->
+  <div class="module-row">
+    <div class="cell cell-cinch">
+      <div class="cell-screenshot"><img src="https://raw.githubusercontent.com/bvl84/ModuleMapping/main/iScreen%20Shoter%20-%2020260305103007938-workflow2.png" alt="Cinch Basic Information"></div>
+      <div class="cell-body">
+        <div class="cell-name">Basic Information</div>
+        <div class="cell-count">7 components</div>
+        <div class="pill-row">
+          <span class="pill pill-display-cinch">display: true</span>
+        </div>
+        <div class="components-wrap">
+          <div class="components-label">Components</div>
+          <span class="component-tag">Form Validation</span>
+          <span class="component-tag">Input Masking</span>
+          <span class="component-tag">Email Verification (Cinch Identity)</span>
+          <span class="component-tag">First Name</span>
+          <span class="component-tag">Last Name</span>
+          <span class="component-tag">Email</span>
+          <span class="component-tag">Phone Number</span>
+        </div>
+      </div>
+    </div>
+    <div class="cell cell-gt">
+      <div class="cell-screenshot"><img src="https://raw.githubusercontent.com/bvl84/ModuleMapping/main/iScreen%20Shoter%20-%2020260312093055443-workflow3.jpg" alt="GreenTech Contact Information"></div>
+      <div class="cell-body">
+        <div class="cell-name">Contact Information</div>
+        <div class="cell-count">9 components</div>
+        <div class="pill-row">
+          <span class="pill pill-display-gt">display: true</span>
+        </div>
+        <div class="components-wrap">
+          <div class="components-label">Components</div>
+          <span class="component-tag">Form Validation</span>
+          <span class="component-tag">Contact Type (Homeowner/Property manager)</span>
+          <span class="component-tag">Primary Contact Toggle</span>
+          <span class="component-tag">First Name</span>
+          <span class="component-tag">Last Name</span>
+          <span class="component-tag">Email</span>
+          <span class="component-tag">Phone</span>
+          <span class="component-tag">Existing Contact Query</span>
+          <span class="component-tag">Add/Remove Additional Contacts</span>
+        </div>
+      </div>
+    </div>
+    <div class="cell cell-sb">
+      <div class="cell-screenshot"><img src="https://raw.githubusercontent.com/bvl84/ModuleMapping/main/SB1.png" alt="Solutions Builder Basic Information"></div>
+      <div class="cell-body">
+        <div class="cell-name">Basic Information</div>
+        <div class="cell-count">5 components</div>
+        <div class="pill-row">
+          <span class="pill pill-display-sb">display: true</span>
+        </div>
+        <div class="components-wrap">
+          <div class="components-label">Components</div>
+          <span class="component-tag">Form Validation</span>
+          <span class="component-tag">First Name</span>
+          <span class="component-tag">Last Name</span>
+          <span class="component-tag">Email</span>
+          <span class="component-tag">Phone Number</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 2: Property Details / Verify Home / Property Details -->
+  <div class="module-row">
+    <div class="cell cell-cinch">
+      <div class="cell-screenshot"><img src="https://raw.githubusercontent.com/bvl84/ModuleMapping/main/iScreen%20Shoter%20-%2020260305103053789-workflow2.png" alt="Cinch Property Details"></div>
+      <div class="cell-body">
+        <div class="cell-name">Property Details</div>
+        <div class="cell-count">13 components</div>
+        <div class="pill-row">
+          <span class="pill pill-display-cinch">display: true</span>
+        </div>
+        <div class="components-wrap">
+          <div class="components-label">Components</div>
+          <span class="component-tag">Address Autocomplete</span>
+          <span class="component-tag">Zillow Verification</span>
+          <span class="component-tag">Property Data Population</span>
+          <span class="component-tag">Map Pin</span>
+          <span class="component-tag">Occupied Toggle</span>
+          <span class="component-tag">Property Address</span>
+          <span class="component-tag">Property Occupied</span>
+          <span class="component-tag">Year Built</span>
+          <span class="component-tag">SqFt</span>
+          <span class="component-tag">Num Systems</span>
+          <span class="component-tag">Beds</span>
+          <span class="component-tag">Baths</span>
+          <span class="component-tag">Map</span>
+        </div>
+      </div>
+    </div>
+    <div class="cell cell-gt">
+      <div class="cell-screenshot"><img src="https://raw.githubusercontent.com/bvl84/ModuleMapping/main/iScreen%20Shoter%20-%2020260312093131499-workflow3.jpg" alt="GreenTech Questions about your home"></div>
+      <div class="cell-body">
+        <div class="cell-name">Verify Home</div>
+        <div class="cell-count">10 components</div>
+        <div class="pill-row">
+          <span class="pill pill-display-gt">display: true</span>
+        </div>
+        <div class="components-wrap">
+          <div class="components-label">Components</div>
+          <span class="component-tag">Manual Address Entry</span>
+          <span class="component-tag">Address Verification (Smarty)</span>
+          <span class="component-tag">Property Address</span>
+          <span class="component-tag">Map Pin Display</span>
+          <span class="component-tag">Occupied Toggle</span>
+          <span class="component-tag">Year Built</span>
+          <span class="component-tag">Square Footage</span>
+          <span class="component-tag"># of Bedrooms</span>
+          <span class="component-tag"># of Bathrooms</span>
+          <span class="component-tag"># of Systems</span>
+        </div>
+      </div>
+    </div>
+    <div class="cell cell-sb">
+      <div class="cell-screenshot"><img src="https://raw.githubusercontent.com/bvl84/ModuleMapping/main/SB3.4.png" alt="Solutions Builder Property Details"></div>
+      <div class="cell-body">
+        <div class="cell-name">Property Details</div>
+        <div class="cell-count">9 components</div>
+        <div class="pill-row">
+          <span class="pill pill-display-sb">display: true</span>
+        </div>
+        <div class="components-wrap">
+          <div class="components-label">Components</div>
+          <span class="component-tag">Address Autocomplete</span>
+          <span class="component-tag">Address Verification (Smarty)</span>
+          <span class="component-tag">Property Address</span>
+          <span class="component-tag">Map Pin Display</span>
+          <span class="component-tag">Occupied Toggle</span>
+          <span class="component-tag">Year Built</span>
+          <span class="component-tag">Square Footage</span>
+          <span class="component-tag">Bedrooms</span>
+          <span class="component-tag">Bathrooms</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 3: HVAC Goals / — / — (Cinch only) -->
+  <div class="module-row">
+    <div class="cell cell-cinch">
+      <div class="cell-screenshot"><img src="https://raw.githubusercontent.com/bvl84/ModuleMapping/main/iScreen%20Shoter%20-%2020260305103306580-workflow2.png" alt="Cinch HVAC Goals"></div>
+      <div class="cell-body">
+        <div class="cell-name">HVAC Goals</div>
+        <div class="cell-count">1 component</div>
+        <div class="pill-row">
+          <span class="pill pill-display-cinch">display: true</span>
+        </div>
+        <div class="components-wrap">
+          <div class="components-label">Components</div>
+          <span class="component-tag">Goal Selection (pick 2 of 4)</span>
+        </div>
+      </div>
+    </div>
+    <div class="cell empty"><span class="empty-text">— not present —</span></div>
+    <div class="cell empty"><span class="empty-text">— not present —</span></div>
+  </div>
+
+  <!-- Row 4: Current System / Additional Details / System Upgrade -->
+  <div class="module-row">
+    <div class="cell cell-cinch">
+      <div class="cell-screenshot"><img src="https://raw.githubusercontent.com/bvl84/ModuleMapping/main/iScreen%20Shoter%20-%2020260305103355379-workflow2.png" alt="Cinch Current System"></div>
+      <div class="cell-body">
+        <div class="cell-name">Current System</div>
+        <div class="cell-count">9 components</div>
+        <div class="pill-row">
+          <span class="pill pill-display-cinch">display: true</span>
+        </div>
+        <div class="components-wrap">
+          <div class="components-label">Components</div>
+          <span class="component-tag">SqFt Input</span>
+          <span class="component-tag">Current System Selection</span>
+          <span class="component-tag">Rating Selection (Good/Better/Best)</span>
+          <span class="component-tag">Rating Details (modal)</span>
+          <span class="component-tag">Ductwork (Yes/No)</span>
+          <span class="component-tag">Heating/Cooling SqFt</span>
+          <span class="component-tag">Current HVAC System</span>
+          <span class="component-tag">New System Rating</span>
+          <span class="component-tag">Ductwork Availability</span>
+        </div>
+      </div>
+    </div>
+    <div class="cell cell-gt">
+      <div class="cell-screenshot"><img src="https://raw.githubusercontent.com/bvl84/ModuleMapping/main/iScreen%20Shoter%20-%2020260312093157280-workflow3.jpg" alt="GreenTech Additional Details"></div>
+      <div class="cell-body">
+        <div class="cell-name">Additional Details</div>
+        <div class="cell-count">5 components</div>
+        <div class="pill-row">
+          <span class="pill pill-display-gt">display: true</span>
+        </div>
+        <div class="components-wrap">
+          <div class="components-label">Components</div>
+          <span class="component-tag">System Selection</span>
+          <span class="component-tag">Conditional: Dual Fuel Efficiency → AFUE</span>
+          <span class="component-tag">Conditional: Ductless → # Rooms</span>
+          <span class="component-tag">Ductwork (Yes/No)</span>
+          <span class="component-tag">New HVAC System</span>
+        </div>
+      </div>
+    </div>
+    <div class="cell cell-sb">
+      <div class="cell-screenshot"><img src="https://raw.githubusercontent.com/bvl84/ModuleMapping/main/SB4.png" alt="Solutions Builder System Upgrade"></div>
+      <div class="cell-body">
+        <div class="cell-name">System Upgrade</div>
+        <div class="cell-count">4 components</div>
+        <div class="pill-row">
+          <span class="pill pill-display-sb">display: true</span>
+        </div>
+        <div class="components-wrap">
+          <div class="components-label">Components</div>
+          <span class="component-tag">System Type Selection</span>
+          <span class="component-tag">Efficiency/Quality Tier</span>
+          <span class="component-tag">SqFt Input</span>
+          <span class="component-tag">Whole House Toggle</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 5: Your Match / Summary / Summary -->
+  <div class="module-row">
+    <div class="cell cell-cinch">
+      <div class="cell-screenshot"><img src="https://raw.githubusercontent.com/bvl84/ModuleMapping/main/iScreen%20Shoter%20-%2020260305103425493-workflow2.png" alt="Cinch Your Match"></div>
+      <div class="cell-body">
+        <div class="cell-name">Your Match</div>
+        <div class="cell-count">5 components</div>
+        <div class="pill-row">
+          <span class="pill pill-display-cinch">display: true</span>
+        </div>
+        <div class="components-wrap">
+          <div class="components-label">Components</div>
+          <span class="component-tag">System Matching Engine</span>
+          <span class="component-tag">Recommended System Display</span>
+          <span class="component-tag">Price Breakdown</span>
+          <span class="component-tag">Alternative Options</span>
+          <span class="component-tag">Schedule Free Inspection</span>
+        </div>
+      </div>
+    </div>
+    <div class="cell cell-gt">
+      <div class="cell-screenshot"><img src="https://raw.githubusercontent.com/bvl84/ModuleMapping/main/iScreen%20Shoter%20-%2020260312093520395-workflow3.jpg" alt="GreenTech Summary"></div>
+      <div class="cell-body">
+        <div class="cell-name">Summary</div>
+        <div class="cell-count">6 components</div>
+        <div class="pill-row">
+          <span class="pill pill-display-gt">display: true</span>
+        </div>
+        <div class="components-wrap">
+          <div class="components-label">Components</div>
+          <span class="component-tag">Contacts Display</span>
+          <span class="component-tag">Recommended System</span>
+          <span class="component-tag">Markup Pricing</span>
+          <span class="component-tag">Price Visibility Toggle</span>
+          <span class="component-tag">Customer Notes</span>
+          <span class="component-tag">Property Details</span>
+        </div>
+      </div>
+    </div>
+    <div class="cell cell-sb">
+      <div class="cell-screenshot"><img src="https://raw.githubusercontent.com/bvl84/ModuleMapping/main/SB7.png" alt="Solutions Builder Summary"></div>
+      <div class="cell-body">
+        <div class="cell-name">Summary</div>
+        <div class="cell-count">7 components</div>
+        <div class="pill-row">
+          <span class="pill pill-display-sb">display: true</span>
+        </div>
+        <div class="components-wrap">
+          <div class="components-label">Components</div>
+          <span class="component-tag">PDF Generation</span>
+          <span class="component-tag">Email Delivery</span>
+          <span class="component-tag">Restart</span>
+          <span class="component-tag">Add-Ons</span>
+          <span class="component-tag">Contact Information</span>
+          <span class="component-tag">Property Details</span>
+          <span class="component-tag">Recommend System</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 6: Schedule Inspection / — / — (Cinch only) -->
+  <div class="module-row">
+    <div class="cell cell-cinch">
+      <div class="cell-screenshot"><img src="https://raw.githubusercontent.com/bvl84/ModuleMapping/main/iScreen%20Shoter%20-%2020260305103500888-workflow2.png" alt="Cinch Schedule Inspection"></div>
+      <div class="cell-body">
+        <div class="cell-name">Schedule Inspection</div>
+        <div class="cell-count">7 components</div>
+        <div class="pill-row">
+          <span class="pill pill-display-cinch">display: true</span>
+        </div>
+        <div class="components-wrap">
+          <div class="components-label">Components</div>
+          <span class="component-tag">Direct Scheduler</span>
+          <span class="component-tag">Calendar (date + time slots)</span>
+          <span class="component-tag">Job Creation</span>
+          <span class="component-tag">Support</span>
+          <span class="component-tag">PDF</span>
+          <span class="component-tag">Email</span>
+          <span class="component-tag">Job Creation</span>
+        </div>
+      </div>
+    </div>
+    <div class="cell empty"><span class="empty-text">— not present —</span></div>
+    <div class="cell empty"><span class="empty-text">— not present —</span></div>
+  </div>
+
+</div>
+
+<!-- Summary -->
+<div class="summary">
+  <div class="summary-card">
+    <div class="summary-wf cinch">Cinch</div>
+    <div class="summary-stats"><span>6 modules</span><span>42 components</span></div>
+  </div>
+  <div class="summary-card">
+    <div class="summary-wf gt">GreenTech</div>
+    <div class="summary-stats"><span>4 modules</span><span>30 components</span></div>
+  </div>
+  <div class="summary-card">
+    <div class="summary-wf sb">Solutions Builder</div>
+    <div class="summary-stats"><span>4 modules</span><span>25 components</span></div>
+  </div>
+</div>
+
+<!-- Backend systems -->
+<div class="backend-section">
+  <div class="backend-title">Backend Systems</div>
+  <div class="backend-grid">
+    <div class="backend-card cinch">
+      <div class="backend-wf cinch">Cinch</div>
+      <div class="pipeline">
+        <div class="pipeline-name">Work Order — Inspection</div>
+        <div class="pipeline-steps">
+          <span class="step-tag">Scheduling</span><span class="step-arrow">›</span>
+          <span class="step-tag">Scheduled</span><span class="step-arrow">›</span>
+          <span class="step-tag">In Process</span><span class="step-arrow">›</span>
+          <span class="step-tag">Inspection Completed</span><span class="step-arrow">›</span>
+          <span class="step-tag">Cancelled</span>
+        </div>
+      </div>
+      <div class="pipeline">
+        <div class="pipeline-name">Quote</div>
+        <div class="pipeline-steps">
+          <span class="step-tag">Quote in Review</span><span class="step-arrow">›</span>
+          <span class="step-tag">Ready for Approval</span><span class="step-arrow">›</span>
+          <span class="step-tag">Approved</span><span class="step-arrow">›</span>
+          <span class="step-tag">Declined</span><span class="step-arrow">›</span>
+          <span class="step-tag">Cancelled</span>
+        </div>
+      </div>
+      <div class="pipeline">
+        <div class="pipeline-name">Work Order — Replacement</div>
+        <div class="pipeline-steps">
+          <span class="step-tag">Created</span><span class="step-arrow">›</span>
+          <span class="step-tag">Scheduling</span><span class="step-arrow">›</span>
+          <span class="step-tag">Scheduled</span><span class="step-arrow">›</span>
+          <span class="step-tag">In Process</span><span class="step-arrow">›</span>
+          <span class="step-tag">Completed</span><span class="step-arrow">›</span>
+          <span class="step-tag">Cancelled</span>
+        </div>
+      </div>
+    </div>
+    <div class="backend-card gt">
+      <div class="backend-wf gt">GreenTech</div>
+      <div class="pipeline">
+        <div class="pipeline-name">Search Jobs</div>
+        <div class="pipeline-steps">
+          <span class="step-tag">Landing</span><span class="step-arrow">›</span>
+          <span class="step-tag">Submitted Work Proposals</span><span class="step-arrow">›</span>
+          <span class="step-tag">View Proposal</span>
+        </div>
+      </div>
+    </div>
+    <div class="backend-card sb">
+      <div class="backend-wf sb">Solutions Builder</div>
+      <div class="pipeline">
+        <div class="pipeline-name">No backend pipeline defined</div>
+        <div class="pipeline-steps">
+          <span class="step-tag">Consumer-facing self-serve</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox overlay -->
+<div class="lightbox" id="lightbox" role="dialog" aria-label="Enlarged screenshot">
+  <button class="lightbox-close" aria-label="Close">&times;</button>
+  <img src="" alt="Enlarged screenshot" id="lightbox-img">
+</div>
+
+<script>
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightbox-img');
+
+  document.querySelectorAll('.cell-screenshot').forEach(el => {
+    el.addEventListener('click', () => {
+      const img = el.querySelector('img');
+      if (!img) return;
+      lightboxImg.src = img.src;
+      lightboxImg.alt = img.alt;
+      lightbox.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    });
+  });
+
+  lightbox.addEventListener('click', closeLightbox);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+  function closeLightbox() {
+    lightbox.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  lightboxImg.addEventListener('click', e => e.stopPropagation());
+</script>
+
+</body>
+</html>
