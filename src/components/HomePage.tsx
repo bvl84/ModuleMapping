@@ -1,9 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { TabNav } from './layout/TabNav';
-
-type TabId = 'cinch' | 'greentech' | 'solutions' | 'comparison';
+import { TabNav, type TabId } from './layout/TabNav';
 
 export function HomePage() {
   const [activeTab, setActiveTab] = useState<TabId>('cinch');
@@ -29,6 +27,14 @@ export function HomePage() {
 
       {activeTab === 'comparison' && (
         <iframe src="/comparison.html" className="flex-1 w-full border-0" title="Workflow Module Comparison" />
+      )}
+
+      {activeTab === 'future-state' && (
+        <iframe
+          src="/config-future-state.html"
+          className="flex-1 w-full border-0"
+          title="Future State — Config Profile"
+        />
       )}
     </div>
   );

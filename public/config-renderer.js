@@ -14,8 +14,38 @@
   };
 
   function load() {
-    try { var s = localStorage.getItem(_key); if (s) return JSON.parse(s); } catch (e) {}
+    try {
+      var s = localStorage.getItem(_key);
+      if (s) {
+        var data = JSON.parse(s);
+        if (stripSchedulingComponentsForFutureState(data)) {
+          localStorage.setItem(_key, JSON.stringify(data));
+        }
+        return data;
+      }
+    } catch (e) {}
     return clone(_defaults);
+  }
+
+  /** Future State: Scheduling is a leaf module (no components collapsible). */
+  function stripSchedulingComponentsForFutureState(data) {
+    if (_key !== 'config-future-state' || !data || !data.sections) return false;
+    var changed = false;
+    data.sections.forEach(function (sec) {
+      if (!sec.entries) return;
+      sec.entries.forEach(function (ent) {
+        if (ent.nameId !== 'Scheduling') return;
+        if (ent.details !== undefined) {
+          delete ent.details;
+          changed = true;
+        }
+        if (ent.subModules !== undefined) {
+          delete ent.subModules;
+          changed = true;
+        }
+      });
+    });
+    return changed;
   }
 
   function save() { localStorage.setItem(_key, JSON.stringify(_data)); }
@@ -373,7 +403,12 @@
       if (!f) return;
       var r = new FileReader();
       r.onload = function (ev) {
-        try { _data = JSON.parse(ev.target.result); save(); render(); }
+        try {
+          _data = JSON.parse(ev.target.result);
+          stripSchedulingComponentsForFutureState(_data);
+          save();
+          render();
+        }
         catch (x) { alert('Invalid JSON file'); }
       };
       r.readAsText(f);

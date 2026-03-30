@@ -8,8 +8,8 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Home Solutions — Dashboard",
-  description: "Your home performance and efficiency scoring dashboard",
+  title: "Module Mapper 3000",
+  description: "Workflow module configuration and comparison tool",
 };
 
 export default function RootLayout({

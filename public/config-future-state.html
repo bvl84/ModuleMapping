@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Future State — Config Profile</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #d4d4d4;
+  background: #1e1e1e;
+  padding: 20px;
+}
+.comment { color: #6a9955; }
+.key { color: #9cdcfe; }
+.str { color: #ce9178; }
+.bool-true { color: #4ec9b0; }
+.bool-false { color: #f44747; }
+.num { color: #b5cea8; }
+.bracket { color: #ffd700; }
+.punct { color: #d4d4d4; }
+.line { padding: 1px 0; white-space: pre; }
+.indent-1 { padding-left: 24px; }
+.indent-2 { padding-left: 48px; }
+.indent-3 { padding-left: 72px; }
+.indent-4 { padding-left: 96px; }
+</style>
+</head>
+<body>
+<div id="config-content"></div>
+<script>
+// Sort order 0–5 matches future-state workflow sequence.
+var DEFAULT_CONFIG = {
+  "meta title": "Future State — HVAC workflow (planned)",
+  "meta description": "Target module sequence and capabilities for the future-state experience.",
+  sections: [
+    {
+      wfName: "Future State",
+      wfType: "WF",
+      clientId: "{clientID}",
+      bc: "{businessContext}",
+      backgroundImage: "{1-6}",
+      moduleName: "Module",
+      entries: [
+        {
+          nameId: "Basic Information",
+          display: true,
+          sort: 0
+        },
+        {
+          nameId: "Property Details",
+          display: true,
+          sort: 1
+        },
+        {
+          nameId: "Home Goals",
+          display: true,
+          sort: 2
+        },
+        {
+          nameId: "System Scoping",
+          display: true,
+          sort: 3
+        },
+        {
+          nameId: "Summary",
+          display: true,
+          sort: 4,
+          details: {
+            Functions: [
+              "Best MATCH / Show Alternative: True",
+              "Efficacy / Tier"
+            ]
+          }
+        },
+        {
+          nameId: "Scheduling",
+          display: true,
+          sort: 5
+        }
+      ]
+    }
+  ]
+};
+</script>
+<script src="config-renderer.js"></script>
+<script>renderConfig(DEFAULT_CONFIG, 'config-future-state');</script>
+</body>
+</html>
