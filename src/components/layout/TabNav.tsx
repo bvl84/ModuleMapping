@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 export type TabId = 'cinch' | 'greentech' | 'solutions' | 'comparison' | 'future-state';
 
 const TABS: { id: TabId; label: string }[] = [
@@ -17,20 +19,43 @@ interface TabNavProps {
 
 export function TabNav({ activeTab, onTabChange }: TabNavProps) {
   return (
-    <div className="flex gap-0 border-b border-gray-600 mb-0">
-      {TABS.map((tab) => (
-        <button
-          key={tab.id}
-          onClick={() => onTabChange(tab.id)}
-          className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors mr-6 ${
-            activeTab === tab.id
-              ? 'text-gray-100 border-gray-100'
-              : 'text-gray-500 border-transparent hover:text-gray-300'
-          }`}
-        >
-          {tab.label}
-        </button>
-      ))}
+    <div className="mb-0 flex flex-wrap items-end gap-0 border-b border-gray-600">
+      {TABS.map((tab) =>
+        tab.id === 'future-state' ? (
+          <div key={tab.id} className="mr-6 flex items-end gap-0">
+            <button
+              type="button"
+              onClick={() => onTabChange(tab.id)}
+              className={`border-b-2 px-1 pb-3 text-sm font-medium transition-colors ${
+                activeTab === tab.id
+                  ? 'border-gray-100 text-gray-100'
+                  : 'border-transparent text-gray-500 hover:text-gray-300'
+              }`}
+            >
+              {tab.label}
+            </button>
+            <Link
+              href="/future-state-visual"
+              className="ml-4 border-b-2 border-transparent px-1 pb-3 text-sm font-medium text-gray-500 transition-colors hover:text-gray-300"
+            >
+              Future State Visual
+            </Link>
+          </div>
+        ) : (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => onTabChange(tab.id)}
+            className={`mr-6 border-b-2 px-1 pb-3 text-sm font-medium transition-colors ${
+              activeTab === tab.id
+                ? 'border-gray-100 text-gray-100'
+                : 'border-transparent text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            {tab.label}
+          </button>
+        )
+      )}
     </div>
   );
 }
