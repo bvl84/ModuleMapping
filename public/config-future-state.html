@@ -32,7 +32,8 @@ body {
 <body>
 <div id="config-content"></div>
 <script>
-// Sort order 0–5 matches future-state workflow sequence.
+// Module row: nameId + display + sort. Sub-config: details.configuration[] with { name, display } (name unique within module).
+// From Confluence export "Future State Module Mapper".
 var DEFAULT_CONFIG = {
   "meta title": "Future State — HVAC workflow (planned)",
   "meta description": "Target module sequence and capabilities for the future-state experience.",
@@ -46,40 +47,108 @@ var DEFAULT_CONFIG = {
       moduleName: "Module",
       entries: [
         {
-          nameId: "Basic Information",
+          nameId: "Landing Page",
           display: true,
-          sort: 0
-        },
-        {
-          nameId: "Property Details",
-          display: true,
-          sort: 1
-        },
-        {
-          nameId: "Home Goals",
-          display: true,
-          sort: 2
-        },
-        {
-          nameId: "System Scoping",
-          display: true,
-          sort: 3
-        },
-        {
-          nameId: "Summary",
-          display: true,
-          sort: 4,
+          sort: 0,
           details: {
-            Functions: [
-              "Best MATCH / Show Alternative: True",
-              "Efficacy / Tier"
+            configuration: [
+              { name: "OTP verification", display: true }
             ]
           }
         },
         {
-          nameId: "Scheduling",
+          nameId: "Basic Information",
           display: true,
-          sort: 5
+          sort: 1,
+          details: {
+            configuration: [
+              {
+                name: "Additional fields",
+                display: true,
+                summary: "If True: reference 3, reference 4, reference 5 as available inputs; label would be an input field - \"Cinch ID\" mapped to reference 3"
+              }
+            ]
+          }
+        },
+        {
+          nameId: "Property Details",
+          display: true,
+          sort: 2,
+          details: {
+            configuration: [
+              { name: "Year built", display: true },
+              { name: "Sq footage", display: true },
+              { name: "# of systems", display: true },
+              { name: "# of Beds", display: true },
+              { name: "# of Baths", display: true }
+            ]
+          }
+        },
+        {
+          nameId: "Home Goals",
+          display: true,
+          sort: 3,
+          details: {
+            configuration: [
+              {
+                name: "Total options",
+                display: true,
+                optionCount: 8,
+                options: [
+                  { field: "value 1", display: true },
+                  { field: "value 2", display: true },
+                  { field: "value 3", display: true },
+                  { field: "value 4", display: true },
+                  { field: "value 5", display: true },
+                  { field: "value 6", display: true },
+                  { field: "value 7", display: true },
+                  { field: "value 8", display: true }
+                ],
+                summary: "Total options = # of options = total # of text fields"
+              },
+              {
+                name: "Max selections",
+                display: true,
+                summary: "(hypothetically 2); Max ≤ number of total options"
+              }
+            ]
+          }
+        },
+        {
+          nameId: "System Scoping",
+          display: true,
+          sort: 4
+        },
+        {
+          nameId: "Summary",
+          display: true,
+          sort: 5,
+          details: {
+            configuration: [
+              {
+                name: "Type: best match or Good Better Best",
+                display: true,
+                configuration: [
+                  { name: "Alternative options", display: true }
+                ]
+              },
+              { name: "Customer Notes", display: true },
+              { name: "Price", display: true },
+              { name: "Add Ons", display: true },
+              { name: "Email", display: true },
+              { name: "PDF", display: true },
+              {
+                name: "Schedule Inspection",
+                display: true,
+                summary: "T/F gate; Based on Job Status module being visible/true"
+              }
+            ]
+          }
+        },
+        {
+          nameId: "Job Status",
+          display: true,
+          sort: 6
         }
       ]
     }

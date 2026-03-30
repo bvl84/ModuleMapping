@@ -18,7 +18,7 @@
       var s = localStorage.getItem(_key);
       if (s) {
         var data = JSON.parse(s);
-        if (stripSchedulingComponentsForFutureState(data)) {
+        if (stripJobStatusComponentsForFutureState(data)) {
           localStorage.setItem(_key, JSON.stringify(data));
         }
         return data;
@@ -27,14 +27,86 @@
     return clone(_defaults);
   }
 
-  /** Future State: Scheduling is a leaf module (no components collapsible). */
-  function stripSchedulingComponentsForFutureState(data) {
+  function mergedDetailsLabel() {
+    return _key === 'config-future-state' ? 'configuration' : 'components';
+  }
+
+  /** Future State: nested config rows use `name` (unique within the module), not nameId. */
+  function countFsConfigItems(arr) {
+    if (!Array.isArray(arr)) return 0;
+    var n = 0;
+    for (var i = 0; i < arr.length; i++) {
+      var item = arr[i];
+      if (item && typeof item === 'object') {
+        n += 1;
+        if (item.options && item.options.length) {
+          n += countFsConfigItems(item.options);
+        }
+        if (item.configuration && item.configuration.length) {
+          n += countFsConfigItems(item.configuration);
+        }
+      }
+    }
+    return n;
+  }
+
+  function renderFsConfigItem(item, itemPath, depth) {
+    var h = '';
+    if (!item || typeof item !== 'object') return h;
+    if (item.name !== undefined) {
+      h += line(depth, sp('key', 'name') + sp('punct', ':') + ' ' + renderValue(item.name, itemPath.concat(['name'])));
+    }
+    if (item.field !== undefined) {
+      h += line(depth, sp('key', 'field') + sp('punct', ':') + ' ' + renderValue(item.field, itemPath.concat(['field'])));
+    }
+    if (item.display !== undefined) {
+      h += line(depth, sp('key', 'display') + sp('punct', ':') + ' ' + renderValue(item.display, itemPath.concat(['display'])));
+    }
+    if (item.optionCount !== undefined) {
+      h += line(depth, sp('key', 'option count') + sp('punct', ':') + ' ' + renderValue(item.optionCount, itemPath.concat(['optionCount'])));
+    }
+    if (item.options && item.options.length > 0) {
+      h += line(depth, sp('key', 'options') + sp('punct', ':') + '');
+      for (var oi = 0; oi < item.options.length; oi++) {
+        h += renderFsConfigItem(item.options[oi], itemPath.concat(['options', oi]), depth + 1);
+      }
+    }
+    if (item.summary !== undefined) {
+      h += line(depth, sp('key', 'summary') + sp('punct', ':') + ' ' + renderValue(item.summary, itemPath.concat(['summary'])));
+    }
+    if (item.configuration && item.configuration.length > 0) {
+      h += line(depth, sp('key', 'sub configuration') + sp('punct', ':') + '');
+      for (var j = 0; j < item.configuration.length; j++) {
+        h += renderFsConfigItem(item.configuration[j], itemPath.concat(['configuration', j]), depth + 1);
+      }
+    }
+    return h;
+  }
+
+  function renderFutureStateConfigurationSection(configArr, detPath, depth) {
+    var count = countFsConfigItems(configArr);
+    var h = '';
+    h += '<div class="line collapsible collapsed">' + pad(depth + 1) +
+      sp('key', mergedDetailsLabel()) + sp('punct', ':') + ' ' +
+      sp('punct', '(' + count + ' items)') +
+      '</div>';
+    h += '<div class="collapsible-content hidden">';
+    for (var i = 0; i < configArr.length; i++) {
+      if (i > 0) h += '<div class="line">\u00a0</div>';
+      h += renderFsConfigItem(configArr[i], detPath.concat(['configuration', i]), depth + 2);
+    }
+    h += '</div>';
+    return h;
+  }
+
+  /** Future State: Job Status is a leaf module (no configuration/components collapsible). */
+  function stripJobStatusComponentsForFutureState(data) {
     if (_key !== 'config-future-state' || !data || !data.sections) return false;
     var changed = false;
     data.sections.forEach(function (sec) {
       if (!sec.entries) return;
       sec.entries.forEach(function (ent) {
-        if (ent.nameId !== 'Scheduling') return;
+        if (ent.nameId !== 'Job Status') return;
         if (ent.details !== undefined) {
           delete ent.details;
           changed = true;
@@ -167,8 +239,16 @@
 
     if (entry.details) {
       var detPath = path.concat(['details']);
+      var fsConfigArr = (_key === 'config-future-state' && Array.isArray(entry.details.configuration))
+        ? entry.details.configuration
+        : null;
+      var hasFsConfig = fsConfigArr && fsConfigArr.length > 0;
+
       var merged = [];
       var mergeKeys = Object.keys(entry.details).filter(function (dk) { return MERGE_KEYS[dk]; });
+      if (hasFsConfig) {
+        mergeKeys = [];
+      }
       mergeKeys.forEach(function (dk) {
         var arr = entry.details[dk];
         if (Array.isArray(arr)) {
@@ -180,10 +260,14 @@
       var subMods = entry.subModules || [];
       var totalCount = merged.length + subMods.length;
 
+      if (hasFsConfig) {
+        h += renderFutureStateConfigurationSection(fsConfigArr, detPath, depth);
+      }
+
       if (totalCount > 0) {
         var items = merged.map(function (m) { return renderValue(m.val, m.path); });
         h += '<div class="line collapsible collapsed">' + pad(depth + 1) +
-          sp('key', 'components') + sp('punct', ':') + ' ' +
+          sp('key', mergedDetailsLabel()) + sp('punct', ':') + ' ' +
           sp('punct', '(' + totalCount + ' items)') +
           '</div>';
         h += '<div class="collapsible-content hidden">';
@@ -199,12 +283,15 @@
       var otherKeys = Object.keys(entry.details).filter(function (dk) {
         return !MERGE_KEYS[dk] && !HIDDEN_KEYS[dk];
       });
+      if (hasFsConfig) {
+        otherKeys = otherKeys.filter(function (dk) { return dk !== 'configuration'; });
+      }
       otherKeys.forEach(function (dk) {
         h += renderNode(dk, entry.details[dk], detPath.concat([dk]), depth + 1);
       });
     } else if (entry.subModules && entry.subModules.length > 0) {
       h += '<div class="line collapsible collapsed">' + pad(depth + 1) +
-        sp('key', 'components') + sp('punct', ':') + ' ' +
+        sp('key', mergedDetailsLabel()) + sp('punct', ':') + ' ' +
         sp('punct', '(' + entry.subModules.length + ' items)') +
         '</div>';
       h += '<div class="collapsible-content hidden">';
@@ -405,7 +492,7 @@
       r.onload = function (ev) {
         try {
           _data = JSON.parse(ev.target.result);
-          stripSchedulingComponentsForFutureState(_data);
+          stripJobStatusComponentsForFutureState(_data);
           save();
           render();
         }
