@@ -10,29 +10,34 @@ export const metadata: Metadata = {
 
 export default function FutureStateVisualPage() {
   return (
-    <div className="min-h-screen bg-[#1e1e1e] text-gray-100">
-      <header className="border-b border-gray-700/80 bg-[#252526] px-6 py-4">
-        <div className="mx-auto flex max-w-2xl flex-wrap items-center justify-between gap-3">
+    <div className="min-h-screen bg-[#f0f7fc] text-gray-800">
+      <header className="border-b border-sky-200/80 bg-white px-6 py-5 shadow-sm">
+        <div className="mx-auto flex max-w-3xl flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Future State</p>
-            <h1 className="text-lg font-semibold text-gray-100">Workflow visual</h1>
+            <p className="text-xs font-medium text-sky-600">
+              Future State <span className="text-gray-400">/</span> Modules
+            </p>
+            <h1 className="mt-1 text-2xl font-bold tracking-tight text-gray-900">Workflow modules</h1>
+            <p className="mt-1 text-sm text-gray-500">
+              Step layout inspired by module selection — pills are configuration and fields for each step.
+            </p>
           </div>
           <Link
             href="/"
-            className="rounded-md border border-gray-600 px-3 py-1.5 text-sm text-gray-300 transition-colors hover:border-gray-500 hover:bg-gray-800/80 hover:text-white"
+            className="shrink-0 rounded-md border-2 border-sky-400 bg-white px-4 py-2 text-sm font-medium text-sky-600 transition-colors hover:bg-sky-50"
           >
             ← Module Mapper
           </Link>
         </div>
       </header>
 
-      <main className="mx-auto max-w-2xl px-6 pt-8">
-        <p className="mb-8 text-sm leading-relaxed text-gray-400">
-          Modules in <span className="text-gray-300">sort</span> order. Each card is a workflow step; nested panels
-          mirror <span className="font-mono text-xs text-gray-400">configuration</span> and{" "}
-          <span className="font-mono text-xs text-gray-400">sub configuration</span> from the Future State profile.
-        </p>
-        <FutureStateVisualDiagram entries={FUTURE_STATE_VISUAL_ENTRIES} />
+      <main className="mx-auto max-w-3xl px-6 py-8">
+        <div className="rounded-xl border-2 border-sky-300 bg-sky-50/40 p-4 shadow-sm sm:p-5">
+          <p className="mb-4 text-center text-xs font-semibold uppercase tracking-wide text-sky-700">
+            Module control — future state
+          </p>
+          <FutureStateVisualDiagram entries={FUTURE_STATE_VISUAL_ENTRIES} />
+        </div>
       </main>
     </div>
   );
