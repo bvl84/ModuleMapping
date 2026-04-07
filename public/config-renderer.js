@@ -21,10 +21,15 @@
         if (stripJobStatusComponentsForFutureState(data)) {
           localStorage.setItem(_key, JSON.stringify(data));
         }
+        if (normalizeFutureStateSections(data)) {
+          localStorage.setItem(_key, JSON.stringify(data));
+        }
         return data;
       }
     } catch (e) {}
-    return clone(_defaults);
+    var data = clone(_defaults);
+    normalizeFutureStateSections(data);
+    return data;
   }
 
   function mergedDetailsLabel() {
@@ -61,6 +66,27 @@
     }
     if (item.display !== undefined) {
       h += line(depth, sp('key', 'display') + sp('punct', ':') + ' ' + renderValue(item.display, itemPath.concat(['display'])));
+    }
+    if (item.configValue !== undefined) {
+      h += line(depth, sp('key', 'configValue') + sp('punct', ':') + ' ' + renderValue(item.configValue, itemPath.concat(['configValue'])));
+    }
+    if (item.reference3Label !== undefined) {
+      h += line(depth, sp('key', 'reference3Label') + sp('punct', ':') + ' ' + renderValue(item.reference3Label, itemPath.concat(['reference3Label'])));
+    }
+    if (item.reference4Label !== undefined) {
+      h += line(depth, sp('key', 'reference4Label') + sp('punct', ':') + ' ' + renderValue(item.reference4Label, itemPath.concat(['reference4Label'])));
+    }
+    if (item.reference5Label !== undefined) {
+      h += line(depth, sp('key', 'reference5Label') + sp('punct', ':') + ' ' + renderValue(item.reference5Label, itemPath.concat(['reference5Label'])));
+    }
+    if (item.alternativeImage1 !== undefined) {
+      h += line(depth, sp('key', 'alternativeImage1') + sp('punct', ':') + ' ' + renderValue(item.alternativeImage1, itemPath.concat(['alternativeImage1'])));
+    }
+    if (item.alternativeImage2 !== undefined) {
+      h += line(depth, sp('key', 'alternativeImage2') + sp('punct', ':') + ' ' + renderValue(item.alternativeImage2, itemPath.concat(['alternativeImage2'])));
+    }
+    if (item.alternativeImage3 !== undefined) {
+      h += line(depth, sp('key', 'alternativeImage3') + sp('punct', ':') + ' ' + renderValue(item.alternativeImage3, itemPath.concat(['alternativeImage3'])));
     }
     if (item.optionCount !== undefined) {
       h += line(depth, sp('key', 'option count') + sp('punct', ':') + ' ' + renderValue(item.optionCount, itemPath.concat(['optionCount'])));
@@ -123,6 +149,24 @@
   function save() { localStorage.setItem(_key, JSON.stringify(_data)); }
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
 
+  /** Future State: wfType is only Direct or Indirect (migrates legacy WF, etc.). */
+  function normalizeFutureStateSections(data) {
+    if (_key !== 'config-future-state' || !data || !Array.isArray(data.sections)) return false;
+    var changed = false;
+    data.sections.forEach(function (sec) {
+      var next = sec.wfType === 'Indirect' ? 'Indirect' : 'Direct';
+      if (sec.wfType !== next) {
+        sec.wfType = next;
+        changed = true;
+      }
+    });
+    return changed;
+  }
+
+  function normalizeFutureStateWfType(v) {
+    return v === 'Indirect' ? 'Indirect' : 'Direct';
+  }
+
   function getPath(path) {
     return path.reduce(function (o, k) { return o[k]; }, _data);
   }
@@ -174,6 +218,15 @@
 
   var WF_TYPE_LABELS = { WF: 'Direct/Indirect', WO: 'Work Order', QO: 'Quote', SJ: 'Search Jobs' };
 
+  /**
+   * Cinch-style profiles use wfType "WF" for the primary flow; WO/QO/SJ sections render as compact Backend Systems rows.
+   * Future State uses "Direct" / "Indirect" (not "WF") but must still render the full section (wfName, entries, configuration).
+   */
+  function sectionIsBackendOnly(sec) {
+    if (_key === 'config-future-state') return false;
+    return !!(sec.wfType && sec.wfType !== 'WF');
+  }
+
   function backendFlowLabel(sec) {
     var typeLabel = WF_TYPE_LABELS[sec.wfType] || sec.wfType;
     var modName = sec.moduleName || '';
@@ -196,6 +249,22 @@
     return h;
   }
 
+  function renderFutureStateWfTypeLine(sec, path, depth) {
+    var n = normalizeFutureStateWfType(sec.wfType);
+    var wfPath = path.concat(['wfType']);
+    var pathStr = wfPath.join('.');
+    var dCls = 'wf-type-pill' + (n === 'Direct' ? ' wf-type-pill-on' : ' wf-type-pill-off');
+    var iCls = 'wf-type-pill' + (n === 'Indirect' ? ' wf-type-pill-on' : ' wf-type-pill-off');
+    if (_editMode) {
+      dCls += ' editable';
+      iCls += ' editable';
+    }
+    return line(depth, sp('key', 'wfType') + sp('punct', ':') + ' ' +
+      '<span class="' + dCls + '" data-path="' + pathStr + '" data-wf-type-val="Direct">Direct</span>' +
+      sp('punct', '  ·  ') +
+      '<span class="' + iCls + '" data-path="' + pathStr + '" data-wf-type-val="Indirect">Indirect</span>');
+  }
+
   function renderSection(sec, path, depth) {
     var h = '';
 
@@ -203,16 +272,32 @@
       h += line(depth, sp('key', 'wfName') + sp('punct', ':') + ' ' + ed('str', sec.wfName, path.concat(['wfName'])));
     }
 
-    var wfLabel = WF_TYPE_LABELS[sec.wfType] || sec.wfType;
-    h += line(depth, sp('key', 'wfType') + sp('punct', ':') + ' ' + ed('str', wfLabel, path.concat(['wfType'])));
+    if (_key === 'config-future-state') {
+      h += renderFutureStateWfTypeLine(sec, path, depth);
+    } else {
+      var wfLabel = WF_TYPE_LABELS[sec.wfType] || sec.wfType;
+      h += line(depth, sp('key', 'wfType') + sp('punct', ':') + ' ' + ed('str', wfLabel, path.concat(['wfType'])));
+    }
 
     h += line(depth, sp('key', 'clientId') + sp('punct', ':') + ' ' + ed('str', sec.clientId, path.concat(['clientId'])));
 
-    h += line(depth + 1, sp('key', 'meta title') + sp('punct', ':') + ' ' + ed('str', _data['meta title'] || '', ['meta title']));
-    h += line(depth + 1, sp('key', 'meta description') + sp('punct', ':') + ' ' + ed('str', _data['meta description'] || '', ['meta description']));
+    var metaDepth = depth + 1;
+    var bcBgDepth = _key === 'config-future-state' ? depth : depth + 1;
 
-    h += line(depth + 1, sp('key', 'BC') + sp('punct', ':') + ' ' + ed('str', sec.bc, path.concat(['bc'])));
-    h += line(depth + 1, sp('key', 'backgroundImage') + sp('punct', ':') + ' ' + ed('str', sec.backgroundImage, path.concat(['backgroundImage'])));
+    h += line(metaDepth, sp('key', 'meta title') + sp('punct', ':') + ' ' + ed('str', _data['meta title'] || '', ['meta title']));
+    h += line(metaDepth, sp('key', 'meta description') + sp('punct', ':') + ' ' + ed('str', _data['meta description'] || '', ['meta description']));
+
+    h += line(bcBgDepth, sp('key', 'BC') + sp('punct', ':') + ' ' + ed('str', sec.bc, path.concat(['bc'])));
+    h += line(bcBgDepth, sp('key', 'backgroundImage') + sp('punct', ':') + ' ' + ed('str', sec.backgroundImage, path.concat(['backgroundImage'])));
+    if (_key === 'config-future-state' && sec.font !== undefined && sec.font !== null) {
+      h += line(bcBgDepth, sp('key', 'font') + sp('punct', ':') + ' ' + ed('str', sec.font, path.concat(['font'])));
+    }
+    if (_key === 'config-future-state' && sec.header !== undefined) {
+      h += line(bcBgDepth, sp('key', 'header') + sp('punct', ':') + ' ' + renderValue(sec.header, path.concat(['header'])));
+    }
+    if (_key === 'config-future-state' && sec.footer !== undefined) {
+      h += line(bcBgDepth, sp('key', 'footer') + sp('punct', ':') + ' ' + renderValue(sec.footer, path.concat(['footer'])));
+    }
     h += '<div class="line">\u00a0</div>';
 
     var modLabel = sec.moduleName || 'Module';
@@ -335,7 +420,7 @@
               h += renderEntry(val[i], path.concat([i]), childDepth);
             } else if (key === 'sections') {
               var secObj = val[i];
-              if (secObj.wfType && secObj.wfType !== 'WF') {
+              if (sectionIsBackendOnly(secObj)) {
                 // skip here; backend sections rendered as a group after the loop
               } else {
                 h += renderSection(secObj, path.concat([i]), childDepth);
@@ -381,7 +466,7 @@
     var backends = [];
     if (_data.sections) {
       _data.sections.forEach(function (sec, si) {
-        if (sec.wfType && sec.wfType !== 'WF') {
+        if (sectionIsBackendOnly(sec)) {
           backends.push({ sec: sec, idx: si });
         }
       });
@@ -401,6 +486,16 @@
 
   document.addEventListener('click', function (e) {
     if (_editMode) {
+      var wft = e.target.closest('[data-wf-type-val]');
+      if (wft) {
+        var p = parsePath(wft.getAttribute('data-path') || '');
+        var pick = wft.getAttribute('data-wf-type-val');
+        if (p.length && pick) {
+          setPath(p, pick);
+          render();
+        }
+        return;
+      }
       var edEl = e.target.closest('.editable');
       if (edEl) { startEdit(edEl); return; }
     }
@@ -473,6 +568,7 @@
       if (!confirm('Reset to defaults? All edits will be lost.')) return;
       localStorage.removeItem(_key);
       _data = clone(_defaults);
+      normalizeFutureStateSections(_data);
       render();
     });
 
@@ -493,6 +589,7 @@
         try {
           _data = JSON.parse(ev.target.result);
           stripJobStatusComponentsForFutureState(_data);
+          normalizeFutureStateSections(_data);
           save();
           render();
         }
@@ -526,6 +623,12 @@
       '.edit-mode .editable{cursor:text;border-bottom:1px dashed rgba(255,255,255,.25);transition:background .1s}' +
       '.edit-mode .editable:hover{background:rgba(255,255,255,.06)}' +
       '.edit-mode .bool-true.editable,.edit-mode .bool-false.editable{cursor:pointer}' +
+      '.wf-type-pill{font-weight:500}' +
+      '.wf-type-pill-on{color:#ce9178}' +
+      '.wf-type-pill-off{color:#858585;opacity:.75}' +
+      '.edit-mode .wf-type-pill.editable{cursor:pointer;border-bottom:1px dashed rgba(255,255,255,.25);' +
+        'transition:background .1s}' +
+      '.edit-mode .wf-type-pill.editable:hover{background:rgba(255,255,255,.06)}' +
       '.inline-edit{background:#1e1e1e;color:inherit;border:1px solid #0e639c;' +
         'font-family:inherit;font-size:inherit;padding:0 4px;outline:none;border-radius:2px;max-width:90vw}';
     document.head.appendChild(s);

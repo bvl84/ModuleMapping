@@ -35,15 +35,18 @@ body {
 // Module row: nameId + display + sort. Sub-config: details.configuration[] with { name, display } (name unique within module).
 // From Confluence export "Future State Module Mapper".
 var DEFAULT_CONFIG = {
-  "meta title": "Future State — HVAC workflow (planned)",
-  "meta description": "Target module sequence and capabilities for the future-state experience.",
+  "meta title": "",
+  "meta description": "",
   sections: [
     {
-      wfName: "Future State",
-      wfType: "WF",
-      clientId: "{clientID}",
-      bc: "{businessContext}",
+      wfName: "",
+      wfType: "Direct",
+      clientId: "",
+      bc: "",
       backgroundImage: "{1-6}",
+      font: "inter",
+      header: true,
+      footer: true,
       moduleName: "Module",
       entries: [
         {
@@ -65,7 +68,10 @@ var DEFAULT_CONFIG = {
               {
                 name: "Additional fields",
                 display: true,
-                summary: "If True: reference 3, reference 4, reference 5 as available inputs; label would be an input field - \"Cinch ID\" mapped to reference 3"
+                summary: "When on, three extra inputs use references 3–5. Set the field label each reference shows in the workflow.",
+                reference3Label: "",
+                reference4Label: "",
+                reference5Label: ""
               }
             ]
           }
@@ -95,21 +101,22 @@ var DEFAULT_CONFIG = {
                 display: true,
                 optionCount: 8,
                 options: [
-                  { field: "value 1", display: true },
-                  { field: "value 2", display: true },
-                  { field: "value 3", display: true },
-                  { field: "value 4", display: true },
-                  { field: "value 5", display: true },
-                  { field: "value 6", display: true },
-                  { field: "value 7", display: true },
-                  { field: "value 8", display: true }
+                  { field: "", display: true },
+                  { field: "", display: true },
+                  { field: "", display: true },
+                  { field: "", display: true },
+                  { field: "", display: true },
+                  { field: "", display: true },
+                  { field: "", display: true },
+                  { field: "", display: true }
                 ],
                 summary: "Total options = # of options = total # of text fields"
               },
               {
                 name: "Max selections",
                 display: true,
-                summary: "(hypothetically 2); Max ≤ number of total options"
+                configValue: 2,
+                summary: "Max ≤ number of total options (Total options when on)."
               }
             ]
           }
@@ -125,12 +132,15 @@ var DEFAULT_CONFIG = {
           sort: 5,
           details: {
             configuration: [
+              { name: "Best match", display: true },
+              { name: "Good Better Best", display: false },
               {
-                name: "Type: best match or Good Better Best",
-                display: true,
-                configuration: [
-                  { name: "Alternative options", display: true }
-                ]
+                name: "Alternative options",
+                display: false,
+                summary: "Shown as its own row on the visual; applies when Best match or Good Better Best is selected.",
+                alternativeImage1: "",
+                alternativeImage2: "",
+                alternativeImage3: ""
               },
               { name: "Customer Notes", display: true },
               { name: "Price", display: true },
@@ -139,8 +149,7 @@ var DEFAULT_CONFIG = {
               { name: "PDF", display: true },
               {
                 name: "Schedule Inspection",
-                display: true,
-                summary: "T/F gate; Based on Job Status module being visible/true"
+                display: true
               }
             ]
           }
