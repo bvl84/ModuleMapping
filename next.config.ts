@@ -9,14 +9,15 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: projectRoot,
   },
-  /** Friendly aliases (spaces / casing) → canonical slugs */
+  /**
+   * Friendly aliases for paths with spaces (encoded or not).
+   * Do not add /Cinch → /cinch style rules: Next can match sources case-insensitively,
+   * so /cinch would 307 to itself and browsers report ERR_TOO_MANY_REDIRECTS.
+   */
   async redirects() {
     return [
-      { source: "/Cinch", destination: "/cinch", permanent: false },
-      { source: "/GreenTech", destination: "/greentech", permanent: false },
       { source: "/Solutions Builder", destination: "/solutions-builder", permanent: false },
       { source: "/Solutions%20Builder", destination: "/solutions-builder", permanent: false },
-      { source: "/Comparison", destination: "/comparison", permanent: false },
       { source: "/Future State", destination: "/future-state", permanent: false },
       { source: "/Future%20State", destination: "/future-state", permanent: false },
       { source: "/Future State Visual", destination: "/future-state-visual", permanent: false },
