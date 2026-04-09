@@ -23,7 +23,7 @@ export default function FutureStateVisualPage() {
             </p>
           </div>
           <Link
-            href="/"
+            href="/cinch"
             className="shrink-0 rounded-md border-2 border-sky-400 bg-white px-4 py-2 text-sm font-medium text-sky-600 transition-colors hover:bg-sky-50"
           >
             ← Module Mapper
