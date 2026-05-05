@@ -54,6 +54,45 @@ export const WORKFLOW_GOOGLE_FONTS: {
   },
 ];
 
+/** 0 = none; 1–4 = theme color slot */
+export type ThemeColorSlotRef = 0 | 1 | 2 | 3 | 4;
+/** 0 = none; 1–3 = logo slot */
+export type ThemeLogoSlotRef = 0 | 1 | 2 | 3;
+
+export type WorkflowBrandingTheme = {
+  /** Theme palette COLOR 1–4 (hex). Empty string = not set (e.g. Color 4). */
+  themeColors: [string, string, string, string];
+  /** LOGO 1–3 — URL or path */
+  logoSrc: [string, string, string];
+  email: {
+    headerLogo: ThemeLogoSlotRef;
+    headerBgColorIndex: ThemeColorSlotRef;
+    headerTextColorIndex: ThemeColorSlotRef;
+    signatureLogo: ThemeLogoSlotRef;
+    footerBgColorIndex: ThemeColorSlotRef;
+  };
+  pdf: {
+    headerLogo: ThemeLogoSlotRef;
+    headerTextColorIndex: ThemeColorSlotRef;
+  };
+};
+
+export const DEFAULT_WORKFLOW_BRANDING: WorkflowBrandingTheme = {
+  themeColors: ["#4294da", "#ffffff", "#000000", ""],
+  logoSrc: ["", "", ""],
+  email: {
+    headerLogo: 2,
+    headerBgColorIndex: 2,
+    headerTextColorIndex: 1,
+    signatureLogo: 2,
+    footerBgColorIndex: 1,
+  },
+  pdf: {
+    headerLogo: 3,
+    headerTextColorIndex: 1,
+  },
+};
+
 export type FutureStateWorkflowProfile = {
   wfName: string;
   /** Mirrors Future State config — only Direct or Indirect. */
@@ -70,6 +109,8 @@ export type FutureStateWorkflowProfile = {
   header: boolean;
   /** Show workflow chrome footer. */
   footer: boolean;
+  /** Branding & themeing (visual + live output JSON). */
+  branding?: WorkflowBrandingTheme;
 };
 
 export const FUTURE_STATE_WORKFLOW_PROFILE: FutureStateWorkflowProfile = {
@@ -83,7 +124,31 @@ export const FUTURE_STATE_WORKFLOW_PROFILE: FutureStateWorkflowProfile = {
   font: "inter",
   header: true,
   footer: true,
+  branding: DEFAULT_WORKFLOW_BRANDING,
 };
+
+export function mergeWorkflowBranding(profile: FutureStateWorkflowProfile): FutureStateWorkflowProfile {
+  const b = profile.branding;
+  const emailMerged = { ...DEFAULT_WORKFLOW_BRANDING.email, ...b?.email };
+  const email: WorkflowBrandingTheme["email"] = {
+    headerLogo: emailMerged.headerLogo,
+    headerBgColorIndex: emailMerged.headerBgColorIndex,
+    headerTextColorIndex: emailMerged.headerTextColorIndex,
+    signatureLogo: emailMerged.signatureLogo,
+    footerBgColorIndex: emailMerged.footerBgColorIndex,
+  };
+  return {
+    ...profile,
+    branding: {
+      ...DEFAULT_WORKFLOW_BRANDING,
+      ...b,
+      themeColors: b?.themeColors ?? DEFAULT_WORKFLOW_BRANDING.themeColors,
+      logoSrc: b?.logoSrc ?? DEFAULT_WORKFLOW_BRANDING.logoSrc,
+      email,
+      pdf: { ...DEFAULT_WORKFLOW_BRANDING.pdf, ...b?.pdf },
+    },
+  };
+}
 
 /**
  * Mirrors `public/config-future-state.html` DEFAULT_CONFIG.entries — update both when the model changes.

@@ -19,10 +19,10 @@ export function FutureStateLiveConfigOutput({
 
   return (
     <aside
-      className="flex w-full min-h-0 shrink-0 flex-col self-stretch lg:min-w-[min(100%,560px)] lg:max-w-[min(100%,820px)] lg:flex-[0_1_44%]"
+      className="flex min-h-0 w-full min-w-0 flex-1 basis-0 flex-col self-stretch"
       aria-label="Live Future State config output"
     >
-      <div className="flex h-full min-h-[min(100dvh,28rem)] flex-1 flex-col overflow-hidden rounded-xl border border-gray-700 bg-[#1e1e1e] shadow-lg ring-1 ring-white/5 sm:min-h-[32rem] lg:min-h-0">
+      <div className="flex h-full min-h-[min(100dvh,28rem)] flex-1 flex-col overflow-hidden rounded-xl border-2 border-[#00BCFF] bg-[#1e1e1e] shadow-lg sm:min-h-[32rem] lg:min-h-0">
         <div className="shrink-0 border-b border-gray-700 px-5 py-4 sm:px-6">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-[#6a9955]">Live output</p>
           <p className="mt-0.5 text-sm font-medium text-[#d4d4d4]">Future State config</p>

@@ -1,4 +1,9 @@
-import type { FutureStateModuleEntry, FutureStateWorkflowProfile } from "@/data/future-state-visual";
+import {
+  mergeWorkflowBranding,
+  type FutureStateModuleEntry,
+  type FutureStateWorkflowProfile,
+  type WorkflowBrandingTheme,
+} from "@/data/future-state-visual";
 
 /** Mirrors `public/config-future-state.html` DEFAULT_CONFIG shape (root + first section). */
 export type FutureStateConfigSnapshot = {
@@ -13,6 +18,7 @@ export type FutureStateConfigSnapshot = {
     font: string;
     header: boolean;
     footer: boolean;
+    branding: WorkflowBrandingTheme;
     moduleName: string;
     entries: FutureStateModuleEntry[];
   }>;
@@ -22,19 +28,21 @@ export function buildFutureStateConfigSnapshot(
   profile: FutureStateWorkflowProfile,
   entries: FutureStateModuleEntry[],
 ): FutureStateConfigSnapshot {
+  const p = mergeWorkflowBranding(profile);
   return {
-    "meta title": profile.metaTitle,
-    "meta description": profile.metaDescription,
+    "meta title": p.metaTitle,
+    "meta description": p.metaDescription,
     sections: [
       {
-        wfName: profile.wfName,
-        wfType: profile.wfType,
-        clientId: profile.clientId,
-        bc: profile.BC,
-        backgroundImage: profile.backgroundImage,
-        font: profile.font,
-        header: profile.header,
-        footer: profile.footer,
+        wfName: p.wfName,
+        wfType: p.wfType,
+        clientId: p.clientId,
+        bc: p.BC,
+        backgroundImage: p.backgroundImage,
+        font: p.font,
+        header: p.header,
+        footer: p.footer,
+        branding: JSON.parse(JSON.stringify(p.branding)) as WorkflowBrandingTheme,
         moduleName: "Module",
         entries: JSON.parse(JSON.stringify(entries)) as FutureStateModuleEntry[],
       },

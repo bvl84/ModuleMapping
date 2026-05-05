@@ -5,17 +5,20 @@ import {
   BACKGROUND_IMAGE_SLOTS,
   BC_FIELD_HELP,
   CLIENT_ID_FIELD_HELP,
+  DEFAULT_WORKFLOW_BRANDING,
   META_DESCRIPTION_FIELD_HELP,
   META_TITLE_FIELD_HELP,
   OPTION_DISPLAY_VALUE_HELP,
   WF_NAME_FIELD_HELP,
-  WORKFLOW_GOOGLE_FONTS,
+  mergeWorkflowBranding,
   type FutureStateConfigItem,
   type FutureStateModuleEntry,
   type FutureStateWorkflowProfile,
+  type WorkflowBrandingTheme,
   type WorkflowGoogleFontId,
 } from "@/data/future-state-visual";
 import { FutureStateLiveConfigOutput } from "./FutureStateLiveConfigOutput";
+import { WorkflowBrandingSection } from "./WorkflowBrandingSection";
 
 /** Accent palette aligned with light “Module Control” UI */
 const accent = {
@@ -590,12 +593,14 @@ type ProfileTextFieldKey = "wfName" | "clientId" | "metaTitle" | "metaDescriptio
 function WorkflowProfileCard({
   profile,
   onFontChange,
+  onBrandingChange,
   onToggleLayout,
   onProfileTextChange,
   onWfTypeChange,
 }: {
   profile: FutureStateWorkflowProfile;
   onFontChange: (font: WorkflowGoogleFontId) => void;
+  onBrandingChange: (updater: (b: WorkflowBrandingTheme) => WorkflowBrandingTheme) => void;
   onToggleLayout: (part: "header" | "footer") => void;
   onProfileTextChange: (key: ProfileTextFieldKey, value: string) => void;
   onWfTypeChange: (next: "Direct" | "Indirect") => void;
@@ -810,39 +815,15 @@ function WorkflowProfileCard({
               </div>
             </div>
           </div>
-          <div>
-            <p className="font-mono text-xs font-semibold text-sky-800">font</p>
-            <p className="mt-0.5 text-xs text-gray-500">
-              Google Fonts — select one (sans-serif or serif).
-            </p>
-            <div role="radiogroup" aria-label="Workflow font" className="mt-3 space-y-3">
-              {(["Sans-serif", "Serif"] as const).map((category) => (
-                <div key={category}>
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-500">{category}</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {WORKFLOW_GOOGLE_FONTS.filter((f) => f.category === category).map((f) => {
-                      const sel = profile.font === f.id;
-                      return (
-                        <button
-                          key={f.id}
-                          type="button"
-                          role="radio"
-                          aria-checked={sel}
-                          onClick={() => onFontChange(f.id)}
-                          className={`inline-flex max-w-full rounded-full border px-3 py-1.5 text-sm font-medium leading-tight transition-colors focus-visible:outline focus-visible:ring-2 focus-visible:ring-sky-400 ${
-                            sel ? accent.pillOn : accent.pillOff
-                          }`}
-                          style={{ fontFamily: f.cssVar }}
-                        >
-                          {f.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+        </div>
+
+        <div className="mt-6 border-t border-gray-200 pt-5">
+          <WorkflowBrandingSection
+            branding={profile.branding ?? DEFAULT_WORKFLOW_BRANDING}
+            onBranding={onBrandingChange}
+            font={profile.font}
+            onFontChange={onFontChange}
+          />
         </div>
       </div>
     </div>
@@ -920,11 +901,18 @@ export function FutureStateVisualDiagram({
   });
 
   const [profile, setProfile] = useState<FutureStateWorkflowProfile>(() =>
-    structuredClone(initialWorkflowProfile),
+    mergeWorkflowBranding(structuredClone(initialWorkflowProfile)),
   );
 
   const onFontChange = useCallback((font: WorkflowGoogleFontId) => {
     setProfile((p) => ({ ...p, font }));
+  }, []);
+
+  const onBrandingChange = useCallback((updater: (b: WorkflowBrandingTheme) => WorkflowBrandingTheme) => {
+    setProfile((p) => ({
+      ...p,
+      branding: updater(p.branding ?? DEFAULT_WORKFLOW_BRANDING),
+    }));
   }, []);
 
   const onToggleLayout = useCallback((part: "header" | "footer") => {
@@ -964,11 +952,12 @@ export function FutureStateVisualDiagram({
   const summaryAllowsAlternativeOptions = bestMatchOn || goodBetterBestOn;
 
   return (
-    <div className="flex flex-col gap-10 lg:flex-row lg:items-stretch lg:gap-12 xl:gap-16">
-      <div className="min-w-0 min-h-0 flex-1 space-y-5 lg:space-y-6">
+    <div className="flex flex-col gap-10 lg:flex-row lg:items-stretch lg:gap-8 xl:gap-10">
+      <div className="min-h-0 min-w-0 w-full flex-1 basis-0 space-y-5 lg:space-y-6">
         <WorkflowProfileCard
           profile={profile}
           onFontChange={onFontChange}
+          onBrandingChange={onBrandingChange}
           onToggleLayout={onToggleLayout}
           onProfileTextChange={onProfileTextChange}
           onWfTypeChange={onWfTypeChange}

@@ -1,7 +1,11 @@
 "use client";
 
 import { Fragment, useState, type ReactNode } from "react";
-import type { FutureStateConfigItem, FutureStateModuleEntry } from "@/data/future-state-visual";
+import type {
+  FutureStateConfigItem,
+  FutureStateModuleEntry,
+  WorkflowBrandingTheme,
+} from "@/data/future-state-visual";
 import type { FutureStateConfigSnapshot } from "./buildFutureStateConfigSnapshot";
 
 function countFsConfigItems(arr: FutureStateConfigItem[] | undefined): number {
@@ -321,6 +325,71 @@ function EntryBlock({
   );
 }
 
+function BrandingSnapshotLines({ b, depth }: { b: WorkflowBrandingTheme; depth: number }) {
+  const d1 = depth + 1;
+  return (
+    <>
+      {[0, 1, 2, 3].map((i) => (
+        <Line key={`tc-${i}`} depth={depth}>
+          <Key>{`themeColor${i + 1}`}</Key>
+          <Punct>: </Punct>
+          <Val v={b.themeColors[i] ?? ""} />
+        </Line>
+      ))}
+      {[0, 1, 2].map((i) => (
+        <Line key={`lg-${i}`} depth={depth}>
+          <Key>{`logo${i + 1}`}</Key>
+          <Punct>: </Punct>
+          <Val v={b.logoSrc[i] ?? ""} />
+        </Line>
+      ))}
+      <Line depth={depth}>
+        <Key>email</Key>
+        <Punct>:</Punct>
+      </Line>
+      <Line depth={d1}>
+        <Key>headerLogo</Key>
+        <Punct>: </Punct>
+        <Val v={b.email.headerLogo} />
+      </Line>
+      <Line depth={d1}>
+        <Key>headerBgColorIndex</Key>
+        <Punct>: </Punct>
+        <Val v={b.email.headerBgColorIndex} />
+      </Line>
+      <Line depth={d1}>
+        <Key>headerTextColorIndex</Key>
+        <Punct>: </Punct>
+        <Val v={b.email.headerTextColorIndex} />
+      </Line>
+      <Line depth={d1}>
+        <Key>signatureLogo</Key>
+        <Punct>: </Punct>
+        <Val v={b.email.signatureLogo} />
+      </Line>
+      <Line depth={d1}>
+        <Key>footerBgColorIndex</Key>
+        <Punct>: </Punct>
+        <Val v={b.email.footerBgColorIndex} />
+      </Line>
+      <Line depth={depth}>
+        <Key>pdf</Key>
+        <Punct>:</Punct>
+      </Line>
+      <Line depth={d1}>
+        <Key>headerLogo</Key>
+        <Punct>: </Punct>
+        <Val v={b.pdf.headerLogo} />
+      </Line>
+      <Line depth={d1}>
+        <Key>headerTextColorIndex</Key>
+        <Punct>: </Punct>
+        <Val v={b.pdf.headerTextColorIndex} />
+      </Line>
+    </>
+  );
+}
+
 function SectionBlock({
   data,
   sec,
@@ -386,6 +455,11 @@ function SectionBlock({
         <Punct>: </Punct>
         <Val v={sec.footer} />
       </Line>
+      <Line depth={bcDepth}>
+        <Key>branding</Key>
+        <Punct>:</Punct>
+      </Line>
+      <BrandingSnapshotLines b={sec.branding} depth={bcDepth + 1} />
       <BlankLine />
       <Line depth={0}>
         <Key>{modLabel}</Key>

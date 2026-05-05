@@ -3,7 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export type TabId = "cinch" | "greentech" | "solutions" | "comparison" | "future-state";
+export type TabId =
+  | "cinch"
+  | "greentech"
+  | "solutions"
+  | "comparison"
+  | "future-state"
+  | "schema-configurator";
 
 export const TAB_ROUTES: Record<TabId, string> = {
   cinch: "/cinch",
@@ -11,6 +17,7 @@ export const TAB_ROUTES: Record<TabId, string> = {
   solutions: "/solutions-builder",
   comparison: "/comparison",
   "future-state": "/future-state",
+  "schema-configurator": "/schema-configurator",
 };
 
 const TABS: { id: TabId; label: string }[] = [
@@ -49,6 +56,16 @@ export function TabNav() {
               }`}
             >
               Future State Visual
+            </Link>
+            <Link
+              href={TAB_ROUTES["schema-configurator"]}
+              className={`ml-4 border-b-2 px-1 pb-3 text-sm font-medium transition-colors ${
+                pathname === TAB_ROUTES["schema-configurator"]
+                  ? "border-gray-100 text-gray-100"
+                  : "border-transparent text-gray-500 hover:text-gray-300"
+              }`}
+            >
+              Schema Configurator
             </Link>
           </div>
         ) : (
