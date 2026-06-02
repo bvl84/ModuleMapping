@@ -225,7 +225,7 @@ export function createDefaultConfiguratorState(): ConfiguratorState {
       version: "1.0.0",
       type: "B2C",
     },
-    includeDisplay: false,
+    includeDisplay: true,
     display: { pageHeader: true, pageFooter: true, stepHeader: true },
     theme: {
       enablePrimary: true,

@@ -106,7 +106,7 @@ export function MetaCard({
           checked={includeDisplay}
           onChange={onIncludeDisplayChange}
           label="Include display block"
-          helperText="When on, controls visibility of the page header, page footer, and step header (used by Solutions Builder)."
+          helperText="Controls visibility of the page header, page footer, step header, and progress indicator."
         />
         {includeDisplay ? (
           <div className="mt-3 space-y-2 rounded-md border border-dashed border-sky-300 bg-sky-50/40 p-3">
@@ -114,16 +114,30 @@ export function MetaCard({
               checked={display.pageHeader !== false}
               onChange={(v) => onDisplayChange({ ...display, pageHeader: v })}
               label="Page Header"
+              helperText="Top bar with the workflow logo and brand styling shown on every step."
             />
             <InlineToggle
               checked={display.pageFooter !== false}
               onChange={(v) => onDisplayChange({ ...display, pageFooter: v })}
               label="Page Footer"
+              helperText="Bottom bar with legal, contact, and footer links shown on every step."
             />
             <InlineToggle
               checked={display.stepHeader !== false}
               onChange={(v) => onDisplayChange({ ...display, stepHeader: v })}
               label="Step Header"
+              helperText="Per-step heading with the title, subtitle, and description above the step content."
+            />
+            <InlineToggle
+              checked={workflow.navigation.showProgress !== false}
+              onChange={(v) =>
+                onWorkflowChange({
+                  ...workflow,
+                  navigation: { ...workflow.navigation, showProgress: v },
+                })
+              }
+              label="Show pizza tracker progress"
+              helperText="Displays the step-by-step progress indicator at the top of the workflow."
             />
           </div>
         ) : null}
@@ -153,17 +167,6 @@ export function MetaCard({
 
       <div className="space-y-2 border-t border-gray-100 pt-3">
         <p className={CFG_LABEL}>Navigation</p>
-        <InlineToggle
-          checked={workflow.navigation.showProgress !== false}
-          onChange={(v) =>
-            onWorkflowChange({
-              ...workflow,
-              navigation: { ...workflow.navigation, showProgress: v },
-            })
-          }
-          label="Show pizza tracker progress"
-          helperText="Displays the step-by-step progress indicator at the top of the workflow."
-        />
         <InlineToggle
           checked={workflow.navigation.shouldSaveOnNext !== false}
           onChange={(v) =>
