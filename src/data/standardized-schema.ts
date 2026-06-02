@@ -44,8 +44,15 @@ export type ThemeColors = {
   background?: ThemeBackground;
 };
 
+export type ThemeBackgroundImage = {
+  src: string;
+  /** Anchor inside the workflow viewport. Currently fixed to bottom-right. */
+  position: "bottom-right";
+};
+
 export type Theme = {
   colors?: ThemeColors;
+  backgroundImage?: ThemeBackgroundImage;
 };
 
 export type FaqDetail = {

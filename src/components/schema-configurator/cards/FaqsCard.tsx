@@ -60,7 +60,7 @@ function FaqList({
           {showDetails ? (
             <div className="space-y-2 rounded border border-dashed border-sky-200 bg-sky-50/40 p-2">
               <p className="font-mono text-[10px] uppercase tracking-wide text-sky-700">
-                details (optional, used for Job Status)
+                Details (optional)
               </p>
               {(item.details ?? []).map((d, di) => (
                 <div key={di} className="space-y-1 rounded border border-gray-200 bg-white p-2">
@@ -133,12 +133,12 @@ export function FaqsCard({
       enabled={faqs.enable}
       onToggleEnabled={(v) => onChange({ ...faqs, enable: v })}
       title="FAQs"
-      subtitle="Default and Job Status FAQ lists (faqs.default[], faqs.jobStatus[])."
+      subtitle="Default and Job Status FAQ lists shown to customers."
     >
       {faqs.enable ? (
         <>
           <FaqList
-            title="default"
+            title="Default"
             hint="Shown on the main workflow."
             items={faqs.default}
             onChange={(next) => onChange({ ...faqs, default: next })}
@@ -147,13 +147,13 @@ export function FaqsCard({
             <InlineToggle
               checked={faqs.enableJobStatus}
               onChange={(v) => onChange({ ...faqs, enableJobStatus: v })}
-              label="Include jobStatus FAQ list"
+              label="Include Job Status FAQs"
               helperText="Surfaced on the post-submission Job Status view; supports nested details."
             />
             {faqs.enableJobStatus ? (
               <div className="mt-3">
                 <FaqList
-                  title="jobStatus"
+                  title="Job Status"
                   items={faqs.jobStatus}
                   showDetails
                   onChange={(next) => onChange({ ...faqs, jobStatus: next })}

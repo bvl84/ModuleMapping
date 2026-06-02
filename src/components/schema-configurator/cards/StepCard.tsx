@@ -39,7 +39,7 @@ function ActionsEditor({
 
   return (
     <div className="space-y-2 rounded-md border border-dashed border-amber-300 bg-amber-50/40 p-2">
-      <p className={`${CFG_LABEL} text-amber-800`}>actions</p>
+      <p className={`${CFG_LABEL} text-amber-800`}>Actions</p>
       {actions.length === 0 ? (
         <p className="text-[11px] italic text-gray-500">No actions.</p>
       ) : null}
@@ -101,7 +101,7 @@ function ActionsEditor({
                 type="text"
                 value={action.module ?? ""}
                 onChange={(e) => update(i, { module: e.target.value })}
-                placeholder="module (e.g., propertyInfo, bundles)"
+                placeholder="Module"
                 className="w-full rounded border border-gray-200 bg-white px-1.5 py-1 font-mono text-[11px] shadow-sm focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400"
               />
             ) : null}
@@ -110,7 +110,7 @@ function ActionsEditor({
                 type="text"
                 value={action.name ?? ""}
                 onChange={(e) => update(i, { name: e.target.value })}
-                placeholder={action.type === "moduleAction" ? "name (action on module)" : "name (optional)"}
+                placeholder="Name"
                 className="w-full rounded border border-gray-200 bg-white px-1.5 py-1 font-mono text-[11px] shadow-sm focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400"
               />
             ) : null}
@@ -119,7 +119,7 @@ function ActionsEditor({
                 type="text"
                 value={action.targetPath ?? ""}
                 onChange={(e) => update(i, { targetPath: e.target.value })}
-                placeholder="targetPath (e.g., @workflow.foo.bar)"
+                placeholder="Target Path"
                 className="w-full rounded border border-gray-200 bg-white px-1.5 py-1 font-mono text-[11px] shadow-sm focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400"
               />
             ) : null}
@@ -135,7 +135,7 @@ function ActionsEditor({
                     update(i, { value: e.target.value });
                   }
                 }}
-                placeholder='value as JSON (e.g., true, false, "string", 123)'
+                placeholder="Value"
                 className="w-full rounded border border-gray-200 bg-white px-1.5 py-1 font-mono text-[11px] shadow-sm focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400"
               />
             ) : null}
@@ -168,7 +168,7 @@ function OptionsEditor({
 
   return (
     <div className="space-y-2 rounded-md border border-dashed border-sky-300 bg-sky-50/40 p-2">
-      <p className={CFG_LABEL}>options</p>
+      <p className={CFG_LABEL}>Options</p>
       {options.length === 0 ? (
         <p className="text-[11px] italic text-gray-500">No options.</p>
       ) : null}
@@ -228,8 +228,6 @@ function SlotRow({
   const baseRequired = typeof baseProps.required === "boolean" ? baseProps.required : false;
   const baseDefault = typeof baseProps.default === "boolean" ? baseProps.default : false;
   const baseContent = typeof baseProps.content === "string" ? baseProps.content : "";
-  const baseBinding =
-    typeof slotTemplate.baseNode.binding === "string" ? slotTemplate.baseNode.binding : "";
   const baseActions = (slotTemplate.baseNode.actions ?? []) as ActionDefinition[];
   const baseOptions = Array.isArray(baseProps.options)
     ? ((baseProps.options as unknown[])
@@ -249,7 +247,6 @@ function SlotRow({
   const requiredValue = slotState.edits.required ?? baseRequired;
   const defaultValue = slotState.edits.default ?? baseDefault;
   const contentValue = slotState.edits.content ?? baseContent;
-  const bindingValue = slotState.edits.binding ?? baseBinding;
   const actionsValue = slotState.edits.actions ?? baseActions;
   const optionsValue = slotState.edits.options ?? baseOptions;
   const selectionRulesValue = slotState.edits.selectionRules ?? {
@@ -257,7 +254,8 @@ function SlotRow({
     maximum: baseSelectionRules.maximum ?? 0,
   };
 
-  const enabled = slotState.enabled;
+  const locked = slotTemplate.locked === true;
+  const enabled = locked ? true : slotState.enabled;
 
   return (
     <div className={`rounded-lg border ${enabled ? "border-gray-200" : "border-gray-200 opacity-80"} bg-white p-3 shadow-sm`}>
@@ -266,18 +264,35 @@ function SlotRow({
           type="button"
           role="checkbox"
           aria-checked={enabled}
-          aria-label={`${slotTemplate.displayName}: ${enabled ? "on" : "off"}`}
-          onClick={() => onChange({ ...slotState, enabled: !enabled })}
-          className="mt-0.5 rounded p-0.5 focus-visible:outline focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-1 hover:opacity-90"
+          aria-disabled={locked}
+          aria-label={
+            locked
+              ? `${slotTemplate.displayName}: required (cannot be disabled)`
+              : `${slotTemplate.displayName}: ${enabled ? "on" : "off"}`
+          }
+          onClick={() => {
+            if (locked) return;
+            onChange({ ...slotState, enabled: !enabled });
+          }}
+          title={locked ? "This component is required and cannot be removed." : undefined}
+          className={`mt-0.5 rounded p-0.5 focus-visible:outline focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-1 ${
+            locked ? "cursor-not-allowed" : "hover:opacity-90"
+          }`}
         >
           <span
-            className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 bg-white ${
-              enabled ? "border-sky-500" : "border-gray-400"
+            className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 ${
+              locked ? "border-gray-300 bg-gray-100" : enabled ? "border-sky-500 bg-white" : "border-gray-400 bg-white"
             }`}
             aria-hidden
           >
             {enabled ? (
-              <svg className="h-3 w-3 text-sky-500" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth="2">
+              <svg
+                className={`h-3 w-3 ${locked ? "text-gray-500" : "text-sky-500"}`}
+                fill="none"
+                viewBox="0 0 12 12"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
                 <path d="M2.5 6l2.5 2.5L9.5 3" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             ) : null}
@@ -291,6 +306,11 @@ function SlotRow({
             <span className="rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 font-mono text-[10px] text-sky-700">
               {slotTemplate.baseNode.component}
             </span>
+            {locked ? (
+              <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-700">
+                Always on
+              </span>
+            ) : null}
           </div>
           {slotTemplate.hint ? (
             <p className="mt-1 text-[11px] text-gray-500">{slotTemplate.hint}</p>
@@ -302,44 +322,40 @@ function SlotRow({
         <div className="mt-3 space-y-2 pl-7">
           {editable.has("label") ? (
             <TextField
-              label="properties.label"
+              label="Label"
               value={labelValue}
               onChange={(v) => update({ label: v })}
             />
           ) : null}
           {editable.has("content") ? (
             <TextField
-              label="properties.content"
+              label="Content"
               value={contentValue}
               onChange={(v) => update({ content: v })}
             />
           ) : null}
-          {editable.has("binding") ? (
-            <TextField
-              label="binding"
-              value={bindingValue}
-              onChange={(v) => update({ binding: v })}
-              placeholder="@module.path.to.field"
-            />
-          ) : null}
           {editable.has("required") ? (
-            <InlineToggle
-              checked={requiredValue}
-              onChange={(v) => update({ required: v })}
-              label="properties.required"
-            />
+            <label className="inline-flex select-none items-center gap-1.5 text-xs text-gray-600">
+              <input
+                type="checkbox"
+                checked={requiredValue}
+                onChange={(e) => update({ required: e.target.checked })}
+                className="h-3.5 w-3.5 rounded border-gray-400 accent-sky-500"
+              />
+              <span>Required Field?</span>
+            </label>
           ) : null}
           {editable.has("default") ? (
             <InlineToggle
               checked={defaultValue}
               onChange={(v) => update({ default: v })}
-              label="properties.default"
+              label="Default"
             />
           ) : null}
           {editable.has("selectionRules") ? (
             <div className="grid grid-cols-2 gap-3">
               <TextField
-                label="selectionRules.minimum"
+                label="Minimum"
                 type="number"
                 value={String(selectionRulesValue.minimum)}
                 onChange={(v) =>
@@ -352,7 +368,7 @@ function SlotRow({
                 }
               />
               <TextField
-                label="selectionRules.maximum"
+                label="Maximum"
                 type="number"
                 value={String(selectionRulesValue.maximum)}
                 onChange={(v) =>
@@ -405,27 +421,26 @@ export function StepCard({
       enabled={step.enabled}
       onToggleEnabled={(v) => onChange({ ...step, enabled: v })}
       title={template.displayName}
-      subtitle={`step: ${template.step}`}
     >
       {step.enabled ? (
         <>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <TextField
-              label="stepperLabel"
+              label="Stepper Label"
               value={step.stepperLabel}
               onChange={(v) => onChange({ ...step, stepperLabel: v })}
             />
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <TextField
-              label="heading.title"
+              label="Title"
               value={step.heading.title ?? ""}
               onChange={(v) =>
                 onChange({ ...step, heading: { ...step.heading, title: v || undefined } })
               }
             />
             <TextField
-              label="heading.subtitle"
+              label="Subtitle"
               value={step.heading.subtitle ?? ""}
               onChange={(v) =>
                 onChange({ ...step, heading: { ...step.heading, subtitle: v || undefined } })
@@ -433,7 +448,7 @@ export function StepCard({
             />
           </div>
           <TextField
-            label="heading.description"
+            label="Description"
             value={step.heading.description ?? ""}
             onChange={(v) =>
               onChange({ ...step, heading: { ...step.heading, description: v || undefined } })
@@ -442,7 +457,7 @@ export function StepCard({
 
           {template.mainSlots.length > 0 ? (
             <div className="space-y-2">
-              <p className={CFG_LABEL}>main components</p>
+              <p className={CFG_LABEL}>Page content</p>
               {template.mainSlots.map((tpl) => {
                 const slotState = step.mainSlots[tpl.slotId];
                 if (!slotState) return null;
@@ -466,7 +481,7 @@ export function StepCard({
 
           {template.footerSlots.length > 0 ? (
             <div className="space-y-2 border-t border-gray-100 pt-3">
-              <p className={CFG_LABEL}>footer components</p>
+              <p className={CFG_LABEL}>Page actions</p>
               {template.footerSlots.map((tpl) => {
                 const slotState = step.footerSlots[tpl.slotId];
                 if (!slotState) return null;

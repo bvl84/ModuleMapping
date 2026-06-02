@@ -32,6 +32,12 @@ export type SlotTemplate = {
   hint?: string;
   /** Whether the slot is on by default in a fresh template. */
   defaultEnabled: boolean;
+  /**
+   * When true, the slot cannot be disabled in the GUI. The user can still edit
+   * any fields listed in `editable`, but the include/exclude checkbox is
+   * permanently checked.
+   */
+  locked?: boolean;
   /** Full snapshot for the slot — used as the emit base. */
   baseNode: ComponentNode;
   /** Curated editable fields for this slot. */
@@ -216,6 +222,7 @@ const propertyDetails: StepTemplate = {
       slotId: "propertyDetails.autoSuggest",
       displayName: "Property address auto-suggest",
       defaultEnabled: true,
+      locked: true,
       baseNode: {
         component: "PropertyInfoAutoSuggest",
         properties: { label: "Property address", required: true },
@@ -226,6 +233,7 @@ const propertyDetails: StepTemplate = {
       slotId: "propertyDetails.addressManualInput",
       displayName: "Manual address fallback",
       defaultEnabled: true,
+      locked: true,
       hint: "Auto-shown when @propertyInfo.showAddressManualInput is true.",
       baseNode: {
         component: "AddressManualInput",
@@ -252,6 +260,7 @@ const propertyDetails: StepTemplate = {
       slotId: "propertyDetails.verificationPanel",
       displayName: "Address verification panel",
       defaultEnabled: true,
+      locked: true,
       baseNode: {
         component: "AddressVerificationPanel",
         showWhen: {
@@ -268,6 +277,7 @@ const propertyDetails: StepTemplate = {
       slotId: "propertyDetails.verifyButton",
       displayName: "Verify address button",
       defaultEnabled: true,
+      locked: true,
       baseNode: {
         component: "Button",
         properties: { label: "Verify Address" },
@@ -281,7 +291,7 @@ const propertyDetails: StepTemplate = {
           { path: "@propertyInfo.addressIsValid", operator: "equals", value: false },
         ],
       },
-      editable: ["label", "actions"],
+      editable: ["label"],
     }),
     slot({
       slotId: "propertyDetails.backButton",
@@ -301,13 +311,13 @@ const propertyDetails: StepTemplate = {
 
 const hvacGoals: StepTemplate = {
   step: "hvacGoals",
-  displayName: "HVAC Goals",
+  displayName: "Home Goals",
   defaultEnabled: true,
-  stepperLabel: "HVAC Goals",
+  stepperLabel: "Home Goals",
   heading: {
     title: "HVAC Upgrade Tool",
     subtitle: "Job Proposal",
-    description: "Choose the 2 most important aspects of your HVAC goals.",
+    description: "Choose the 2 most important aspects of your home goals.",
   },
   pageLayout: PAGE_LAYOUT_FOOTER_RR_QUARTER,
   mainSlots: [

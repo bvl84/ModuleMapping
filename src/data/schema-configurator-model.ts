@@ -24,6 +24,7 @@ import {
   type StepHeading,
   type StepPageLayout,
   type Theme,
+  type ThemeBackgroundImage,
   type Workflow,
   type WorkflowNavigation,
   type WorkflowStep,
@@ -84,6 +85,8 @@ export type ThemeState = {
   secondary: ColorPalette;
   enableBackground: boolean;
   background: LinearGradientBackground;
+  enableBackgroundImage: boolean;
+  backgroundImage: ThemeBackgroundImage;
 };
 
 export type FaqsState = {
@@ -164,6 +167,29 @@ function emptySlotState(slot: SlotTemplate): SlotState {
   return { slotId: slot.slotId, enabled: slot.defaultEnabled, edits: {} };
 }
 
+/**
+ * Convert a free-form label into a camelCase identifier suitable for the JSON
+ * `step` field. Strips non-alphanumeric characters, lowercases the first word,
+ * and capitalizes the first letter of subsequent words.
+ *
+ * Examples: "Basic Information" → "basicInformation"; "HVAC Goals" → "hvacGoals".
+ */
+export function labelToStepId(label: string): string {
+  const tokens = label
+    .normalize("NFKD")
+    .replace(/[^A-Za-z0-9]+/g, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (tokens.length === 0) return "";
+  const head = tokens[0].toLowerCase();
+  const tail = tokens
+    .slice(1)
+    .map((t) => t.charAt(0).toUpperCase() + t.slice(1).toLowerCase())
+    .join("");
+  return head + tail;
+}
+
 function emptyStepStateFromTemplate(t: StepTemplate): StepState {
   const mainSlots: Record<string, SlotState> = {};
   for (const s of t.mainSlots) mainSlots[s.slotId] = emptySlotState(s);
@@ -171,7 +197,7 @@ function emptyStepStateFromTemplate(t: StepTemplate): StepState {
   for (const s of t.footerSlots) footerSlots[s.slotId] = emptySlotState(s);
   return {
     step: t.step,
-    enabled: t.defaultEnabled,
+    enabled: true,
     stepperLabel: t.stepperLabel,
     heading: { ...t.heading },
     mainSlotsByOrder: t.mainSlots.map((s) => s.slotId),
@@ -208,15 +234,17 @@ export function createDefaultConfiguratorState(): ConfiguratorState {
       secondary: { ...DEFAULT_SECONDARY_PALETTE },
       enableBackground: false,
       background: structuredClone(DEFAULT_BACKGROUND),
+      enableBackgroundImage: false,
+      backgroundImage: { src: "", position: "bottom-right" },
     },
     faqs: {
-      enable: false,
+      enable: true,
       default: [],
       enableJobStatus: false,
       jobStatus: [],
     },
     landingPage: {
-      enable: false,
+      enable: true,
       manufacturerLogos: [],
     },
     workflow: {
@@ -288,8 +316,9 @@ function buildStepFromState(stepState: StepState, template: StepTemplate): Workf
   }
   for (const extra of stepState.extraFooter) footer.push(structuredClone(extra));
 
+  const derivedStepId = labelToStepId(stepState.stepperLabel);
   const out: WorkflowStep = {
-    step: stepState.step,
+    step: derivedStepId || stepState.step,
     stepperLabel: stepState.stepperLabel,
   };
 
@@ -327,9 +356,30 @@ function tryParseJson(s: string): unknown | undefined {
 /* Build standardized config from state                            */
 /* -------------------------------------------------------------- */
 
+/**
+ * Walks an arbitrary JSON-like value and rewrites any object property whose
+ * key is `step` and whose string value matches a renamed step ID. Used to keep
+ * cross-step references (e.g., `nextStep` actions targeting another step by
+ * name) in sync when a user renames a step via its stepper label.
+ */
+function applyStepRenamesDeep(value: unknown, renames: Map<string, string>): unknown {
+  if (renames.size === 0 || value === null || typeof value !== "object") return value;
+  if (Array.isArray(value)) return value.map((v) => applyStepRenamesDeep(v, renames));
+  if (!isPlainObject(value)) return value;
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(value)) {
+    if (k === "step" && typeof v === "string" && renames.has(v)) {
+      out[k] = renames.get(v) ?? v;
+    } else {
+      out[k] = applyStepRenamesDeep(v, renames);
+    }
+  }
+  return out;
+}
+
 export function buildStandardizedConfigFromState(state: ConfiguratorState): StandardizedConfig {
   const out: StandardizedConfig = {
-    id: state.meta.id,
+    id: labelToStepId(state.meta.id) || state.meta.id,
     title: state.meta.title,
     description: state.meta.description,
     version: state.meta.version,
@@ -338,12 +388,24 @@ export function buildStandardizedConfigFromState(state: ConfiguratorState): Stan
   };
 
   const theme: Theme = {};
-  if (state.theme.enablePrimary || state.theme.enableSecondary || state.theme.enableBackground) {
-    theme.colors = {};
-    if (state.theme.enablePrimary) theme.colors.primary = { ...state.theme.primary };
-    if (state.theme.enableSecondary) theme.colors.secondary = { ...state.theme.secondary };
-    if (state.theme.enableBackground) {
-      theme.colors.background = { primary: structuredClone(state.theme.background) };
+  const hasColors =
+    state.theme.enablePrimary || state.theme.enableSecondary || state.theme.enableBackground;
+  const hasBackgroundImage =
+    state.theme.enableBackgroundImage && state.theme.backgroundImage.src.trim().length > 0;
+  if (hasColors || hasBackgroundImage) {
+    if (hasColors) {
+      theme.colors = {};
+      if (state.theme.enablePrimary) theme.colors.primary = { ...state.theme.primary };
+      if (state.theme.enableSecondary) theme.colors.secondary = { ...state.theme.secondary };
+      if (state.theme.enableBackground) {
+        theme.colors.background = { primary: structuredClone(state.theme.background) };
+      }
+    }
+    if (hasBackgroundImage) {
+      theme.backgroundImage = {
+        src: state.theme.backgroundImage.src.trim(),
+        position: "bottom-right",
+      };
     }
     out.theme = theme;
   }
@@ -378,21 +440,32 @@ export function buildStandardizedConfigFromState(state: ConfiguratorState): Stan
   }
   wf.navigation = { ...state.workflow.navigation };
 
+  const renames = new Map<string, string>();
   for (const stepId of state.stepOrder) {
     const stepState = state.steps[stepId];
     if (!stepState || !stepState.enabled) continue;
     const template = SCHEMA_STEP_TEMPLATES.find((t) => t.step === stepId);
     if (!template) continue;
-    wf.steps.push(buildStepFromState(stepState, template));
+    const built = buildStepFromState(stepState, template);
+    if (typeof built.step === "string" && built.step !== stepState.step) {
+      renames.set(stepState.step, built.step);
+    }
+    wf.steps.push(built);
   }
   for (const extra of state.extraSteps) wf.steps.push(structuredClone(extra));
+
+  if (renames.size > 0) {
+    wf.steps = wf.steps.map((s) => applyStepRenamesDeep(s, renames) as WorkflowStep);
+  }
 
   out.workflow = wf;
 
   if (state.proposedPayload.enabled) {
     const parsed = tryParseJson(state.proposedPayload.rawJson);
     if (parsed && isPlainObject(parsed)) {
-      out.proposedPayload = parsed as StandardizedConfig["proposedPayload"];
+      const payload =
+        renames.size > 0 ? applyStepRenamesDeep(parsed, renames) : parsed;
+      out.proposedPayload = payload as StandardizedConfig["proposedPayload"];
     }
   }
 
@@ -455,7 +528,9 @@ function matchSlotsToImported(
   imported: ComponentNode[],
 ): { slots: Record<string, SlotState>; extras: ComponentNode[] } {
   const slots: Record<string, SlotState> = {};
-  for (const t of templateSlots) slots[t.slotId] = { slotId: t.slotId, enabled: false, edits: {} };
+  for (const t of templateSlots) {
+    slots[t.slotId] = { slotId: t.slotId, enabled: t.locked === true, edits: {} };
+  }
 
   const extras: ComponentNode[] = [];
   let s = 0;
@@ -536,9 +611,14 @@ export function hydrateStateFromStandardizedConfig(input: unknown): Configurator
           : [],
       };
     }
-  } else {
+  } else if (!theme) {
     fresh.theme.enablePrimary = false;
     fresh.theme.enableSecondary = false;
+  }
+  const bgImage = theme && isPlainObject(theme.backgroundImage) ? theme.backgroundImage : undefined;
+  if (bgImage && typeof bgImage.src === "string" && bgImage.src.trim().length > 0) {
+    fresh.theme.enableBackgroundImage = true;
+    fresh.theme.backgroundImage = { src: bgImage.src, position: "bottom-right" };
   }
 
   // faqs

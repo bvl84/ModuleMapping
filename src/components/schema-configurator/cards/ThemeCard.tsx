@@ -85,10 +85,14 @@ function GradientEditor({
       <div className="flex flex-wrap items-end gap-3">
         <TextField
           id="bg-angle"
-          label="angle (deg)"
+          label="Angle (deg)"
           type="number"
           value={String(background.angle)}
+          step={45}
+          min={0}
+          max={360}
           onChange={(v) => onChange({ ...background, angle: Number.parseFloat(v) || 0 })}
+          helperText="Increments by 45°."
         />
         <div className="h-10 flex-1 min-w-[8rem] rounded-md border border-gray-300 shadow-inner" style={{ background: previewCss }} />
       </div>
@@ -96,7 +100,7 @@ function GradientEditor({
         {background.stops.map((stop, i) => (
           <div key={i} className="flex flex-wrap items-end gap-2 rounded-md border border-gray-200 bg-white p-2">
             <div className="flex-1 min-w-[12rem]">
-              <p className="font-mono text-[10px] uppercase tracking-wide text-gray-500">color</p>
+              <p className="font-mono text-[10px] uppercase tracking-wide text-gray-500">Color</p>
               <input
                 type="text"
                 value={stop.color}
@@ -106,7 +110,7 @@ function GradientEditor({
               />
             </div>
             <div className="w-24">
-              <p className="font-mono text-[10px] uppercase tracking-wide text-gray-500">position</p>
+              <p className="font-mono text-[10px] uppercase tracking-wide text-gray-500">Position</p>
               <input
                 type="text"
                 value={stop.position}
@@ -147,18 +151,18 @@ export function ThemeCard({
     <SectionCard
       enabled
       title="Theme"
-      subtitle="Color palettes and optional background gradient (theme.colors.*)."
+      subtitle="Color palettes and optional background gradient."
     >
       <div className="space-y-3">
         <InlineToggle
           checked={theme.enablePrimary}
           onChange={(v) => onChange({ ...theme, enablePrimary: v })}
           label="Primary palette"
-          helperText="Emits theme.colors.primary.{100..900}."
+          helperText="Nine shades from 100 (lightest) to 900 (darkest) used as the brand's primary color."
         />
         {theme.enablePrimary ? (
           <PaletteEditor
-            title="primary"
+            title="Primary"
             palette={theme.primary}
             onChange={(p) => onChange({ ...theme, primary: p })}
           />
@@ -170,11 +174,11 @@ export function ThemeCard({
           checked={theme.enableSecondary}
           onChange={(v) => onChange({ ...theme, enableSecondary: v })}
           label="Secondary palette"
-          helperText="Emits theme.colors.secondary.{100..900}."
+          helperText="Nine shades from 100 (lightest) to 900 (darkest) used for accents and supporting elements."
         />
         {theme.enableSecondary ? (
           <PaletteEditor
-            title="secondary"
+            title="Secondary"
             palette={theme.secondary}
             onChange={(p) => onChange({ ...theme, secondary: p })}
           />
@@ -186,13 +190,62 @@ export function ThemeCard({
           checked={theme.enableBackground}
           onChange={(v) => onChange({ ...theme, enableBackground: v })}
           label="Background gradient"
-          helperText="Emits theme.colors.background.primary as a linear-gradient (used by Solutions Builder)."
+          helperText="Optional page-level linear gradient (used by Solutions Builder)."
         />
         {theme.enableBackground ? (
           <GradientEditor
             background={theme.background}
             onChange={(bg) => onChange({ ...theme, background: bg })}
           />
+        ) : null}
+      </div>
+
+      <div className="space-y-3 border-t border-gray-100 pt-3">
+        <InlineToggle
+          checked={theme.enableBackgroundImage}
+          onChange={(v) => onChange({ ...theme, enableBackgroundImage: v })}
+          label="Background image"
+          helperText="Optional decorative image anchored to the bottom-right of the workflow."
+        />
+        {theme.enableBackgroundImage ? (
+          <div className="space-y-3 rounded-md border border-dashed border-sky-300 bg-sky-50/40 p-3">
+            <TextField
+              id="bg-image-src"
+              label="Image URL"
+              type="url"
+              value={theme.backgroundImage.src}
+              onChange={(v) =>
+                onChange({
+                  ...theme,
+                  backgroundImage: { ...theme.backgroundImage, src: v },
+                })
+              }
+              placeholder="https://… or asset path"
+              helperText="Anchored to the bottom-right of the workflow."
+            />
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-wide text-gray-500">
+                Preview
+              </p>
+              <div
+                className="mt-1 h-32 w-full rounded-md border border-gray-200 bg-white shadow-inner"
+                style={{
+                  backgroundImage: theme.backgroundImage.src
+                    ? `url(${theme.backgroundImage.src})`
+                    : undefined,
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "bottom right",
+                  backgroundSize: "auto 70%",
+                }}
+              >
+                {!theme.backgroundImage.src ? (
+                  <div className="flex h-full w-full items-center justify-center text-[11px] text-gray-400">
+                    Add an image URL above to preview
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          </div>
         ) : null}
       </div>
     </SectionCard>

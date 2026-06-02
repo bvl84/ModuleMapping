@@ -27,17 +27,17 @@ export function ProposedPayloadCard({
       enabled={state.enabled}
       onToggleEnabled={(v) => onChange({ ...state, enabled: v })}
       title="Proposed payload"
-      subtitle="proposedPayload.{metadata, summary} — advanced raw JSON (highly client-specific)."
+      subtitle="Advanced raw JSON (client-specific) for the proposal submission shape."
     >
       {state.enabled ? (
         <>
           <p className="text-[11px] text-gray-500">
-            Edit the raw JSON below. Bindings starting with{" "}
-            <span className="font-mono text-sky-700">@</span> reference workflow paths and are
+            Advanced editor — leave as-is unless you know what you are changing. Values starting
+            with <span className="font-mono text-sky-700">@</span> are workflow references
             evaluated at runtime.
           </p>
           <TextAreaField
-            label="proposedPayload (JSON)"
+            label="Proposed Payload (JSON)"
             value={state.rawJson}
             onChange={(v) => onChange({ ...state, rawJson: v })}
             rows={16}

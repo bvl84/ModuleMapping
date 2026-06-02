@@ -136,6 +136,9 @@ export function TextField({
   type = "text",
   disabled,
   helperText,
+  step,
+  min,
+  max,
 }: {
   id?: string;
   label: string;
@@ -146,6 +149,9 @@ export function TextField({
   type?: "text" | "email" | "url" | "number";
   disabled?: boolean;
   helperText?: string;
+  step?: number | string;
+  min?: number | string;
+  max?: number | string;
 }) {
   return (
     <div>
@@ -160,6 +166,9 @@ export function TextField({
         placeholder={placeholder}
         required={required}
         disabled={disabled}
+        step={step}
+        min={min}
+        max={max}
         className={inputClass}
       />
       {helperText ? <p className="mt-1 text-[11px] text-gray-500">{helperText}</p> : null}
@@ -177,6 +186,7 @@ export function TextAreaField({
   disabled,
   helperText,
   monospace = true,
+  required,
 }: {
   id?: string;
   label: string;
@@ -187,10 +197,13 @@ export function TextAreaField({
   disabled?: boolean;
   helperText?: string;
   monospace?: boolean;
+  required?: boolean;
 }) {
   return (
     <div>
-      <FieldLabel htmlFor={id}>{label}</FieldLabel>
+      <FieldLabel htmlFor={id} required={required}>
+        {label}
+      </FieldLabel>
       <textarea
         id={id}
         value={value}
@@ -198,6 +211,8 @@ export function TextAreaField({
         placeholder={placeholder}
         rows={rows}
         disabled={disabled}
+        required={required}
+        aria-required={required}
         className={`mt-1 w-full rounded-md border border-gray-300 bg-white px-2.5 py-1.5 ${
           monospace ? "font-mono text-sm" : "text-sm"
         } text-gray-800 shadow-sm placeholder:text-gray-400 focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400 disabled:bg-gray-100`}

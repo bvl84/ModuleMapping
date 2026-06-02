@@ -24,11 +24,11 @@ export function LandingPageCard({
       enabled={state.enable}
       onToggleEnabled={(v) => onChange({ ...state, enable: v })}
       title="Landing page"
-      subtitle="landingPage.manufacturerLogos[] — names or asset paths shown on the landing screen."
+      subtitle="Manufacturer names or asset paths shown on the landing screen."
     >
       {state.enable ? (
         <div className="space-y-2">
-          <p className={CFG_LABEL}>manufacturerLogos</p>
+          <p className={CFG_LABEL}>Manufacturer Logos</p>
           {state.manufacturerLogos.length === 0 ? (
             <p className="text-xs italic text-gray-400">No entries yet.</p>
           ) : null}
