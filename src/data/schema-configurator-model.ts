@@ -45,6 +45,8 @@ export type SlotEdits = {
   actions?: ActionDefinition[];
   options?: Array<{ label: string; targetPath: string }>;
   selectionRules?: { minimum: number; maximum: number };
+  key?: string;
+  keyName?: string;
 };
 
 export type SlotState = {
@@ -284,6 +286,8 @@ function applySlotEdits(base: ComponentNode, edits: SlotEdits): ComponentNode {
   if (edits.content !== undefined) props.content = edits.content;
   if (edits.options !== undefined) props.options = edits.options;
   if (edits.selectionRules !== undefined) props.selectionRules = edits.selectionRules;
+  if (edits.key !== undefined) props.key = edits.key;
+  if (edits.keyName !== undefined) props.keyName = edits.keyName;
 
   if (Object.keys(props).length > 0) node.properties = props;
   if (edits.binding !== undefined) node.binding = edits.binding;
@@ -297,13 +301,38 @@ function applySlotEditsOrImported(slot: SlotState, template: SlotTemplate): Comp
   return applySlotEdits(base, slot.edits);
 }
 
+/**
+ * Derive an option's emitted targetPath from the step's stepper label and
+ * the option's label, e.g. `@workflow.goals.homeGoals.lowerUtilityCosts`.
+ * Used so PMs only have to edit human labels — the path is regenerated on
+ * every emit.
+ */
+export function deriveOptionTargetPath(stepperLabel: string, optionLabel: string): string {
+  const stepSlug = labelToStepId(stepperLabel) || "step";
+  const optSlug = labelToStepId(optionLabel) || "option";
+  return `@workflow.goals.${stepSlug}.${optSlug}`;
+}
+
+function applyDerivedOptionTargetPaths(node: ComponentNode, stepperLabel: string): void {
+  const props = isPlainObject(node.properties) ? node.properties : undefined;
+  if (!props || !Array.isArray(props.options)) return;
+  props.options = (props.options as unknown[]).map((opt) => {
+    if (!isPlainObject(opt)) return opt;
+    const label = typeof opt.label === "string" ? opt.label : "";
+    return { ...opt, targetPath: deriveOptionTargetPath(stepperLabel, label) };
+  });
+  node.properties = props;
+}
+
 function buildStepFromState(stepState: StepState, template: StepTemplate): WorkflowStep {
   const main: ComponentNode[] = [];
   for (const slotId of stepState.mainSlotsByOrder) {
     const slotState = stepState.mainSlots[slotId];
     const slotTemplate = template.mainSlots.find((s) => s.slotId === slotId);
     if (!slotState || !slotTemplate || !slotState.enabled) continue;
-    main.push(applySlotEditsOrImported(slotState, slotTemplate));
+    const node = applySlotEditsOrImported(slotState, slotTemplate);
+    applyDerivedOptionTargetPaths(node, stepState.stepperLabel);
+    main.push(node);
   }
   for (const extra of stepState.extraMain) main.push(structuredClone(extra));
 
@@ -312,7 +341,9 @@ function buildStepFromState(stepState: StepState, template: StepTemplate): Workf
     const slotState = stepState.footerSlots[slotId];
     const slotTemplate = template.footerSlots.find((s) => s.slotId === slotId);
     if (!slotState || !slotTemplate || !slotState.enabled) continue;
-    footer.push(applySlotEditsOrImported(slotState, slotTemplate));
+    const node = applySlotEditsOrImported(slotState, slotTemplate);
+    applyDerivedOptionTargetPaths(node, stepState.stepperLabel);
+    footer.push(node);
   }
   for (const extra of stepState.extraFooter) footer.push(structuredClone(extra));
 
@@ -388,15 +419,18 @@ export function buildStandardizedConfigFromState(state: ConfiguratorState): Stan
   };
 
   const theme: Theme = {};
-  const hasColors =
-    state.theme.enablePrimary || state.theme.enableSecondary || state.theme.enableBackground;
+  // Primary and Secondary palettes are always required in the GUI, so emit
+  // them regardless of any legacy enablePrimary/enableSecondary state flags.
+  const emitPrimary = true;
+  const emitSecondary = true;
+  const hasColors = emitPrimary || emitSecondary || state.theme.enableBackground;
   const hasBackgroundImage =
     state.theme.enableBackgroundImage && state.theme.backgroundImage.src.trim().length > 0;
   if (hasColors || hasBackgroundImage) {
     if (hasColors) {
       theme.colors = {};
-      if (state.theme.enablePrimary) theme.colors.primary = { ...state.theme.primary };
-      if (state.theme.enableSecondary) theme.colors.secondary = { ...state.theme.secondary };
+      if (emitPrimary) theme.colors.primary = { ...state.theme.primary };
+      if (emitSecondary) theme.colors.secondary = { ...state.theme.secondary };
       if (state.theme.enableBackground) {
         theme.colors.background = { primary: structuredClone(state.theme.background) };
       }
@@ -518,6 +552,16 @@ function readSlotEditsFromNode(node: ComponentNode, slotTemplate: SlotTemplate):
       minimum: typeof sr.minimum === "number" ? sr.minimum : 0,
       maximum: typeof sr.maximum === "number" ? sr.maximum : 0,
     };
+  }
+  if (editable.has("key") && typeof nodeProps.key === "string" && nodeProps.key !== baseProps.key) {
+    edits.key = nodeProps.key;
+  }
+  if (
+    editable.has("keyName") &&
+    typeof nodeProps.keyName === "string" &&
+    nodeProps.keyName !== baseProps.keyName
+  ) {
+    edits.keyName = nodeProps.keyName;
   }
 
   return edits;

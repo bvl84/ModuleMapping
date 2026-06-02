@@ -21,7 +21,22 @@ export type EditableField =
   | "content"
   | "actions"
   | "options"
-  | "selectionRules";
+  | "selectionRules"
+  | "key"
+  | "keyName";
+
+/**
+ * Optional grouping metadata. Slots with the same `group.id` are rendered
+ * together inside a single collapsible section in the GUI.
+ */
+export type SlotGroup = {
+  /** Stable id (only slots sharing this id are grouped). */
+  id: string;
+  /** Friendly heading shown on the collapsed section. */
+  label: string;
+  /** When true, the section starts collapsed in the GUI. */
+  defaultCollapsed?: boolean;
+};
 
 export type SlotTemplate = {
   /** Stable id used for hydration/round-trip matching. */
@@ -38,6 +53,8 @@ export type SlotTemplate = {
    * permanently checked.
    */
   locked?: boolean;
+  /** Optional collapsible group this slot belongs to. */
+  group?: SlotGroup;
   /** Full snapshot for the slot — used as the emit base. */
   baseNode: ComponentNode;
   /** Curated editable fields for this slot. */
@@ -323,7 +340,7 @@ const hvacGoals: StepTemplate = {
   mainSlots: [
     slot({
       slotId: "hvacGoals.sectionButtonGroup",
-      displayName: "HVAC goals options",
+      displayName: "Home goals options",
       defaultEnabled: true,
       hint: "Choices the customer can select from. Max selections caps how many can be picked at once.",
       baseNode: {
@@ -331,10 +348,10 @@ const hvacGoals: StepTemplate = {
         properties: {
           selectionRules: { minimum: 0, maximum: 2 },
           options: [
-            { label: "Lower utility costs", targetPath: "@workflow.goals.hvacGoals.lowerCost" },
-            { label: "Better performance", targetPath: "@workflow.goals.hvacGoals.betterPerformance" },
-            { label: "Modernize my system", targetPath: "@workflow.goals.hvacGoals.modernizeSystem" },
-            { label: "Improve air quality", targetPath: "@workflow.goals.hvacGoals.improveAirQuality" },
+            { label: "Lower utility costs", targetPath: "@workflow.goals.homeGoals.lowerUtilityCosts" },
+            { label: "Better performance", targetPath: "@workflow.goals.homeGoals.betterPerformance" },
+            { label: "Modernize my system", targetPath: "@workflow.goals.homeGoals.modernizeMySystem" },
+            { label: "Improve air quality", targetPath: "@workflow.goals.homeGoals.improveAirQuality" },
           ],
         },
         styling: {
@@ -582,7 +599,8 @@ const systemUpgrade: StepTemplate = {
     slot({
       slotId: "systemUpgrade.optInCommunication",
       displayName: "Opt-in communication checkbox",
-      defaultEnabled: true,
+      defaultEnabled: false,
+      group: { id: "daikin", label: "Daikin Specific Config", defaultCollapsed: true },
       baseNode: {
         component: "OptInCommunication",
         properties: {
@@ -601,21 +619,18 @@ const systemUpgrade: StepTemplate = {
     slot({
       slotId: "systemUpgrade.recaptcha",
       displayName: "reCAPTCHA",
-      defaultEnabled: true,
+      defaultEnabled: false,
+      group: { id: "daikin", label: "Daikin Specific Config", defaultCollapsed: true },
       baseNode: {
         component: "ReCaptcha",
-        showWhen: {
-          path: "@systemUpgrades.hasBundlesAndRequiredFields",
-          operator: "equals",
-          value: true,
-        },
       },
       editable: [],
     }),
     slot({
       slotId: "systemUpgrade.disclaimer",
       displayName: "Submit disclaimer text",
-      defaultEnabled: true,
+      defaultEnabled: false,
+      group: { id: "daikin", label: "Daikin Specific Config", defaultCollapsed: true },
       baseNode: {
         component: "Text",
         properties: {

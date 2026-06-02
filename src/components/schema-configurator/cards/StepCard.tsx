@@ -1,6 +1,12 @@
 "use client";
 
-import type { SlotEdits, SlotState, StepState } from "@/data/schema-configurator-model";
+import { useState, type ReactNode } from "react";
+import {
+  deriveOptionTargetPath,
+  type SlotEdits,
+  type SlotState,
+  type StepState,
+} from "@/data/schema-configurator-model";
 import type { StepTemplate, SlotTemplate } from "@/data/schema-step-templates";
 import {
   KNOWN_ACTION_TYPES,
@@ -15,6 +21,132 @@ import {
 } from "../ConfiguratorUI";
 
 type SlotEditPatch = Partial<SlotEdits> & { _replace?: SlotEdits };
+
+function SlotGroupSection({
+  label,
+  defaultCollapsed,
+  enabledCount,
+  totalCount,
+  children,
+}: {
+  label: string;
+  defaultCollapsed?: boolean;
+  enabledCount: number;
+  totalCount: number;
+  children: ReactNode;
+}) {
+  const [collapsed, setCollapsed] = useState(defaultCollapsed === true);
+  return (
+    <div className="rounded-lg border border-amber-300 bg-amber-50/40 shadow-sm">
+      <button
+        type="button"
+        onClick={() => setCollapsed((c) => !c)}
+        aria-expanded={!collapsed}
+        className="flex w-full items-center gap-2 px-3 py-2 text-left transition-colors hover:bg-amber-100/40"
+      >
+        <span
+          aria-hidden
+          className={`inline-block h-2 w-2 shrink-0 transform border-r-2 border-b-2 border-amber-700 transition-transform ${
+            collapsed ? "-rotate-45" : "rotate-45"
+          }`}
+        />
+        <span className="text-sm font-bold tracking-tight text-amber-900">{label}</span>
+        <span className="ml-auto rounded-full border border-amber-300 bg-white px-2 py-0.5 font-mono text-[10px] font-semibold text-amber-800">
+          {enabledCount}/{totalCount} on
+        </span>
+      </button>
+      {!collapsed ? <div className="space-y-2 border-t border-amber-200 p-3">{children}</div> : null}
+    </div>
+  );
+}
+
+type SlotListItem =
+  | { kind: "slot"; tpl: SlotTemplate }
+  | {
+      kind: "group";
+      id: string;
+      label: string;
+      defaultCollapsed?: boolean;
+      tpls: SlotTemplate[];
+    };
+
+function buildSlotListItems(slots: readonly SlotTemplate[]): SlotListItem[] {
+  const items: SlotListItem[] = [];
+  const groupIdxByKey = new Map<string, number>();
+  for (const tpl of slots) {
+    if (!tpl.group) {
+      items.push({ kind: "slot", tpl });
+      continue;
+    }
+    const key = tpl.group.id;
+    const existingIdx = groupIdxByKey.get(key);
+    if (existingIdx !== undefined) {
+      const existing = items[existingIdx];
+      if (existing.kind === "group") existing.tpls.push(tpl);
+      continue;
+    }
+    groupIdxByKey.set(key, items.length);
+    items.push({
+      kind: "group",
+      id: key,
+      label: tpl.group.label,
+      defaultCollapsed: tpl.group.defaultCollapsed,
+      tpls: [tpl],
+    });
+  }
+  return items;
+}
+
+function renderGroupedSlots(
+  templates: readonly SlotTemplate[],
+  states: Record<string, SlotState>,
+  stepperLabel: string,
+  onSlotChange: (slotId: string, next: SlotState) => void,
+): ReactNode {
+  const items = buildSlotListItems(templates);
+  return items.map((item) => {
+    if (item.kind === "slot") {
+      const state = states[item.tpl.slotId];
+      if (!state) return null;
+      return (
+        <SlotRow
+          key={item.tpl.slotId}
+          slotTemplate={item.tpl}
+          slotState={state}
+          stepperLabel={stepperLabel}
+          onChange={(next) => onSlotChange(item.tpl.slotId, next)}
+        />
+      );
+    }
+    const enabledCount = item.tpls.reduce((acc, t) => {
+      const s = states[t.slotId];
+      return acc + (s?.enabled || t.locked === true ? 1 : 0);
+    }, 0);
+    return (
+      <SlotGroupSection
+        key={`group-${item.id}`}
+        label={item.label}
+        defaultCollapsed={item.defaultCollapsed}
+        enabledCount={enabledCount}
+        totalCount={item.tpls.length}
+      >
+        {item.tpls.map((tpl) => {
+          const state = states[tpl.slotId];
+          if (!state) return null;
+          return (
+            <SlotRow
+              key={tpl.slotId}
+              slotTemplate={tpl}
+              slotState={state}
+              stepperLabel={stepperLabel}
+              onChange={(next) => onSlotChange(tpl.slotId, next)}
+            />
+          );
+        })}
+      </SlotGroupSection>
+    );
+  });
+}
 
 function ActionsEditor({
   actions,
@@ -39,9 +171,9 @@ function ActionsEditor({
 
   return (
     <div className="space-y-2 rounded-md border border-dashed border-amber-300 bg-amber-50/40 p-2">
-      <p className={`${CFG_LABEL} text-amber-800`}>Actions</p>
+      <p className={`${CFG_LABEL} text-gray-900`}>Actions</p>
       {actions.length === 0 ? (
-        <p className="text-[11px] italic text-gray-500">No actions.</p>
+        <p className="text-[11px] italic text-gray-700">No actions.</p>
       ) : null}
       {actions.map((action, i) => {
         const needsModule = action.type === "moduleAction";
@@ -51,7 +183,7 @@ function ActionsEditor({
         return (
           <div key={i} className="space-y-1.5 rounded border border-amber-200 bg-white p-2">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="font-mono text-[11px] text-gray-500">#{i + 1}</span>
+              <span className="font-mono text-[11px] font-semibold text-gray-900">#{i + 1}</span>
               <select
                 value={KNOWN_ACTION_TYPES.includes(action.type as KnownActionType) ? action.type : "__custom"}
                 onChange={(e) => {
@@ -59,7 +191,7 @@ function ActionsEditor({
                   if (t === "__custom") return;
                   update(i, { type: t });
                 }}
-                className="rounded border border-gray-300 bg-white px-1.5 py-0.5 font-mono text-xs shadow-sm focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400"
+                className="rounded border border-gray-300 bg-white px-1.5 py-0.5 font-mono text-xs text-gray-900 shadow-sm focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400"
               >
                 {KNOWN_ACTION_TYPES.map((t) => (
                   <option key={t} value={t}>
@@ -102,7 +234,7 @@ function ActionsEditor({
                 value={action.module ?? ""}
                 onChange={(e) => update(i, { module: e.target.value })}
                 placeholder="Module"
-                className="w-full rounded border border-gray-200 bg-white px-1.5 py-1 font-mono text-[11px] shadow-sm focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400"
+                className="w-full rounded border border-gray-200 bg-white px-1.5 py-1 font-mono text-[11px] text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400"
               />
             ) : null}
             {needsName ? (
@@ -111,7 +243,7 @@ function ActionsEditor({
                 value={action.name ?? ""}
                 onChange={(e) => update(i, { name: e.target.value })}
                 placeholder="Name"
-                className="w-full rounded border border-gray-200 bg-white px-1.5 py-1 font-mono text-[11px] shadow-sm focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400"
+                className="w-full rounded border border-gray-200 bg-white px-1.5 py-1 font-mono text-[11px] text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400"
               />
             ) : null}
             {needsTargetPath ? (
@@ -120,7 +252,7 @@ function ActionsEditor({
                 value={action.targetPath ?? ""}
                 onChange={(e) => update(i, { targetPath: e.target.value })}
                 placeholder="Target Path"
-                className="w-full rounded border border-gray-200 bg-white px-1.5 py-1 font-mono text-[11px] shadow-sm focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400"
+                className="w-full rounded border border-gray-200 bg-white px-1.5 py-1 font-mono text-[11px] text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400"
               />
             ) : null}
             {needsValue ? (
@@ -136,7 +268,7 @@ function ActionsEditor({
                   }
                 }}
                 placeholder="Value"
-                className="w-full rounded border border-gray-200 bg-white px-1.5 py-1 font-mono text-[11px] shadow-sm focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400"
+                className="w-full rounded border border-gray-200 bg-white px-1.5 py-1 font-mono text-[11px] text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400"
               />
             ) : null}
           </div>
@@ -155,49 +287,59 @@ function ActionsEditor({
 
 function OptionsEditor({
   options,
+  stepperLabel,
   onChange,
 }: {
   options: NonNullable<SlotEdits["options"]>;
+  stepperLabel: string;
   onChange: (next: NonNullable<SlotEdits["options"]>) => void;
 }) {
   const update = (i: number, patch: Partial<{ label: string; targetPath: string }>) => {
     onChange(options.map((o, idx) => (idx === i ? { ...o, ...patch } : o)));
   };
   const remove = (i: number) => onChange(options.filter((_, idx) => idx !== i));
-  const add = () => onChange([...options, { label: "", targetPath: "" }]);
+  const add = () =>
+    onChange([
+      ...options,
+      { label: "", targetPath: deriveOptionTargetPath(stepperLabel, "") },
+    ]);
 
   return (
     <div className="space-y-2 rounded-md border border-dashed border-sky-300 bg-sky-50/40 p-2">
-      <p className={CFG_LABEL}>Options</p>
+      <p className={`${CFG_LABEL} text-gray-900`}>Options</p>
+      <p className="text-[11px] text-gray-600">
+        The path each option writes to is auto-generated from the step name and the option label.
+      </p>
       {options.length === 0 ? (
-        <p className="text-[11px] italic text-gray-500">No options.</p>
+        <p className="text-[11px] italic text-gray-700">No options.</p>
       ) : null}
-      {options.map((opt, i) => (
-        <div key={i} className="flex flex-wrap items-center gap-2">
-          <span className="font-mono text-[11px] text-gray-500">#{i + 1}</span>
-          <input
-            type="text"
-            value={opt.label}
-            onChange={(e) => update(i, { label: e.target.value })}
-            placeholder="Label"
-            className="min-w-[10rem] flex-1 rounded border border-gray-200 bg-white px-1.5 py-1 text-xs shadow-sm focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400"
-          />
-          <input
-            type="text"
-            value={opt.targetPath}
-            onChange={(e) => update(i, { targetPath: e.target.value })}
-            placeholder="@workflow.goals.…"
-            className="min-w-[12rem] flex-1 rounded border border-gray-200 bg-white px-1.5 py-1 font-mono text-[11px] shadow-sm focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400"
-          />
-          <button
-            type="button"
-            onClick={() => remove(i)}
-            className="rounded border border-red-200 bg-white px-1.5 py-0.5 text-[10px] font-semibold text-red-600 hover:bg-red-50"
-          >
-            Remove
-          </button>
-        </div>
-      ))}
+      {options.map((opt, i) => {
+        const derivedPath = deriveOptionTargetPath(stepperLabel, opt.label);
+        return (
+          <div key={i} className="space-y-1 rounded border border-sky-200 bg-white p-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-mono text-[11px] font-semibold text-gray-900">#{i + 1}</span>
+              <input
+                type="text"
+                value={opt.label}
+                onChange={(e) => update(i, { label: e.target.value })}
+                placeholder="Label"
+                className="min-w-[12rem] flex-1 rounded border border-gray-200 bg-white px-1.5 py-1 text-xs text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400"
+              />
+              <button
+                type="button"
+                onClick={() => remove(i)}
+                className="rounded border border-red-200 bg-white px-1.5 py-0.5 text-[10px] font-semibold text-red-600 hover:bg-red-50"
+              >
+                Remove
+              </button>
+            </div>
+            <p className="font-mono text-[10px] text-gray-500">
+              Path: <span className="text-gray-700">{derivedPath}</span>
+            </p>
+          </div>
+        );
+      })}
       <button
         type="button"
         onClick={add}
@@ -212,10 +354,12 @@ function OptionsEditor({
 function SlotRow({
   slotTemplate,
   slotState,
+  stepperLabel,
   onChange,
 }: {
   slotTemplate: SlotTemplate;
   slotState: SlotState;
+  stepperLabel: string;
   onChange: (next: SlotState) => void;
 }) {
   const update = (patch: SlotEditPatch) => {
@@ -241,6 +385,8 @@ function SlotRow({
     baseProps.selectionRules && typeof baseProps.selectionRules === "object"
       ? (baseProps.selectionRules as { minimum?: number; maximum?: number })
       : { minimum: 0, maximum: 0 };
+  const baseKey = typeof baseProps.key === "string" ? baseProps.key : "";
+  const baseKeyName = typeof baseProps.keyName === "string" ? baseProps.keyName : "";
 
   const editable = new Set<string>(slotTemplate.editable);
   const labelValue = slotState.edits.label ?? baseLabel;
@@ -253,6 +399,8 @@ function SlotRow({
     minimum: baseSelectionRules.minimum ?? 0,
     maximum: baseSelectionRules.maximum ?? 0,
   };
+  const keyValue = slotState.edits.key ?? baseKey;
+  const keyNameValue = slotState.edits.keyName ?? baseKeyName;
 
   const locked = slotTemplate.locked === true;
   const enabled = locked ? true : slotState.enabled;
@@ -383,7 +531,29 @@ function SlotRow({
             </div>
           ) : null}
           {editable.has("options") ? (
-            <OptionsEditor options={optionsValue} onChange={(next) => update({ options: next })} />
+            <OptionsEditor
+              options={optionsValue}
+              stepperLabel={stepperLabel}
+              onChange={(next) => update({ options: next })}
+            />
+          ) : null}
+          {editable.has("key") ? (
+            <TextField
+              label="Key"
+              value={keyValue}
+              onChange={(v) => update({ key: v })}
+              placeholder="reCAPTCHA site key"
+              helperText="The actual reCAPTCHA site key issued by Google."
+            />
+          ) : null}
+          {editable.has("keyName") ? (
+            <TextField
+              label="reCAPTCHA Key Name"
+              value={keyNameValue}
+              onChange={(v) => update({ keyName: v })}
+              placeholder="e.g. daikinFitLocal"
+              helperText="A friendly identifier the runtime uses to look up this reCAPTCHA configuration."
+            />
           ) : null}
           {editable.has("actions") ? (
             <ActionsEditor actions={actionsValue} onChange={(next) => update({ actions: next })} />
@@ -458,18 +628,12 @@ export function StepCard({
           {template.mainSlots.length > 0 ? (
             <div className="space-y-2">
               <p className={CFG_LABEL}>Page content</p>
-              {template.mainSlots.map((tpl) => {
-                const slotState = step.mainSlots[tpl.slotId];
-                if (!slotState) return null;
-                return (
-                  <SlotRow
-                    key={tpl.slotId}
-                    slotTemplate={tpl}
-                    slotState={slotState}
-                    onChange={(next) => updateSlot("main", tpl.slotId, next)}
-                  />
-                );
-              })}
+              {renderGroupedSlots(
+                template.mainSlots,
+                step.mainSlots,
+                step.stepperLabel,
+                (slotId, next) => updateSlot("main", slotId, next),
+              )}
               {step.extraMain.length > 0 ? (
                 <p className="text-[11px] italic text-gray-500">
                   + {step.extraMain.length} unmatched main component
@@ -482,18 +646,12 @@ export function StepCard({
           {template.footerSlots.length > 0 ? (
             <div className="space-y-2 border-t border-gray-100 pt-3">
               <p className={CFG_LABEL}>Page actions</p>
-              {template.footerSlots.map((tpl) => {
-                const slotState = step.footerSlots[tpl.slotId];
-                if (!slotState) return null;
-                return (
-                  <SlotRow
-                    key={tpl.slotId}
-                    slotTemplate={tpl}
-                    slotState={slotState}
-                    onChange={(next) => updateSlot("footer", tpl.slotId, next)}
-                  />
-                );
-              })}
+              {renderGroupedSlots(
+                template.footerSlots,
+                step.footerSlots,
+                step.stepperLabel,
+                (slotId, next) => updateSlot("footer", slotId, next),
+              )}
               {step.extraFooter.length > 0 ? (
                 <p className="text-[11px] italic text-gray-500">
                   + {step.extraFooter.length} unmatched footer component

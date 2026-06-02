@@ -276,34 +276,32 @@ export function ThemeCard({
     >
       <div className="space-y-3">
         <InlineToggle
-          checked={theme.enablePrimary}
-          onChange={(v) => onChange({ ...theme, enablePrimary: v })}
+          checked
+          onChange={() => {}}
+          disabled
           label="Primary palette"
-          helperText="Nine shades from 100 (lightest) to 900 (darkest) used as the brand's primary color."
+          helperText="Nine shades from 100 (lightest) to 900 (darkest) used as the brand's primary color. Required."
         />
-        {theme.enablePrimary ? (
-          <PaletteEditor
-            title="Primary"
-            palette={theme.primary}
-            onChange={(p) => onChange({ ...theme, primary: p })}
-          />
-        ) : null}
+        <PaletteEditor
+          title="Primary"
+          palette={theme.primary}
+          onChange={(p) => onChange({ ...theme, primary: p })}
+        />
       </div>
 
       <div className="space-y-3 border-t border-gray-100 pt-3">
         <InlineToggle
-          checked={theme.enableSecondary}
-          onChange={(v) => onChange({ ...theme, enableSecondary: v })}
+          checked
+          onChange={() => {}}
+          disabled
           label="Secondary palette"
-          helperText="Nine shades from 100 (lightest) to 900 (darkest) used for accents and supporting elements."
+          helperText="Nine shades from 100 (lightest) to 900 (darkest) used for accents and supporting elements. Required."
         />
-        {theme.enableSecondary ? (
-          <PaletteEditor
-            title="Secondary"
-            palette={theme.secondary}
-            onChange={(p) => onChange({ ...theme, secondary: p })}
-          />
-        ) : null}
+        <PaletteEditor
+          title="Secondary"
+          palette={theme.secondary}
+          onChange={(p) => onChange({ ...theme, secondary: p })}
+        />
       </div>
 
       <div className="space-y-3 border-t border-gray-100 pt-3">
