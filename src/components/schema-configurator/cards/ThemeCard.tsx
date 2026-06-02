@@ -9,6 +9,75 @@ import {
 } from "@/data/standardized-schema";
 import { CFG_LABEL, InlineToggle, SectionCard, TextField } from "../ConfiguratorUI";
 
+type Rgb = [number, number, number];
+
+function hexToRgb(hex: string): Rgb | null {
+  const trimmed = hex.trim();
+  const long = /^#?([\da-f]{6})$/i.exec(trimmed);
+  if (long) {
+    const v = long[1];
+    return [
+      Number.parseInt(v.slice(0, 2), 16),
+      Number.parseInt(v.slice(2, 4), 16),
+      Number.parseInt(v.slice(4, 6), 16),
+    ];
+  }
+  const short = /^#?([\da-f]{3})$/i.exec(trimmed);
+  if (short) {
+    const v = short[1];
+    return [
+      Number.parseInt(v[0] + v[0], 16),
+      Number.parseInt(v[1] + v[1], 16),
+      Number.parseInt(v[2] + v[2], 16),
+    ];
+  }
+  return null;
+}
+
+function rgbToHex([r, g, b]: Rgb): string {
+  const f = (n: number) =>
+    Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, "0");
+  return `#${f(r)}${f(g)}${f(b)}`.toUpperCase();
+}
+
+function mix(base: Rgb, target: Rgb, amt: number): Rgb {
+  return [
+    base[0] * (1 - amt) + target[0] * amt,
+    base[1] * (1 - amt) + target[1] * amt,
+    base[2] * (1 - amt) + target[2] * amt,
+  ];
+}
+
+const WHITE: Rgb = [255, 255, 255];
+const BLACK: Rgb = [0, 0, 0];
+
+/**
+ * Mix amounts toward white (lighter) or black (darker) for each shade,
+ * relative to the base 500 color. Tuned to approximate a Tailwind-style ramp.
+ */
+const PALETTE_MIX_RECIPE: Record<PaletteShade, { target: Rgb; amt: number } | null> = {
+  "100": { target: WHITE, amt: 0.9 },
+  "200": { target: WHITE, amt: 0.75 },
+  "300": { target: WHITE, amt: 0.55 },
+  "400": { target: WHITE, amt: 0.3 },
+  "500": null,
+  "600": { target: BLACK, amt: 0.15 },
+  "700": { target: BLACK, amt: 0.3 },
+  "800": { target: BLACK, amt: 0.45 },
+  "900": { target: BLACK, amt: 0.6 },
+};
+
+function generatePaletteFromBase(hex500: string): ColorPalette | null {
+  const rgb = hexToRgb(hex500);
+  if (!rgb) return null;
+  const out: ColorPalette = {};
+  for (const key of PALETTE_SHADE_KEYS) {
+    const recipe = PALETTE_MIX_RECIPE[key];
+    out[key] = recipe ? rgbToHex(mix(rgb, recipe.target, recipe.amt)) : rgbToHex(rgb);
+  }
+  return out;
+}
+
 function PaletteEditor({
   title,
   palette,
@@ -18,23 +87,75 @@ function PaletteEditor({
   palette: ColorPalette;
   onChange: (next: ColorPalette) => void;
 }) {
+  const baseHex = palette["500"] ?? "";
+  const canGenerate = hexToRgb(baseHex) !== null;
+
+  const onGenerate = () => {
+    const generated = generatePaletteFromBase(baseHex);
+    if (generated) onChange(generated);
+  };
+
+  const otherShades = PALETTE_SHADE_KEYS.filter((s) => s !== "500");
+
   return (
     <div>
       <p className={CFG_LABEL}>{title}</p>
-      <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-3 md:grid-cols-3">
-        {PALETTE_SHADE_KEYS.map((shade: PaletteShade) => {
+      <p className="mt-1 text-[11px] text-gray-500">
+        Set the 500 base color and click <span className="font-semibold">Generate</span> — the
+        configurator fills 100–900 for you. You can tweak any shade afterward.
+      </p>
+
+      <div className="mt-2 flex flex-wrap items-center gap-2 rounded-md border border-sky-300 bg-sky-50/50 px-2 py-1.5 shadow-sm">
+        <input
+          type="color"
+          value={baseHex || "#ffffff"}
+          onChange={(e) => onChange({ ...palette, "500": e.target.value })}
+          aria-label={`${title} 500 base color`}
+          className="h-8 w-8 shrink-0 cursor-pointer rounded border border-white shadow ring-1 ring-sky-300"
+        />
+        <span className="font-mono text-[10px] font-semibold uppercase tracking-wide text-sky-800">
+          500 · base
+        </span>
+        <input
+          type="text"
+          value={baseHex}
+          onChange={(e) => onChange({ ...palette, "500": e.target.value })}
+          placeholder="#0C60ED"
+          className="w-24 rounded border border-gray-300 bg-white px-1.5 py-0.5 font-mono text-xs text-gray-800 shadow-sm focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400"
+        />
+        <button
+          type="button"
+          onClick={onGenerate}
+          disabled={!canGenerate}
+          className="ml-auto rounded-md border border-sky-500 bg-sky-500 px-2.5 py-1 text-xs font-semibold text-white shadow-sm hover:bg-sky-600 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-300"
+          title="Generate 100–900 from the 500 hex"
+        >
+          Generate 100–900 →
+        </button>
+      </div>
+
+      <p className="mt-3 font-mono text-[10px] uppercase tracking-wide text-gray-400">
+        Derived shades
+      </p>
+      <div className="mt-1 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {otherShades.map((shade: PaletteShade) => {
           const value = palette[shade] ?? "";
           return (
-            <div key={shade} className="flex items-center gap-2 rounded-md border border-gray-200 bg-white p-2">
+            <div
+              key={shade}
+              className="flex items-center gap-2 rounded-md border border-gray-200 bg-white p-2"
+            >
               <input
                 type="color"
                 value={value || "#ffffff"}
                 onChange={(e) => onChange({ ...palette, [shade]: e.target.value })}
                 aria-label={`${title} ${shade}`}
-                className="h-8 w-8 shrink-0 cursor-pointer rounded border border-gray-300 bg-white"
+                className="h-7 w-7 shrink-0 cursor-pointer rounded border border-gray-300 bg-white"
               />
               <div className="min-w-0 flex-1">
-                <p className="font-mono text-[10px] uppercase tracking-wide text-gray-500">{shade}</p>
+                <p className="font-mono text-[10px] uppercase tracking-wide text-gray-500">
+                  {shade}
+                </p>
                 <input
                   type="text"
                   value={value}
