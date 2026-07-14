@@ -13,7 +13,7 @@ import { useCallback } from "react";
  */
 export function useAuthHeader(): () => Promise<Record<string, string>> {
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
-  return useCallback(async () => {
+  return useCallback(async (): Promise<Record<string, string>> => {
     if (!isAuthenticated) return {};
     try {
       const token = await getAccessTokenSilently();
