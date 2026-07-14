@@ -1,0 +1,286 @@
+{
+  "name": "HVACUpgradeTool",
+  "comments": [
+    "Cinch WF — Config Profile",
+    "HomeWarranty"
+  ],
+  "sections": [
+    {
+      "wfType": "WF",
+      "clientId": "{clientID}",
+      "bc": "HomeWarranty",
+      "backgroundImage": "{1-6}",
+      "moduleName": "Module",
+      "entries": [
+        {
+          "nameId": "Contact",
+          "display": true,
+          "sort": 0,
+          "details": {
+            "Functions": [
+              "Form Validation",
+              "Input Masking",
+              "Email Verification (Cinch Identity)"
+            ],
+            "Fields": [
+              "First Name",
+              "Last Name",
+              "Email",
+              "Phone Number"
+            ]
+          }
+        },
+        {
+          "nameId": "Verify Home",
+          "display": true,
+          "sort": 1,
+          "details": {
+            "Functions": [
+              "Address Autocomplete",
+              "Zillow Verification",
+              "Property Data Population",
+              "Map Pin",
+              "Occupied Toggle"
+            ],
+            "Fields": [
+              "Property Address",
+              "Property Occupied"
+            ],
+            "Ext_Fields": [
+              "Year Built",
+              "SqFt",
+              "Num Systems",
+              "Beds",
+              "Baths",
+              "Map"
+            ]
+          }
+        },
+        {
+          "nameId": "HVAC Goals",
+          "display": true,
+          "sort": 2,
+          "details": {
+            "Functions": [
+              "Goal Selection (pick 2 of 4)"
+            ],
+            "Options": [
+              "Lower utility cost",
+              "Modernize my system",
+              "Better performance",
+              "Improve air quality"
+            ]
+          }
+        },
+        {
+          "nameId": "Current System",
+          "display": true,
+          "sort": 3,
+          "details": {
+            "Functions": [
+              "SqFt Input",
+              "Current System Selection",
+              "Rating Selection (Good/Better/Best)",
+              "Rating Details (modal)",
+              "Ductwork (Yes/No)"
+            ],
+            "Fields": [
+              "Heating/Cooling SqFt",
+              "Current HVAC System",
+              "New System Rating",
+              "Ductwork Availability"
+            ]
+          }
+        },
+        {
+          "nameId": "Your Match",
+          "display": true,
+          "sort": 4,
+          "details": {
+            "Functions": [
+              "System Matching Engine",
+              "Recommended System Display",
+              "Price Breakdown",
+              "Alternative Options",
+              "Schedule Free Inspection"
+            ]
+          }
+        },
+        {
+          "nameId": "Scheduling",
+          "display": true,
+          "sort": 5,
+          "details": {
+            "Functions": [
+              "Direct Scheduler",
+              "Calendar (date + time slots)",
+              "Job Creation"
+            ],
+            "Config": {
+              "jobType": "Inspection",
+              "estTime": "1hr",
+              "tz": "MDT"
+            }
+          }
+        },
+        {
+          "nameId": "Support",
+          "display": true
+        },
+        {
+          "nameId": "PDF",
+          "display": false
+        },
+        {
+          "nameId": "Email",
+          "display": false
+        },
+        {
+          "nameId": "Job Creation",
+          "display": true
+        }
+      ]
+    },
+    {
+      "wfType": "WO",
+      "clientId": "{clientID}",
+      "bc": "HomeWarranty",
+      "backgroundImage": "{1-6}",
+      "moduleName": "Module_Inspection",
+      "entries": [
+        {
+          "nameId": "Scheduling",
+          "display": true,
+          "sort": 0,
+          "actions": [
+            "Reschedule"
+          ]
+        },
+        {
+          "nameId": "Scheduled",
+          "display": true,
+          "sort": 1,
+          "actions": [
+            "Reschedule"
+          ]
+        },
+        {
+          "nameId": "In Process",
+          "display": true,
+          "sort": 2
+        },
+        {
+          "nameId": "Inspection Completed",
+          "display": true,
+          "sort": 3
+        },
+        {
+          "nameId": "Cancelled",
+          "display": true
+        }
+      ]
+    },
+    {
+      "wfType": "QO",
+      "clientId": "{clientID}",
+      "bc": "HomeWarranty",
+      "backgroundImage": "{1-6}",
+      "moduleName": "Module",
+      "entries": [
+        {
+          "nameId": "Quote in Review",
+          "display": true,
+          "sort": 0
+        },
+        {
+          "nameId": "Quote Ready for Approval",
+          "display": true,
+          "sort": 1,
+          "details": {
+            "actions": [
+              "Approve Quote",
+              "Reject Quote"
+            ],
+            "Fields": [
+              "System cost",
+              "Labor",
+              "Shipping/Delivery",
+              "Subtotal",
+              "Estimated tax",
+              "Grand Total"
+            ]
+          }
+        },
+        {
+          "nameId": "Quote Approved",
+          "display": true,
+          "sort": 2
+        },
+        {
+          "nameId": "Quote Declined",
+          "display": true
+        },
+        {
+          "nameId": "Quote Cancelled",
+          "display": true
+        }
+      ]
+    },
+    {
+      "wfType": "WO",
+      "clientId": "{clientID}",
+      "bc": "HomeWarranty",
+      "backgroundImage": "{1-6}",
+      "moduleName": "Module_Replacement",
+      "entries": [
+        {
+          "nameId": "Created",
+          "display": true,
+          "sort": 0,
+          "actions": [
+            "Schedule Installation"
+          ]
+        },
+        {
+          "nameId": "Scheduling",
+          "display": true,
+          "sort": 1,
+          "actions": [
+            "Reschedule"
+          ]
+        },
+        {
+          "nameId": "Scheduled",
+          "display": true,
+          "sort": 2,
+          "actions": [
+            "Reschedule"
+          ]
+        },
+        {
+          "nameId": "In Process",
+          "display": true,
+          "sort": 3
+        },
+        {
+          "nameId": "Completed",
+          "display": true,
+          "sort": 4,
+          "details": {
+            "Feedback": [
+              "Installation quality",
+              "Communication",
+              "Timeliness",
+              "Technician professionalism",
+              "Value for cost"
+            ]
+          }
+        },
+        {
+          "nameId": "Cancelled",
+          "display": true
+        }
+      ]
+    }
+  ]
+}

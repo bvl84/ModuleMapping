@@ -1,0 +1,610 @@
+{
+  "id": "cinchPOC",
+  "title": "Replace Your HVAC System | Cinch Home Services",
+  "description": "Find your perfect HVAC replacement in minutes. See system matches, upfront pricing, and schedule a free in-home inspection — covered by your Cinch home warranty.",
+  "version": "1.0.0",
+  "type": "B2C",
+  "theme": {
+    "colors": {
+      "primary": {
+        "100": "#E4EEFF",
+        "200": "#CEDFFB",
+        "300": "#94B9F6",
+        "400": "#6BA0F7",
+        "500": "#0C60ED",
+        "600": "#024BC6",
+        "700": "#003EA6",
+        "800": "#002F7D",
+        "900": "#00225A"
+      },
+      "secondary": {
+        "100": "#E5FFEB",
+        "200": "#AFFFC1",
+        "300": "#73FF83",
+        "400": "#1FC345",
+        "500": "#058623",
+        "600": "#02701B",
+        "700": "#025E17",
+        "800": "#014B12",
+        "900": "#01340D"
+      }
+    }
+  },
+  "faqs": {
+    "default": [
+      {
+        "question": "How long will it take to get my HVAC unit installed?",
+        "answer": "Once you request a consultation, your project will typically be completed within 10 days."
+      },
+      {
+        "question": "What brands are available for installation?",
+        "answer": "Daikin, Goodman, and Amana brand products are currently available for installation. Our independent contractors can advise you on the best choice for your home."
+      },
+      {
+        "question": "Should I also replace my duct work?",
+        "answer": "We recommend evaluating duct-work performance with any new system installation to maximize the new system's performance."
+      },
+      {
+        "question": "Can I have you install a system I've already purchased?",
+        "answer": "Please note we're unable to install products that were not purchased with installation. For installation services the product and labor must be purchased together as a package."
+      }
+    ],
+    "jobStatus": [
+      {
+        "question": "What to expect",
+        "answer": "We guide you through each step of the job so you know exactly what to expect.",
+        "details": [
+          {
+            "title": "1. Inspection",
+            "content": "A contractor visits your home to confirm your system needs and setup."
+          },
+          {
+            "title": "2. Quote",
+            "content": "We prepare your options, finalize pricing, and place the order once approved."
+          },
+          {
+            "title": "3. Replacement",
+            "content": "Your new system is installed and tested to ensure everything is working properly."
+          }
+        ]
+      },
+      {
+        "question": "How long will it take to get my HVAC unit installed?",
+        "answer": "Once you request a consultation, your project will typically be completed within 10 days."
+      },
+      {
+        "question": "What brands are available for installation?",
+        "answer": "Daikin, Goodman, and Amana brand products are currently available for installation. Our independent contractors can advise you on the best choice for your home."
+      },
+      {
+        "question": "Should I also replace my duct work?",
+        "answer": "We recommend evaluating duct-work performance with any new system installation to maximize the new system's performance."
+      },
+      {
+        "question": "Can I have you install a system I've already purchased?",
+        "answer": "Please note we're unable to install products that were not purchased with installation. For installation services the product and labor must be purchased together as a package."
+      }
+    ]
+  },
+  "landingPage": {
+    "manufacturerLogos": ["Daikin", "Goodman", "Amana"]
+  },
+  "workflow": {
+    "defaultStepPostAuthentication": 1,
+    "moduleConfigs": {
+      "contacts": {
+        "mode": "single"
+      }
+    },
+    "navigation": {
+      "showProgress": true,
+      "shouldSaveOnNext": true
+    },
+    "steps": [
+      {
+        "step": "basicInfo",
+        "stepperLabel": "Basic Information",
+        "heading": {
+          "title": "HVAC Upgrade Tool",
+          "subtitle": "Job Proposal",
+          "description": "Before we get started, we'll need to verify your information and some basic details to personalize your upgrade options."
+        },
+        "pageLayout": {
+          "main": {
+            "styling": {
+              "core": "md:w-2/3 lg:w-1/3"
+            }
+          }
+        },
+        "main": [
+          {
+            "component": "TextInput",
+            "properties": {
+              "label": "First name",
+              "required": true
+            },
+            "binding": "@contacts.contactForm.firstName"
+          },
+          {
+            "component": "TextInput",
+            "properties": {
+              "label": "Last name",
+              "required": true
+            },
+            "binding": "@contacts.contactForm.lastName"
+          },
+          {
+            "component": "TextInput",
+            "properties": {
+              "type": "email",
+              "label": "Email",
+              "required": true
+            },
+            "binding": "@contacts.contactForm.email"
+          },
+          {
+            "component": "PhoneInput",
+            "properties": {
+              "label": "Phone number",
+              "required": true
+            },
+            "binding": "@contacts.contactForm.phone",
+            "styling": {
+              "core": "md:w-[180px]"
+            }
+          }
+        ],
+        "footer": [
+          {
+            "component": "Button",
+            "properties": {
+              "label": "Verify Information"
+            },
+            "actions": [
+              {
+                "type": "validateStep"
+              },
+              {
+                "type": "nextStep"
+              }
+            ],
+            "disabledWhen": {
+              "path": "@contacts.isCurrentContactValid",
+              "operator": "equals",
+              "value": false
+            }
+          }
+        ]
+      },
+      {
+        "step": "propertyDetails",
+        "stepperLabel": "Property Details",
+        "heading": {
+          "title": "HVAC Upgrade Tool",
+          "subtitle": "Job Proposal",
+          "description": "Enter the property address for the upgrade so we can provide the most accurate options for your home."
+        },
+        "auth": {
+          "required": true,
+          "preAuthData": {
+            "email": "@contacts.contactForm.email"
+          }
+        },
+        "pageLayout": {
+          "main": {
+            "styling": {
+              "core": "md:w-2/3 lg:w-1/3"
+            }
+          },
+          "footer": {
+            "styling": {
+              "layout": {
+                "lg": {
+                  "type": "flex",
+                  "direction": "row-reverse",
+                  "justify": "end"
+                }
+              }
+            }
+          }
+        },
+        "main": [
+          {
+            "component": "PropertyInfoAutoSuggest",
+            "properties": {
+              "label": "Property address",
+              "required": true
+            }
+          },
+          {
+            "component": "AddressManualInput",
+            "showWhen": {
+              "path": "@propertyInfo.showAddressManualInput",
+              "operator": "equals",
+              "value": true
+            }
+          },
+          {
+            "component": "Checkbox",
+            "properties": {
+              "label": "Property is currently occupied",
+              "default": true
+            },
+            "binding": "@propertyInfo.isOccupied"
+          },
+          {
+            "component": "AddressVerificationPanel",
+            "showWhen": {
+              "path": "@workflow.verifyHome.showVerifyHome",
+              "operator": "equals",
+              "value": true
+            }
+          }
+        ],
+        "footer": [
+          {
+            "component": "Button",
+            "properties": {
+              "label": "Verify Address"
+            },
+            "actions": [
+              {
+                "type": "validateStep"
+              },
+              {
+                "type": "moduleAction",
+                "module": "propertyInfo",
+                "name": "getHomeInfo"
+              },
+              {
+                "type": "flipBool",
+                "targetPath": "@workflow.verifyHome.showVerifyHome"
+              }
+            ],
+            "disabledWhen": [
+              {
+                "path": "@propertyInfo.hasValidAddress",
+                "operator": "equals",
+                "value": false
+              },
+              {
+                "path": "@propertyInfo.addressIsValid",
+                "operator": "equals",
+                "value": false
+              }
+            ]
+          },
+          {
+            "component": "Button",
+            "properties": {
+              "label": "Back",
+              "variant": "secondary"
+            },
+            "actions": [
+              {
+                "type": "previousStep"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "step": "hvacGoals",
+        "stepperLabel": "HVAC Goals",
+        "heading": {
+          "title": "HVAC Upgrade Tool",
+          "subtitle": "Job Proposal",
+          "description": "Choose the 2 most important aspects of your HVAC goals."
+        },
+        "pageLayout": {
+          "footer": {
+            "styling": {
+              "core": "lg:w-1/4",
+              "layout": {
+                "lg": {
+                  "type": "flex",
+                  "direction": "row-reverse",
+                  "justify": "end"
+                }
+              }
+            }
+          }
+        },
+        "main": [
+          {
+            "component": "SectionButtonGroup",
+            "properties": {
+              "selectionRules": {
+                "minimum": 0,
+                "maximum": 2
+              },
+              "options": [
+                {
+                  "label": "Lower utility costs",
+                  "targetPath": "@workflow.goals.hvacGoals.lowerCost"
+                },
+                {
+                  "label": "Better performance",
+                  "targetPath": "@workflow.goals.hvacGoals.betterPerformance"
+                },
+                {
+                  "label": "Modernize my system",
+                  "targetPath": "@workflow.goals.hvacGoals.modernizeSystem"
+                },
+                {
+                  "label": "Improve air quality",
+                  "targetPath": "@workflow.goals.hvacGoals.improveAirQuality"
+                }
+              ]
+            },
+            "styling": {
+              "core": "lg:w-3/4",
+              "layout": {
+                "default": {
+                  "type": "grid",
+                  "columns": 2
+                },
+                "lg": {
+                  "type": "grid",
+                  "columns": 4
+                }
+              }
+            }
+          }
+        ],
+        "footer": [
+          {
+            "component": "Button",
+            "properties": {
+              "label": "Continue"
+            },
+            "styling": {
+              "core": "xl:w-[120px]"
+            },
+            "actions": [
+              {
+                "type": "validateStep"
+              },
+              {
+                "type": "nextStep"
+              }
+            ]
+          },
+          {
+            "component": "Button",
+            "properties": {
+              "label": "Go Back",
+              "variant": "secondary"
+            },
+            "styling": {
+              "core": "xl:w-[120px]"
+            },
+            "actions": [
+              {
+                "type": "previousStep"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "step": "currentSystem",
+        "stepperLabel": "Current System",
+        "heading": {
+          "title": "HVAC Upgrade Tool",
+          "subtitle": "Job Proposal",
+          "description": "Tell us what you know about your current system type."
+        },
+        "pageLayout": {
+          "footer": {
+            "styling": {
+              "core": "lg:w-1/4",
+              "layout": {
+                "lg": {
+                  "type": "flex",
+                  "direction": "row-reverse",
+                  "justify": "end"
+                }
+              }
+            }
+          }
+        },
+        "main": [
+          {
+            "component": "CurrentSystemContainer",
+            "properties": {
+              "children": [
+                {
+                  "component": "CinchCurrentSystemInfo"
+                }
+              ]
+            }
+          }
+        ],
+        "footer": [
+          {
+            "component": "Button",
+            "properties": {
+              "label": "View Upgrade"
+            },
+            "styling": {
+              "core": "lg:w-[120px]"
+            },
+            "actions": [
+              {
+                "type": "nextStep"
+              }
+            ],
+            "disabledWhen": {
+              "path": "@bundles.hasBundlesAndRequiredFields",
+              "operator": "equals",
+              "value": false
+            }
+          },
+          {
+            "component": "Button",
+            "properties": {
+              "label": "Go Back",
+              "variant": "secondary"
+            },
+            "actions": [
+              {
+                "type": "previousStep"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "step": "yourMatch",
+        "stepperLabel": "Your Match",
+        "heading": {
+          "title": "Your HVAC Upgrade!",
+          "subtitle": "Job Proposal"
+        },
+        "main": [
+          {
+            "component": "Container",
+            "styling": {
+              "core": "lg:gap-16",
+              "layout": {
+                "lg": {
+                  "type": "flex",
+                  "direction": "row"
+                }
+              }
+            },
+            "properties": {
+              "children": [
+                {
+                  "component": "SummaryBundleCard",
+                  "binding": {
+                    "systemsDataPath": "@bundles.systems",
+                    "currentSystemIndexPath": {
+                      "target": "@workflow.yourMatch.currentSystemIndex",
+                      "default": 0
+                    }
+                  },
+                  "styling": {
+                    "core": "mb-10 flex-1"
+                  }
+                },
+                {
+                  "component": "Container",
+                  "properties": {
+                    "children": [
+                      {
+                        "component": "PriceBreakdown",
+                        "binding": "@pricing.finalPrice"
+                      },
+                      {
+                        "component": "ContactInfo",
+                        "binding": "@contacts.contactForm",
+                        "styling": {
+                          "core": "order-3 lg:order-2"
+                        }
+                      },
+                      {
+                        "component": "Container",
+                        "properties": {
+                          "children": [
+                            {
+                              "component": "Button",
+                              "properties": {
+                                "label": "Schedule Free Inspection"
+                              },
+                              "actions": [
+                                {
+                                  "type": "flipBool",
+                                  "targetPath": "@workflow.yourMatch.showScheduleDrawer"
+                                }
+                              ]
+                            },
+                            {
+                              "component": "Button",
+                              "properties": {
+                                "label": "Go Back",
+                                "variant": "secondary"
+                              },
+                              "actions": [
+                                {
+                                  "type": "previousStep"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "styling": {
+                          "core": "order-2 lg:order-3",
+                          "layout": {
+                            "default": {
+                              "direction": "col"
+                            },
+                            "lg": {
+                              "type": "flex",
+                              "direction": "row-reverse",
+                              "justify": "start"
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "styling": {
+                    "core": "flex-1"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "component": "SummaryBundleAlternativeOptions"
+          },
+          {
+            "component": "ScheduleDrawer",
+            "properties": {
+              "title": "Show Schedule Drawer",
+              "containerContentType": "inspection"
+            },
+            "binding": {
+              "timezonePath": "@propertyInfo.timezone",
+              "appointmentsPath": "@bundles.inspectionSchedules"
+            },
+            "showWhen": {
+              "path": "@workflow.yourMatch.showScheduleDrawer",
+              "operator": "equals",
+              "value": true
+            },
+            "actions": [
+              {
+                "type": "moduleAction",
+                "name": "validateInspectionSchedule",
+                "module": "bundles"
+              },
+              { "type": "submitWorkOrderProposal" }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "proposedPayload": {
+    "metadata": {
+      "submittedBy": {
+        "name": "@contacts.contactForm.firstName",
+        "email": "@contacts.contactForm.email"
+      }
+    },
+    "summary": {
+      "companyId": "cinchPOC",
+      "summaryName": "@contacts.contactForm.firstName",
+      "warrantyId": "@workflow.basicInfo.warrantyId",
+      "contacts": "@contacts.proposalFormatted.contacts",
+      "selectedBundles": "@bundles.proposalFormatted.selectedBundles",
+      "property": "@propertyInfo.proposalFormatted",
+      "estimatedPrice": "@pricing.proposalFormatted.estimatedPrice",
+      "selectedInspectionSchedules": "@bundles.proposalFormatted.selectedInspectionSchedules",
+      "goals": { "$filterTrue": true, "value": "@workflow.goals" }
+    }
+  }
+}

@@ -1,0 +1,658 @@
+{
+  "id": "sbPOC",
+  "title": "Find Your HVAC Upgrade | Daikin Solutions Builder",
+  "description": "Compare Daikin inverter heat pumps, single-room and multi-room ductless systems for your home. Get a personalized recommendation and connect with a Daikin Comfort Pro.",
+  "version": "1.0.0",
+  "type": "B2C",
+  "theme": {
+    "colors": {
+      "primary": {
+        "100": "#E5F6FD",
+        "200": "#BDE9FA",
+        "300": "#7ED0F4",
+        "400": "#40B8ED",
+        "500": "#0097E0",
+        "600": "#0087C8",
+        "700": "#0065A3",
+        "800": "#004E82",
+        "900": "#00365F"
+      },
+      "secondary": {
+        "100": "#FFFFFF",
+        "200": "#F5F5F5",
+        "300": "#E6E6E6",
+        "400": "#CCCCCC",
+        "500": "#999999",
+        "600": "#666666",
+        "700": "#4C4C4C",
+        "800": "#262626",
+        "900": "#000000"
+      },
+      "background": {
+        "primary": {
+          "type": "linear-gradient",
+          "angle": 315,
+          "stops": [
+            { "color": "rgba(189, 233, 250, 0.4)", "position": "0%" },
+            { "color": "rgba(255, 255, 255, 1)", "position": "50%" }
+          ]
+        }
+      }
+    }
+  },
+  "display": {
+    "pageHeader": false,
+    "pageFooter": false,
+    "stepHeader": false
+  },
+  "workflow": {
+    "moduleConfigs": {
+      "contacts": {
+        "mode": "single"
+      }
+    },
+    "navigation": {
+      "showProgress": true,
+      "shouldSaveOnNext": true
+    },
+    "steps": [
+      {
+        "step": "basicInfo",
+        "stepperLabel": "Basic Information",
+        "heading": {
+          "description": "Before we get started, we need a few details to create your personalized solution."
+        },
+        "pageLayout": {
+          "main": {
+            "styling": {
+              "core": "md:w-2/3 lg:w-1/3"
+            }
+          }
+        },
+        "main": [
+          {
+            "component": "InfoBanner",
+            "properties": {
+              "content": "Providing your information allows us to connect you with your local Daikin Pro."
+            }
+          },
+          {
+            "component": "TextInput",
+            "properties": {
+              "label": "First name",
+              "required": true
+            },
+            "binding": "@contacts.contactForm.firstName"
+          },
+          {
+            "component": "TextInput",
+            "properties": {
+              "label": "Last name",
+              "required": true
+            },
+            "binding": "@contacts.contactForm.lastName"
+          },
+          {
+            "component": "TextInput",
+            "properties": {
+              "type": "email",
+              "label": "Email",
+              "required": true
+            },
+            "binding": "@contacts.contactForm.email"
+          },
+          {
+            "component": "PhoneInput",
+            "properties": {
+              "label": "Phone number",
+              "required": true
+            },
+            "binding": "@contacts.contactForm.phone",
+            "styling": {
+              "core": "md:w-[180px]"
+            }
+          }
+        ],
+        "footer": [
+          {
+            "component": "Button",
+            "properties": {
+              "label": "Verify Information"
+            },
+            "actions": [
+              {
+                "type": "validateStep"
+              },
+              {
+                "type": "nextStep"
+              }
+            ],
+            "disabledWhen": {
+              "path": "@contacts.isCurrentContactValid",
+              "operator": "equals",
+              "value": false
+            }
+          }
+        ]
+      },
+      {
+        "step": "propertyDetails",
+        "stepperLabel": "Property Details",
+        "heading": {
+          "description": "Enter your property address so we can estimate your home's size."
+        },
+        "pageLayout": {
+          "main": {
+            "styling": {
+              "core": "md:w-2/3 lg:w-1/3"
+            }
+          },
+          "footer": {
+            "styling": {
+              "layout": {
+                "lg": {
+                  "type": "flex",
+                  "direction": "row-reverse",
+                  "justify": "end"
+                }
+              }
+            }
+          }
+        },
+        "main": [
+          {
+            "component": "InfoBanner",
+            "properties": {
+              "content": "Your address helps us provide a heating and cooling system that is the best fit for your home."
+            }
+          },
+          {
+            "component": "PropertyInfoAutoSuggest",
+            "properties": {
+              "label": "Property address",
+              "required": true
+            }
+          },
+          {
+            "component": "AddressManualInput",
+            "showWhen": {
+              "path": "@propertyInfo.showAddressManualInput",
+              "operator": "equals",
+              "value": true
+            }
+          },
+          {
+            "component": "Checkbox",
+            "properties": {
+              "label": "Property is currently occupied",
+              "default": true
+            },
+            "binding": "@propertyInfo.isOccupied"
+          },
+          {
+            "component": "AddressVerificationPanel",
+            "properties": {
+              "hideNumberOfSystems": true
+            },
+            "showWhen": {
+              "path": "@workflow.verifyHome.showVerifyHome",
+              "operator": "equals",
+              "value": true
+            }
+          }
+        ],
+        "footer": [
+          {
+            "component": "Button",
+            "properties": {
+              "label": "Verify Address"
+            },
+            "actions": [
+              {
+                "type": "validateStep"
+              },
+              {
+                "type": "moduleAction",
+                "module": "propertyInfo",
+                "name": "getHomeInfo"
+              },
+              {
+                "type": "flipBool",
+                "targetPath": "@workflow.verifyHome.showVerifyHome"
+              }
+            ],
+            "disabledWhen": [
+              {
+                "path": "@propertyInfo.hasValidAddress",
+                "operator": "equals",
+                "value": false
+              },
+              {
+                "path": "@propertyInfo.addressIsValid",
+                "operator": "equals",
+                "value": false
+              }
+            ]
+          },
+          {
+            "component": "Button",
+            "properties": {
+              "label": "Back",
+              "variant": "secondary"
+            },
+            "actions": [
+              {
+                "type": "previousStep"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "step": "systemUpgrade",
+        "stepperLabel": "System Upgrade",
+        "heading": {
+          "description": "Select the type of solution you are most interested in for your home."
+        },
+        "pageLayout": {
+          "footer": {
+            "styling": {
+              "layout": {
+                "lg": {
+                  "type": "flex",
+                  "direction": "row-reverse",
+                  "justify": "end"
+                }
+              }
+            }
+          }
+        },
+        "main": [
+          {
+            "component": "SystemUpgradeContainer"
+          },
+          {
+            "component": "OptInCommunication",
+            "properties": {
+              "label": "I agree to receive communications from Daikin.",
+              "description": "Daikin respects your privacy. Our Privacy Policy outlines how we collect and use information. By submitting your information here, you agree that we may contact you about our current and future products and services and that you are directing us to provide your submitted information to independent dealers in your area that offer our products and services. Your agreement and consent are not required to make a purchase but help facilitate future communications about, and the purchase of, Daikin, Goodman, and Amana-brand products and services.",
+              "disclaimer": "You can unsubscribe from these communications at any time. For more information on how to unsubscribe, our privacy practices, and how we are committed to protecting and respecting your privacy, please review our Privacy Policy. \n By clicking submit below, you consent to allow Daikin to store and process the personal information submitted above to provide you the content requested.",
+              "required": true,
+              "default": false
+            },
+            "binding": "@contacts.optInCommunication"
+          },
+          {
+            "component": "ReCaptcha",
+            "showWhen": {
+              "path": "@systemUpgrades.hasBundlesAndRequiredFields",
+              "operator": "equals",
+              "value": true
+            }
+          },
+          {
+            "component": "Text",
+            "properties": {
+              "content": "By clicking submit, you understand you will be contacted by your local Daikin Pro to review your personalized solution."
+            },
+            "styling": {
+              "core": "text-xs"
+            }
+          }
+        ],
+        "footer": [
+          {
+            "component": "Button",
+            "properties": {
+              "label": "Submit"
+            },
+            "disabledWhen": [
+              {
+                "path": "@systemUpgrades.hasBundlesAndRequiredFields",
+                "operator": "equals",
+                "value": false
+              },
+              {
+                "path": "@workflow.reCaptchaVerified",
+                "operator": "not_equals",
+                "value": true
+              },
+              {
+                "path": "@contacts.optInCommunication",
+                "operator": "equals",
+                "value": false
+              }
+            ],
+            "actions": [
+              {
+                "type": "validateStep"
+              },
+              {
+                "type": "generateSalesforceWebToCase"
+              },
+              {
+                "type": "nextStep"
+              }
+            ]
+          },
+          {
+            "component": "Button",
+            "properties": {
+              "label": "Back",
+              "variant": "secondary"
+            },
+            "actions": [
+              {
+                "type": "previousStep"
+              },
+              {
+                "type": "setValue",
+                "targetPath": "@workflow.reCaptchaVerified",
+                "value": false
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "step": "summary",
+        "stepperLabel": "Summary",
+        "pageLayout": {
+          "main": {
+            "styling": {
+              "core": "lg:gap-x-16",
+              "layout": {
+                "lg": {
+                  "type": "grid",
+                  "columns": 2,
+                  "items": "start"
+                }
+              }
+            }
+          }
+        },
+        "main": [
+          {
+            "component": "Container",
+            "styling": {
+              "core": "flex-1"
+            },
+
+            "properties": {
+              "children": [
+                {
+                  "component": "SummarySystemUpgradeDetails",
+                  "binding": {
+                    "systemsDataPath": "@systemUpgrades.systems",
+                    "currentSystemIndexPath": {
+                      "target": "@workflow.yourMatch.currentSystemIndex",
+                      "default": 0
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "component": "Container",
+            "styling": {
+              "core": "flex-1"
+            },
+            "properties": {
+              "children": [
+                {
+                  "component": "SummaryAddonContainer",
+                  "showWhen": {
+                    "path": "@workflow.summary.hideAddonsContent",
+                    "operator": "equals",
+                    "value": false
+                  },
+                  "styling": {
+                    "core": "mt-6 lg:mt-0"
+                  }
+                },
+                {
+                  "component": "ContactInfo",
+                  "binding": "@contacts.contactForm",
+                  "showWhen": {
+                    "path": "@workflow.summary.hideAddonsContent",
+                    "operator": "equals",
+                    "value": true
+                  }
+                },
+                {
+                  "component": "PropertyAddress",
+                  "showWhen": {
+                    "path": "@workflow.summary.hideAddonsContent",
+                    "operator": "equals",
+                    "value": true
+                  }
+                },
+                {
+                  "component": "Container",
+                  "showWhen": {
+                    "path": "@workflow.summary.hideAddonsContent",
+                    "operator": "equals",
+                    "value": true
+                  },
+                  "properties": {
+                    "children": [
+                      {
+                        "component": "Text",
+                        "properties": {
+                          "content": "Pricing is finalized after an in-home assessment"
+                        },
+                        "styling": {
+                          "core": "text-gray-600 font-semibold"
+                        }
+                      },
+                      {
+                        "component": "Text",
+                        "properties": {
+                          "content": "Equipment pricing can vary based on your home, installation requirements, and local contractor rates. A Daikin Comfort Pro will assess and confirm the appropriate system FIT."
+                        },
+                        "styling": {
+                          "core": "text-sm text-gray-600"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "component": "Container",
+                  "properties": {
+                    "children": [
+                      {
+                        "component": "Text",
+                        "properties": {
+                          "content": "Next steps with your Daikin Pro"
+                        },
+                        "styling": {
+                          "core": "font-semibold text-gray-600"
+                        }
+                      },
+                      {
+                        "component": "Text",
+                        "properties": {
+                          "content": "A trusted local Daikin Pro will be assigned to you shortly (Monday – Friday, 8 a.m. – 5 p.m. CST). You can expect to be contacted within 2 business days to schedule an in-home assessment to review the recommended solutions."
+                        },
+                        "styling": {
+                          "core": "text-sm text-gray-600"
+                        }
+                      },
+                      {
+                        "component": "Container",
+                        "properties": {
+                          "children": [
+                            {
+                              "component": "Text",
+                              "properties": {
+                                "content": "If you have additional questions, please call "
+                              },
+                              "styling": {
+                                "core": "text-sm"
+                              }
+                            },
+                            {
+                              "component": "Text",
+                              "properties": {
+                                "content": "833-803-1172",
+                                "href": "tel:8338031172"
+                              },
+                              "styling": {
+                                "core": "text-sm"
+                              }
+                            }
+                          ]
+                        },
+                        "styling": {
+                          "core": "gap-1 text-sm text-gray-600",
+                          "layout": {
+                            "default": {
+                              "type": "flex",
+                              "direction": "row",
+                              "wrap": true
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "styling": {
+                    "core": "mt-2 gap-1"
+                  }
+                },
+                {
+                  "component": "FluidButtonGroup",
+                  "properties": {
+                    "children": [
+                      {
+                        "component": "Button",
+                        "properties": {
+                          "label": "Restart Upgrade",
+                          "variant": "secondary"
+                        },
+                        "actions": [
+                          {
+                            "type": "resetWorkflow"
+                          }
+                        ]
+                      },
+                      {
+                        "component": "Button",
+                        "properties": {
+                          "label": "Email",
+                          "variant": "secondary",
+                          "preIcon": "MailIcon"
+                        },
+                        "actions": [
+                          {
+                            "type": "sendReportPDF"
+                          }
+                        ]
+                      },
+                      {
+                        "component": "Button",
+                        "properties": {
+                          "label": "Download PDF",
+                          "preIcon": "PDFIcon",
+                          "preIconColor": "white"
+                        },
+                        "actions": [
+                          {
+                            "type": "generateReportPDF"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "styling": {
+                    "core": "my-6",
+                    "layout": {
+                      "default": {
+                        "type": "flex",
+                        "direction": "col-reverse"
+                      },
+                      "lg": {
+                        "type": "flex",
+                        "direction": "row",
+                        "justify": "end"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "component": "Container",
+            "styling": {
+              "core": "lg:col-start-1 mt-0 lg:mt-6"
+            },
+            "showWhen": {
+              "path": "@workflow.summary.hideAddonsContent",
+              "operator": "equals",
+              "value": false
+            },
+            "properties": {
+              "children": [
+                {
+                  "component": "ContactInfo",
+                  "binding": "@contacts.contactForm"
+                },
+                {
+                  "component": "PropertyAddress"
+                },
+                {
+                  "component": "Container",
+                  "properties": {
+                    "children": [
+                      {
+                        "component": "Text",
+                        "properties": {
+                          "content": "Pricing is finalized after an in-home assessment"
+                        },
+                        "styling": {
+                          "core": "text-gray-600 font-semibold"
+                        }
+                      },
+                      {
+                        "component": "Text",
+                        "properties": {
+                          "content": "Equipment pricing can vary based on your home, installation requirements, and local contractor rates. A Daikin Comfort Pro will assess and confirm the appropriate system FIT."
+                        },
+                        "styling": {
+                          "core": "text-sm text-gray-600"
+                        }
+                      }
+                    ]
+                  },
+                  "styling": {
+                    "core": "gap-1"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "proposedPayload": {
+    "metadata": {
+      "submittedBy": {
+        "name": "@contacts.contactForm.firstName",
+        "email": "@contacts.contactForm.email"
+      }
+    },
+    "summary": {
+      "companyId": "sbPOC",
+      "summaryName": "@contacts.contactForm.firstName",
+      "contacts": "@contacts.proposalFormatted.contacts",
+      "systems": "@systemUpgrades.proposalFormatted.systems",
+      "pdfSummary": "@systemUpgrades.proposalFormatted.pdfSummary",
+      "selectedAddOns": "@systemUpgrades.proposalFormatted.selectedAddOns",
+      "property": "@propertyInfo.proposalFormatted"
+    }
+  }
+}

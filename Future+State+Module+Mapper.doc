@@ -1,0 +1,404 @@
+Date: Mon, 30 Mar 2026 22:23:19 +0000 (UTC)
+Message-ID: <819242399.61.1774909399987@93b365aa8c92>
+Subject: Exported From Confluence
+MIME-Version: 1.0
+Content-Type: multipart/related; 
+	boundary="----=_Part_60_1876384336.1774909399987"
+
+------=_Part_60_1876384336.1774909399987
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///C:/exported.html
+
+<html xmlns:o=3D'urn:schemas-microsoft-com:office:office'
+      xmlns:w=3D'urn:schemas-microsoft-com:office:word'
+      xmlns:v=3D'urn:schemas-microsoft-com:vml'
+      xmlns=3D'urn:w3-org-ns:HTML'>
+<head>
+    <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dutf-8=
+">
+    <title>Future State Module Mapper</title>
+    <!--[if gte mso 9]>
+    <xml>
+        <o:OfficeDocumentSettings>
+            <o:TargetScreenSize>1024x640</o:TargetScreenSize>
+            <o:PixelsPerInch>72</o:PixelsPerInch>
+            <o:AllowPNG/>
+        </o:OfficeDocumentSettings>
+        <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>90</w:Zoom>
+            <w:DoNotOptimizeForBrowser/>
+        </w:WordDocument>
+    </xml>
+    <![endif]-->
+    <style>
+                <!--
+        @page Section1 {
+            size: 8.5in 11.0in;
+            margin: 1.0in;
+            mso-header-margin: .5in;
+            mso-footer-margin: .5in;
+            mso-paper-source: 0;
+        }
+
+        table {
+            border: solid 1px;
+            border-collapse: collapse;
+        }
+
+        table td, table th {
+            border: solid 1px;
+            padding: 5px;
+        }
+
+        td {
+            page-break-inside: avoid;
+        }
+
+        tr {
+            page-break-after: avoid;
+        }
+
+        div.Section1 {
+            page: Section1;
+        }
+
+        /* Confluence print stylesheet. Common to all themes for print medi=
+a */
+/* Full of !important until we improve batching for print CSS */
+
+@media print {
+    #main {
+        padding-bottom: 1em !important; /* The default padding of 6em is to=
+o much for printouts */
+    }
+
+    body {
+        font: var(--ds-font-body-small, Arial, Helvetica, FreeSans, sans-se=
+rif);
+    }
+
+    body, #full-height-container, #main, #page, #content, .has-personal-sid=
+ebar #content {
+        background: var(--ds-surface, #fff) !important;
+        color: var(--ds-text, #000) !important;
+        border: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
+    }
+
+    a, a:link, a:visited, a:focus, a:hover, a:active {
+        color: var(--ds-text, #000);
+    }
+
+    #content h1,
+    #content h2,
+    #content h3,
+    #content h4,
+    #content h5,
+    #content h6 {
+        page-break-after: avoid;
+    }
+
+    pre {
+        font: var(--ds-font-code, Monaco, "Courier New", monospace);
+    }
+
+    #header,
+    .aui-header-inner,
+    #navigation,
+    #sidebar,
+    .sidebar,
+    #personal-info-sidebar,
+    .ia-fixed-sidebar,
+    .page-actions,
+    .navmenu,
+    .ajs-menu-bar,
+    .noprint,
+    .inline-control-link,
+    .inline-control-link a,
+    a.show-labels-editor,
+    .global-comment-actions,
+    .comment-actions,
+    .quick-comment-container,
+    #addcomment {
+        display: none !important;
+    }
+
+    /* CONF-28544 cannot print multiple pages in IE */
+    #splitter-content {
+        position: relative !important;
+    }
+
+    .comment .date::before {
+        content: none !important; /* remove middot for print view */
+    }
+
+    h1.pagetitle img {
+        height: auto;
+        width: auto;
+    }
+
+    .print-only {
+        display: block;
+    }
+
+    #footer {
+        position: relative !important; /* CONF-17506 Place the footer at en=
+d of the content */
+        margin: 0;
+        padding: 0;
+        background: none;
+        clear: both;
+    }
+
+    #poweredby {
+        border-top: none;
+        background: none;
+    }
+
+    #poweredby li.print-only {
+        display: list-item;
+        font-style: italic;
+    }
+
+    #poweredby li.noprint {
+        display: none;
+    }
+
+    /* no width controls in print */
+    .wiki-content .table-wrap,
+    .wiki-content p,
+    .panel .codeContent,
+    .panel .codeContent pre,
+    .image-wrap {
+        overflow: visible !important;
+    }
+
+    /* TODO - should this work? */
+    #children-section,
+    #comments-section .comment,
+    #comments-section .comment .comment-body,
+    #comments-section .comment .comment-content,
+    #comments-section .comment p {
+        page-break-inside: avoid;
+    }
+
+    #page-children a {
+        text-decoration: none;
+    }
+
+    /**
+     hide twixies
+
+     the specificity here is a hack because print styles
+     are getting loaded before the base styles. */
+    #comments-section.pageSection .section-header,
+    #comments-section.pageSection .section-title,
+    #children-section.pageSection .section-header,
+    #children-section.pageSection .section-title,
+    .children-show-hide {
+        padding-left: 0;
+        margin-left: 0;
+    }
+
+    .children-show-hide.icon {
+        display: none;
+    }
+
+    /* personal sidebar */
+    .has-personal-sidebar #content {
+        margin-right: 0px;
+    }
+
+    .has-personal-sidebar #content .pageSection {
+        margin-right: 0px;
+    }
+
+    .no-print, .no-print * {
+        display: none !important;
+    }
+}
+-->
+    </style>
+</head>
+<body>
+    <h1>Future State Module Mapper</h1>
+    <div class=3D"Section1">
+        <ul local-id=3D"f1eab919-4a87-4d29-811b-7fa274d4ffb4">
+<style>[data-colorid=3Djfey5em90x]{color:#4c9aff} html[data-color-mode=3Dda=
+rk] [data-colorid=3Djfey5em90x]{color:#004eb3}[data-colorid=3Dkyladfxrm8]{c=
+olor:#ff5630} html[data-color-mode=3Ddark] [data-colorid=3Dkyladfxrm8]{colo=
+r:#cf2600}[data-colorid=3Dvpz80cns8g]{color:#4c9aff} html[data-color-mode=
+=3Ddark] [data-colorid=3Dvpz80cns8g]{color:#004eb3}[data-colorid=3Do4yz2p5q=
+kc]{color:#4c9aff} html[data-color-mode=3Ddark] [data-colorid=3Do4yz2p5qkc]=
+{color:#004eb3}[data-colorid=3Dlpgpjeg444]{color:#4c9aff} html[data-color-m=
+ode=3Ddark] [data-colorid=3Dlpgpjeg444]{color:#004eb3}[data-colorid=3Dkzqhs=
+q4jzl]{color:#4c9aff} html[data-color-mode=3Ddark] [data-colorid=3Dkzqhsq4j=
+zl]{color:#004eb3}</style>
+<li local-id=3D"5a73bdfa-44b7-49b5-b9c2-317b664c5aaf">
+<p local-id=3D"9147a8292500"><span data-colorid=3D"lpgpjeg444">Landing Page=
+</span></p>
+<ul local-id=3D"35ddb614-43e6-48dc-a471-6879b1f6c3bf">
+<li local-id=3D"2d3fe43c-e7fe-4a7d-8faa-3d57f644fd39">
+<p local-id=3D"b9f43409aa76">Config: OTP verification</p>
+<ul local-id=3D"dbfb9bcd-a004-4f2f-a528-1055135fe78a">
+<li local-id=3D"c9415ca2-68b0-4238-b162-5e4927cf38be">
+<p local-id=3D"709ec1d474f7">T/F</p></li>
+</ul></li>
+</ul></li>
+<li local-id=3D"4279d593-fa5a-40a7-b57c-055cb985aa5b">
+<p local-id=3D"bf3105571d97"><span data-colorid=3D"kzqhsq4jzl">Basic Info M=
+odule</span></p>
+<ul local-id=3D"86557f14-6a9d-4f48-9524-fb84b4703508">
+<li local-id=3D"9e3cfb85-eb9a-4bef-88bd-5610243683d0">
+<p local-id=3D"e06065fa14dc">Config:</p>
+<ul local-id=3D"122efafe-e330-403e-b3ab-94bd6a763b6b">
+<li local-id=3D"9b430732-efc3-4baf-b65c-074c598f7b79">
+<p local-id=3D"5c02bda28b25">Additional fields</p>
+<ul local-id=3D"9360661d-ffa6-47b6-9b67-cc2e69c4cec4">
+<li local-id=3D"cd907183-8f4b-4ec0-b4fa-1c04b423ec90">
+<p local-id=3D"819fb4d89a72">T/F</p></li>
+<li local-id=3D"e36eb05a-ce3e-4bc2-8211-0b304bf2fe3a">
+<p local-id=3D"34985ef4aa43">if True: reference 3, reference 4, reference 5=
+ as available inputs</p></li>
+<li local-id=3D"9854b152-e0fd-4649-9e64-602f57eaf65c">
+<p local-id=3D"7aacee6a177d">label would be an input field - =E2=80=9CCinch=
+ ID=E2=80=9D mapped to reference 3</p></li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li local-id=3D"91a47047-a733-4fa7-a923-3ec1f6cbec05">
+<p local-id=3D"3b345e630d2a"><span data-colorid=3D"vpz80cns8g">Property Det=
+ails</span></p>
+<ul local-id=3D"1d1f96a1-12f6-4751-91fa-851186abf2bc">
+<li local-id=3D"46aaa569-d566-4624-8ec9-50999c0f38eb">
+<p local-id=3D"572fc82b0e6a">Config:</p>
+<ul local-id=3D"b86d2462-a6b4-446d-aa75-b7aa934eb1bc">
+<li local-id=3D"6e9a5939-b784-4580-93b7-ad823c355a18">
+<p local-id=3D"8001edd61159">Year built</p>
+<ul local-id=3D"d9a6fad6-d059-490d-bf13-81ffc20662ce">
+<li local-id=3D"4ebffb15-5e93-46f2-8041-cb89cd98f525">
+<p local-id=3D"9020ef5353c0">T/F</p></li>
+</ul></li>
+<li local-id=3D"d2cc7f48-f82e-477b-aa2b-9fc4a3bd60ef">
+<p local-id=3D"0a0ad614993b">Sq footage</p>
+<ul local-id=3D"9043a40e-cf80-4688-b313-5524d8daa6a2">
+<li local-id=3D"373a16b9-ca15-40b8-bc02-1c9504c0ba34">
+<p local-id=3D"8213f6f54f95">T/F</p></li>
+</ul></li>
+<li local-id=3D"71d064f6-2743-4a89-8726-f5adfcb64875">
+<p local-id=3D"27599537b30e"># of systems</p>
+<ul local-id=3D"ee6ac921-232b-443a-8575-f1ec1b85cad9">
+<li local-id=3D"68f1b436-4e0b-4048-b078-730275da468a">
+<p local-id=3D"4725c6518df2">T/F</p></li>
+</ul></li>
+<li local-id=3D"6028e89c-004c-44b2-b35e-854380646ba3">
+<p local-id=3D"77b783a57eb4"># of Beds</p>
+<ul local-id=3D"4a9084bd-f2e8-49a0-b5b0-ff0d99f06a0e">
+<li local-id=3D"c20f534e-416b-45ea-a065-ff4f8b160fa4">
+<p local-id=3D"5fe7ea31b851">T/F</p></li>
+</ul></li>
+<li local-id=3D"a2d2ccf9-8e02-4138-acd7-44cec5ca22e5">
+<p local-id=3D"7cd98bdc86aa"># of Baths</p>
+<ul local-id=3D"bd756842-4f5f-4a39-ae2f-c16ee6c0e631">
+<li local-id=3D"c3c80d65-d58e-4373-8b18-7dc154eabd52">
+<p local-id=3D"35826239e6bf">T/F</p></li>
+</ul></li>
+</ul></li>
+<li local-id=3D"0fa5ea35-434e-416c-9487-0ae28296b8d1">
+<p local-id=3D"5dea0f75f8a0">look into Smarty in future state</p></li>
+</ul></li>
+<li local-id=3D"c28b2bc7-7a31-4ceb-b48f-278c0c2983c1">
+<p local-id=3D"de5dd9bcd48e"><span data-colorid=3D"jfey5em90x">Home Goals</=
+span></p>
+<ul local-id=3D"6d5a5871-ee3f-468a-ba33-05426e0192c1">
+<li local-id=3D"f95a20b9-686a-49e0-b026-dfc09ccd6a4c">
+<p local-id=3D"7738dc2e15ed">Config:</p>
+<ul local-id=3D"42397a0c-fc30-4e0d-b467-21742a1afc3c">
+<li local-id=3D"11716a7a-e67c-4646-93d2-51239894c4ee">
+<p local-id=3D"cf361c754622">total options (8)</p>
+<ul local-id=3D"3168702d-4776-45ee-85a6-1b05b150ae74">
+<li local-id=3D"967b5bbe-82a4-4391-8746-542528f19d0c">
+<p local-id=3D"43d9ea0940e5"># of options =3D total # of text fields</p></l=
+i>
+</ul></li>
+<li local-id=3D"71a16c16-5979-445c-8474-745dd4cfc4e2">
+<p local-id=3D"2cb7c95308a9">max selections Hypothetically 2</p>
+<ul local-id=3D"39d7a5d2-67d9-4d37-a9ec-3557d887c052">
+<li local-id=3D"e6b97c5b-e218-4571-9030-8a8bdc2427b5">
+<p local-id=3D"31bb5a0e631d">Max =3D&lt; of total Options</p></li>
+</ul></li>
+<li local-id=3D"46fc8d42-7ca7-487b-805c-30597bea8e96">
+<p local-id=3D"f5a17dff621f">Support (Slide out)</p>
+<ul local-id=3D"7d4c33c7-2dd9-4732-89cf-e3b0bd27adb6">
+<li local-id=3D"ac1aae55-3e7f-4ffb-8964-e9d5289c5dfa">
+<p local-id=3D"e8a25f728da3"><strong><span data-colorid=3D"kyladfxrm8">Remo=
+ve</span></strong></p></li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li local-id=3D"dee9aefc-1740-4749-963c-01766c2b5629">
+<p local-id=3D"942853f2e7e8"><span data-colorid=3D"o4yz2p5qkc">Summary</spa=
+n></p>
+<ul local-id=3D"0b570cdc-ead0-4e87-b1c8-99d6fa1a5956">
+<li local-id=3D"70a4474d-5ac3-4973-a20f-e9ae4dc1d171">
+<p local-id=3D"ca16e0261009">Config:</p>
+<ul local-id=3D"2b4f3078-b033-4ce2-995d-873a8835a76f">
+<li local-id=3D"4b6e3110-0f67-41b6-8edd-c04be65f4ee6">
+<p local-id=3D"8354ee9e7b34">Type- best match or Good Better Best</p>
+<ul local-id=3D"f2b94411-64b7-4a81-97f0-0b517dcb9286">
+<li local-id=3D"af90c20d-37f2-47bd-8e25-b370d2169df3">
+<p local-id=3D"2bca9ee73b02">sub config: alternative options</p></li>
+</ul></li>
+<li local-id=3D"6b153a84-125f-4dad-b5d2-eb1423bb2f21">
+<p local-id=3D"3af9d6cb4a1b">Customer Notes</p>
+<ul local-id=3D"083caf72-0475-41ae-af89-62f02e3ed5f6">
+<li local-id=3D"71ec9e19-32dc-4e35-8769-b4ec2cae804a">
+<p local-id=3D"700055c36304">T/F</p></li>
+</ul></li>
+<li local-id=3D"2ef02415-7230-467a-8180-9d7f88556839">
+<p local-id=3D"8db35ee96f92">Price</p>
+<ul local-id=3D"136ac1c0-98db-4ee1-b9a7-2a8a7e09d98c">
+<li local-id=3D"ede1e598-58ab-4331-bf45-942d3f8b53a4">
+<p local-id=3D"e3a7c0e06cec">T/F</p></li>
+</ul></li>
+<li local-id=3D"05b4b7fc-8039-4dbc-9418-b757c6a1804b">
+<p local-id=3D"5c7a8cfbe825">Add Ons</p>
+<ul local-id=3D"0e5a494b-204e-4825-886c-c0aafdbb6b00">
+<li local-id=3D"baa17ae1-d806-44e8-93b7-fbb928e2b3dc">
+<p local-id=3D"d96cf1e77572">T/F</p></li>
+</ul></li>
+<li local-id=3D"20926ed6-c226-490c-99fd-0a81cfd60d1a">
+<p local-id=3D"33bd0a215835">Email</p>
+<ul local-id=3D"d392685b-035c-4e8e-9bfa-b11eaacfbb21">
+<li local-id=3D"394cd678-4840-4485-a3ef-d3e813e9f569">
+<p local-id=3D"ee7bbbaf4d5b">T/F</p></li>
+</ul></li>
+<li local-id=3D"5a661d4e-3125-4a9c-adfe-9eaf573c3726">
+<p local-id=3D"63acd1f0eefc">PDF</p>
+<ul local-id=3D"0f283a9f-d5b6-4feb-87f5-d0f09b22c121">
+<li local-id=3D"4ace0f5c-4160-4a5d-8eec-e19a0ee84999">
+<p local-id=3D"912de9c458a9">T/F</p></li>
+</ul></li>
+<li local-id=3D"fa575f12-597e-437d-8c5f-e931ec28dc8b">
+<p local-id=3D"faf9c2e9d7d3">Schedule Inspection</p>
+<ul local-id=3D"c3411331-577a-405d-95a9-9940a4091c12">
+<li local-id=3D"cbff0bbf-9e04-41fb-a073-6f7398d68cee">
+<p local-id=3D"754d311570ed">T/F</p></li>
+<li local-id=3D"727a5b529a91">
+<p local-id=3D"e862a95c05ac">based on Job Status module being visible/true<=
+/p></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+    </div>
+</body>
+</html>
+------=_Part_60_1876384336.1774909399987--

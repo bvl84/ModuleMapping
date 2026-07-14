@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { AuthCallback } from "@/components/auth/AuthCallback";
 
 export default async function RootPage({
   searchParams,
@@ -14,11 +15,7 @@ export default async function RootPage({
     redirect("/workflows");
   }
 
-  // Auth0 callback: render a placeholder so the Auth0Provider (root layout) can
-  // process ?code&state; its onRedirectCallback then routes to /workflows.
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-[#1e1e1e]">
-      <p className="text-sm text-gray-400">Signing you in…</p>
-    </div>
-  );
+  // Auth0 callback: the client gate lets the Auth0Provider (root layout) process
+  // ?code&state, then routes to /workflows (and shows an error if it fails).
+  return <AuthCallback />;
 }

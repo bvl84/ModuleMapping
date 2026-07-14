@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #d4d4d4;
+  background: #1e1e1e;
+  padding: 20px;
+}
+.comment { color: #6a9955; }
+.key { color: #9cdcfe; }
+.str { color: #ce9178; }
+.bool-true { color: #4ec9b0; }
+.bool-false { color: #f44747; }
+.num { color: #b5cea8; }
+.bracket { color: #ffd700; }
+.punct { color: #d4d4d4; }
+
+.line { padding: 1px 0; white-space: pre; }
+.indent-1 { padding-left: 24px; }
+.indent-2 { padding-left: 48px; }
+.indent-3 { padding-left: 72px; }
+.indent-4 { padding-left: 96px; }
+
+.collapsible {
+  cursor: pointer;
+  user-select: none;
+}
+.collapsible:hover { background: #2a2d2e; }
+.collapsible::before {
+  content: '▼ ';
+  font-size: 10px;
+  color: #858585;
+}
+.collapsible.collapsed::before {
+  content: '▶ ';
+}
+.collapsible-content {
+  overflow: hidden;
+}
+.collapsible-content.hidden {
+  display: none;
+}
+.collapsed-hint {
+  color: #858585;
+  font-style: italic;
+  display: none;
+}
+.collapsible.collapsed + .collapsible-content + .collapsed-hint,
+.collapsible.collapsed ~ .collapsed-hint {
+  display: inline;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid #333;
+  margin: 16px 0;
+}
+</style>
+</head>
+<body>
+
+<div class="line comment">// Home Solutions Platform — Config Profiles</div>
+<div class="line comment">// Grouped by Client → Module Type</div>
+<div class="line">&nbsp;</div>
+
+<!-- ==================== DAIKIN ==================== -->
+<div class="line collapsible" onclick="tog(this)"><span class="bracket">{</span> <span class="key">"Daikin"</span><span class="punct">:</span> <span class="bracket">{</span></div>
+<div class="collapsible-content">
+
+<div class="line indent-1 comment">// ─── SolutionsBuilder ───</div>
+<div class="line indent-1 collapsible" onclick="tog(this)"><span class="key">"SolutionsBuilder"</span><span class="punct">:</span> <span class="bracket">{</span></div>
+<div class="collapsible-content">
+<div class="line indent-2"><span class="key">"WF_Type"</span><span class="punct">:</span> <span class="str">"{placeholder}"</span><span class="punct">,</span></div>
+<div class="line indent-2"><span class="key">"Client_ID"</span><span class="punct">:</span> <span class="str">"{clientID}"</span><span class="punct">,</span></div>
+<div class="line indent-2"><span class="key">"BC"</span><span class="punct">:</span> <span class="str">"HomeComfort"</span><span class="punct">,</span></div>
+<div class="line indent-2"><span class="key">"BackgroundImage"</span><span class="punct">:</span> <span class="str">"{1-6}"</span><span class="punct">,</span></div>
+<div class="line indent-2">&nbsp;</div>
+
+<div class="line indent-2 collapsible" onclick="tog(this)"><span class="key">"WFModule"</span><span class="punct">:</span> <span class="bracket">[</span></div>
+<div class="collapsible-content">
+
+<div class="line indent-3 collapsible" onclick="tog(this)"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Contact"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">0</span></div>
+<div class="collapsible-content">
+<div class="line indent-4"><span class="key">"Functions"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Form Validation"</span><span class="punct">,</span> <span class="str">"Input Masking (phone)"</span><span class="punct">,</span> <span class="str">"Navigation (Next)"</span><span class="bracket">]</span></div>
+<div class="line indent-4"><span class="key">"Fields"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"First Name"</span><span class="punct">,</span> <span class="str">"Last Name"</span><span class="punct">,</span> <span class="str">"Email"</span><span class="punct">,</span> <span class="str">"Phone Number"</span><span class="bracket">]</span></div>
+<div class="line indent-3"><span class="bracket">}</span><span class="punct">,</span></div>
+</div>
+
+<div class="line indent-3 collapsible" onclick="tog(this)"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Verify Home"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">1</span></div>
+<div class="collapsible-content">
+<div class="line indent-4"><span class="key">"Functions"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Address Autocomplete"</span><span class="punct">,</span> <span class="str">"Address Verification (Zillow)"</span><span class="punct">,</span> <span class="str">"Property Data Population"</span><span class="punct">,</span> <span class="str">"Map Pin Display"</span><span class="punct">,</span> <span class="str">"Occupied Toggle"</span><span class="bracket">]</span></div>
+<div class="line indent-4"><span class="key">"Fields"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Property Address"</span><span class="punct">,</span> <span class="str">"Property Occupied"</span><span class="bracket">]</span></div>
+<div class="line indent-4"><span class="key">"Ext_Fields"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Year Built"</span><span class="punct">,</span> <span class="str">"Square Footage"</span><span class="punct">,</span> <span class="str">"Bedrooms"</span><span class="punct">,</span> <span class="str">"Bathrooms"</span><span class="punct">,</span> <span class="str">"Map"</span><span class="bracket">]</span></div>
+<div class="line indent-3"><span class="bracket">}</span><span class="punct">,</span></div>
+</div>
+
+<div class="line indent-3 collapsible" onclick="tog(this)"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Additional Details"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">2</span></div>
+<div class="collapsible-content">
+<div class="line indent-4"><span class="key">"Functions"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"System Type Selection (Heat Pump, Ductless Room, Multi-Room Ductless, AC + Furnace)"</span><span class="punct">,</span> <span class="str">"Efficiency Tier (Good/Best)"</span><span class="punct">,</span> <span class="str">"SqFt Input"</span><span class="punct">,</span> <span class="str">"Whole House Toggle"</span><span class="punct">,</span> <span class="str">"System Rating Details (modal)"</span><span class="bracket">]</span></div>
+<div class="line indent-4"><span class="key">"Fields"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Heating/Cooling SqFt"</span><span class="punct">,</span> <span class="str">"Whole House"</span><span class="punct">,</span> <span class="str">"System Type"</span><span class="punct">,</span> <span class="str">"Efficiency Tier"</span><span class="bracket">]</span></div>
+<div class="line indent-3"><span class="bracket">}</span><span class="punct">,</span></div>
+</div>
+
+<div class="line indent-3 collapsible" onclick="tog(this)"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Summary"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">3</span></div>
+<div class="collapsible-content">
+<div class="line indent-4"><span class="key">"Functions"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"PDF Generation (3-page)"</span><span class="punct">,</span> <span class="str">"Email Delivery"</span><span class="punct">,</span> <span class="str">"SFDC Web-to-Case"</span><span class="punct">,</span> <span class="str">"Combine &amp; Save (add-ons)"</span><span class="bracket">]</span></div>
+<div class="line indent-4"><span class="key">"Fields"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Contacts"</span><span class="punct">,</span> <span class="str">"Additional Details"</span><span class="punct">,</span> <span class="str">"Customer Notes"</span><span class="punct">,</span> <span class="str">"Recommend System"</span><span class="punct">,</span> <span class="str">"Price"</span><span class="punct">,</span> <span class="str">"Property Details"</span><span class="bracket">]</span></div>
+<div class="line indent-3"><span class="bracket">}</span><span class="punct">,</span></div>
+</div>
+
+<div class="line indent-3"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Scheduling"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-false">false</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">4</span> <span class="bracket">}</span><span class="punct">,</span></div>
+<div class="line indent-3"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"PDF"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span> <span class="bracket">}</span><span class="punct">,</span></div>
+<div class="line indent-3"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Email"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span> <span class="bracket">}</span></div>
+
+<div class="line indent-2"><span class="bracket">]</span></div>
+</div>
+
+<div class="line indent-1"><span class="bracket">}</span><span class="punct">,</span></div>
+</div>
+
+<!-- ==================== CINCH ==================== -->
+<div class="line indent-1">&nbsp;</div>
+<div class="line indent-1 comment">// ─── Cinch / HomeWarranty ───</div>
+
+<div class="line indent-1 collapsible" onclick="tog(this)"><span class="key">"Cinch"</span><span class="punct">:</span> <span class="bracket">{</span></div>
+<div class="collapsible-content">
+
+<!-- CINCH WF -->
+<div class="line indent-2 collapsible" onclick="tog(this)"><span class="key">"HVACUpgradeTool"</span><span class="punct">:</span> <span class="bracket">{</span></div>
+<div class="collapsible-content">
+<div class="line indent-3"><span class="key">"WF_Type"</span><span class="punct">:</span> <span class="str">"{placeholder}"</span><span class="punct">,</span></div>
+<div class="line indent-3"><span class="key">"Client_ID"</span><span class="punct">:</span> <span class="str">"{clientID}"</span><span class="punct">,</span></div>
+<div class="line indent-3"><span class="key">"BC"</span><span class="punct">:</span> <span class="str">"HomeWarranty"</span><span class="punct">,</span></div>
+<div class="line indent-3"><span class="key">"BackgroundImage"</span><span class="punct">:</span> <span class="str">"{1-6}"</span><span class="punct">,</span></div>
+<div class="line indent-3">&nbsp;</div>
+
+<div class="line indent-3 collapsible" onclick="tog(this)"><span class="key">"WFModule"</span><span class="punct">:</span> <span class="bracket">[</span></div>
+<div class="collapsible-content">
+<div class="line indent-4 collapsible" onclick="tog(this)"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Contact"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">0</span></div>
+<div class="collapsible-content">
+<div class="line indent-4">&nbsp; <span class="key">"Functions"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Form Validation"</span><span class="punct">,</span> <span class="str">"Input Masking"</span><span class="punct">,</span> <span class="str">"Email Verification (Cinch Identity)"</span><span class="bracket">]</span></div>
+<div class="line indent-4">&nbsp; <span class="key">"Fields"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"First Name"</span><span class="punct">,</span> <span class="str">"Last Name"</span><span class="punct">,</span> <span class="str">"Email"</span><span class="punct">,</span> <span class="str">"Phone Number"</span><span class="bracket">]</span></div>
+<div class="line indent-4"><span class="bracket">}</span><span class="punct">,</span></div>
+</div>
+<div class="line indent-4 collapsible" onclick="tog(this)"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Verify Home"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">1</span></div>
+<div class="collapsible-content">
+<div class="line indent-4">&nbsp; <span class="key">"Functions"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Address Autocomplete"</span><span class="punct">,</span> <span class="str">"Zillow Verification"</span><span class="punct">,</span> <span class="str">"Property Data Population"</span><span class="punct">,</span> <span class="str">"Map Pin"</span><span class="punct">,</span> <span class="str">"Occupied Toggle"</span><span class="bracket">]</span></div>
+<div class="line indent-4">&nbsp; <span class="key">"Fields"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Property Address"</span><span class="punct">,</span> <span class="str">"Property Occupied"</span><span class="bracket">]</span></div>
+<div class="line indent-4">&nbsp; <span class="key">"Ext_Fields"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Year Built"</span><span class="punct">,</span> <span class="str">"SqFt"</span><span class="punct">,</span> <span class="str">"Num Systems"</span><span class="punct">,</span> <span class="str">"Beds"</span><span class="punct">,</span> <span class="str">"Baths"</span><span class="punct">,</span> <span class="str">"Map"</span><span class="bracket">]</span></div>
+<div class="line indent-4"><span class="bracket">}</span><span class="punct">,</span></div>
+</div>
+<div class="line indent-4 collapsible" onclick="tog(this)"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"HVAC Goals"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">2</span></div>
+<div class="collapsible-content">
+<div class="line indent-4">&nbsp; <span class="key">"Functions"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Goal Selection (pick 2 of 4)"</span><span class="bracket">]</span></div>
+<div class="line indent-4">&nbsp; <span class="key">"Options"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Lower utility cost"</span><span class="punct">,</span> <span class="str">"Modernize my system"</span><span class="punct">,</span> <span class="str">"Better performance"</span><span class="punct">,</span> <span class="str">"Improve air quality"</span><span class="bracket">]</span></div>
+<div class="line indent-4"><span class="bracket">}</span><span class="punct">,</span></div>
+</div>
+<div class="line indent-4 collapsible" onclick="tog(this)"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Current System"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">3</span></div>
+<div class="collapsible-content">
+<div class="line indent-4">&nbsp; <span class="key">"Functions"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"SqFt Input"</span><span class="punct">,</span> <span class="str">"Current System Selection"</span><span class="punct">,</span> <span class="str">"Rating Selection (Good/Better/Best)"</span><span class="punct">,</span> <span class="str">"Rating Details (modal)"</span><span class="punct">,</span> <span class="str">"Ductwork (Yes/No)"</span><span class="bracket">]</span></div>
+<div class="line indent-4">&nbsp; <span class="key">"Fields"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Heating/Cooling SqFt"</span><span class="punct">,</span> <span class="str">"Current HVAC System"</span><span class="punct">,</span> <span class="str">"New System Rating"</span><span class="punct">,</span> <span class="str">"Ductwork Availability"</span><span class="bracket">]</span></div>
+<div class="line indent-4"><span class="bracket">}</span><span class="punct">,</span></div>
+</div>
+<div class="line indent-4 collapsible" onclick="tog(this)"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Your Match"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">4</span></div>
+<div class="collapsible-content">
+<div class="line indent-4">&nbsp; <span class="key">"Functions"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"System Matching Engine"</span><span class="punct">,</span> <span class="str">"Recommended System Display"</span><span class="punct">,</span> <span class="str">"Price Breakdown"</span><span class="punct">,</span> <span class="str">"Alternative Options"</span><span class="punct">,</span> <span class="str">"Schedule Free Inspection"</span><span class="bracket">]</span></div>
+<div class="line indent-4"><span class="bracket">}</span><span class="punct">,</span></div>
+</div>
+<div class="line indent-4 collapsible" onclick="tog(this)"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Scheduling"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">5</span></div>
+<div class="collapsible-content">
+<div class="line indent-4">&nbsp; <span class="key">"Functions"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Direct Scheduler"</span><span class="punct">,</span> <span class="str">"Calendar (date + time slots)"</span><span class="punct">,</span> <span class="str">"Job Creation"</span><span class="bracket">]</span></div>
+<div class="line indent-4">&nbsp; <span class="key">"Config"</span><span class="punct">:</span> <span class="bracket">{</span> <span class="key">"jobType"</span><span class="punct">:</span> <span class="str">"Inspection"</span><span class="punct">,</span> <span class="key">"estTime"</span><span class="punct">:</span> <span class="str">"1hr"</span><span class="punct">,</span> <span class="key">"tz"</span><span class="punct">:</span> <span class="str">"MDT"</span> <span class="bracket">}</span></div>
+<div class="line indent-4"><span class="bracket">}</span><span class="punct">,</span></div>
+</div>
+<div class="line indent-4"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Support"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span> <span class="bracket">}</span><span class="punct">,</span></div>
+<div class="line indent-4"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"PDF"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-false">false</span> <span class="bracket">}</span><span class="punct">,</span></div>
+<div class="line indent-4"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Email"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-false">false</span> <span class="bracket">}</span><span class="punct">,</span></div>
+<div class="line indent-4"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Job Creation"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span> <span class="bracket">}</span></div>
+<div class="line indent-3"><span class="bracket">]</span><span class="punct">,</span></div>
+</div>
+
+<div class="line indent-3">&nbsp;</div>
+
+<!-- CINCH WO INSPECTION -->
+<div class="line indent-3 collapsible" onclick="tog(this)"><span class="key">"WOModule_Inspection"</span><span class="punct">:</span> <span class="bracket">[</span></div>
+<div class="collapsible-content">
+<div class="line indent-4"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Scheduling"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">0</span><span class="punct">,</span> <span class="key">"actions"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Reschedule"</span><span class="bracket">]</span> <span class="bracket">}</span><span class="punct">,</span></div>
+<div class="line indent-4"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Scheduled"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">1</span><span class="punct">,</span> <span class="key">"actions"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Reschedule"</span><span class="bracket">]</span> <span class="bracket">}</span><span class="punct">,</span></div>
+<div class="line indent-4"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"In Process"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">2</span> <span class="bracket">}</span><span class="punct">,</span></div>
+<div class="line indent-4"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Inspection Completed"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">3</span> <span class="bracket">}</span><span class="punct">,</span></div>
+<div class="line indent-4"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Cancelled"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span> <span class="bracket">}</span></div>
+<div class="line indent-3"><span class="bracket">]</span><span class="punct">,</span></div>
+</div>
+
+<div class="line indent-3">&nbsp;</div>
+
+<!-- CINCH QO -->
+<div class="line indent-3 collapsible" onclick="tog(this)"><span class="key">"QOModule"</span><span class="punct">:</span> <span class="bracket">[</span></div>
+<div class="collapsible-content">
+<div class="line indent-4"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Quote in Review"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">0</span> <span class="bracket">}</span><span class="punct">,</span></div>
+<div class="line indent-4 collapsible" onclick="tog(this)"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Quote Ready for Approval"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">1</span></div>
+<div class="collapsible-content">
+<div class="line indent-4">&nbsp; <span class="key">"actions"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Approve Quote"</span><span class="punct">,</span> <span class="str">"Reject Quote"</span><span class="bracket">]</span></div>
+<div class="line indent-4">&nbsp; <span class="key">"Fields"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"System cost"</span><span class="punct">,</span> <span class="str">"Labor"</span><span class="punct">,</span> <span class="str">"Shipping/Delivery"</span><span class="punct">,</span> <span class="str">"Subtotal"</span><span class="punct">,</span> <span class="str">"Estimated tax"</span><span class="punct">,</span> <span class="str">"Grand Total"</span><span class="bracket">]</span></div>
+<div class="line indent-4"><span class="bracket">}</span><span class="punct">,</span></div>
+</div>
+<div class="line indent-4"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Quote Approved"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">2</span> <span class="bracket">}</span><span class="punct">,</span></div>
+<div class="line indent-4"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Quote Declined"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span> <span class="bracket">}</span><span class="punct">,</span></div>
+<div class="line indent-4"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Quote Cancelled"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span> <span class="bracket">}</span></div>
+<div class="line indent-3"><span class="bracket">]</span><span class="punct">,</span></div>
+</div>
+
+<div class="line indent-3">&nbsp;</div>
+
+<!-- CINCH WO REPLACEMENT -->
+<div class="line indent-3 collapsible" onclick="tog(this)"><span class="key">"WOModule_Replacement"</span><span class="punct">:</span> <span class="bracket">[</span></div>
+<div class="collapsible-content">
+<div class="line indent-4"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Created"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">0</span><span class="punct">,</span> <span class="key">"actions"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Schedule Installation"</span><span class="bracket">]</span> <span class="bracket">}</span><span class="punct">,</span></div>
+<div class="line indent-4"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Scheduling"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">1</span><span class="punct">,</span> <span class="key">"actions"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Reschedule"</span><span class="bracket">]</span> <span class="bracket">}</span><span class="punct">,</span></div>
+<div class="line indent-4"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Scheduled"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">2</span><span class="punct">,</span> <span class="key">"actions"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Reschedule"</span><span class="bracket">]</span> <span class="bracket">}</span><span class="punct">,</span></div>
+<div class="line indent-4"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"In Process"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">3</span> <span class="bracket">}</span><span class="punct">,</span></div>
+<div class="line indent-4 collapsible" onclick="tog(this)"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Completed"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">4</span></div>
+<div class="collapsible-content">
+<div class="line indent-4">&nbsp; <span class="key">"Feedback"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Installation quality"</span><span class="punct">,</span> <span class="str">"Communication"</span><span class="punct">,</span> <span class="str">"Timeliness"</span><span class="punct">,</span> <span class="str">"Technician professionalism"</span><span class="punct">,</span> <span class="str">"Value for cost"</span><span class="bracket">]</span></div>
+<div class="line indent-4"><span class="bracket">}</span><span class="punct">,</span></div>
+</div>
+<div class="line indent-4"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Cancelled"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span> <span class="bracket">}</span></div>
+<div class="line indent-3"><span class="bracket">]</span></div>
+</div>
+
+<div class="line indent-2"><span class="bracket">}</span><span class="punct">,</span></div>
+</div>
+
+<div class="line indent-1"><span class="bracket">}</span><span class="punct">,</span></div>
+</div>
+
+<!-- ==================== GREENTECH ==================== -->
+<div class="line indent-1">&nbsp;</div>
+<div class="line indent-1 comment">// ─── GreenTech Renewables ───</div>
+
+<div class="line indent-1 collapsible" onclick="tog(this)"><span class="key">"GreenTech"</span><span class="punct">:</span> <span class="bracket">{</span></div>
+<div class="collapsible-content">
+
+<div class="line indent-2 collapsible" onclick="tog(this)"><span class="key">"NewWorkProposal"</span><span class="punct">:</span> <span class="bracket">{</span></div>
+<div class="collapsible-content">
+<div class="line indent-3"><span class="key">"WF_Type"</span><span class="punct">:</span> <span class="str">"{placeholder}"</span><span class="punct">,</span></div>
+<div class="line indent-3"><span class="key">"Client_ID"</span><span class="punct">:</span> <span class="str">"{clientID}"</span><span class="punct">,</span></div>
+<div class="line indent-3"><span class="key">"BC"</span><span class="punct">:</span> <span class="str">"GreenTechRenewables"</span><span class="punct">,</span></div>
+<div class="line indent-3"><span class="key">"BackgroundImage"</span><span class="punct">:</span> <span class="str">"{1-6}"</span><span class="punct">,</span></div>
+<div class="line indent-3">&nbsp;</div>
+
+<div class="line indent-3 collapsible" onclick="tog(this)"><span class="key">"WFModule"</span><span class="punct">:</span> <span class="bracket">[</span></div>
+<div class="collapsible-content">
+<div class="line indent-4 collapsible" onclick="tog(this)"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Contact Information"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">0</span></div>
+<div class="collapsible-content">
+<div class="line indent-4">&nbsp; <span class="key">"Functions"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Form Validation"</span><span class="punct">,</span> <span class="str">"Contact Type (Homeowner/Property manager)"</span><span class="punct">,</span> <span class="str">"Primary Contact Toggle"</span><span class="punct">,</span> <span class="str">"Multi-Contact Support"</span><span class="bracket">]</span></div>
+<div class="line indent-4">&nbsp; <span class="key">"Fields"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Contact Type"</span><span class="punct">,</span> <span class="str">"First Name"</span><span class="punct">,</span> <span class="str">"Last Name"</span><span class="punct">,</span> <span class="str">"Email"</span><span class="punct">,</span> <span class="str">"Phone"</span><span class="punct">,</span> <span class="str">"Primary Contact"</span><span class="bracket">]</span></div>
+<div class="line indent-4"><span class="bracket">}</span><span class="punct">,</span></div>
+</div>
+<div class="line indent-4 collapsible" onclick="tog(this)"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Verify Home"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">1</span></div>
+<div class="collapsible-content">
+<div class="line indent-4">&nbsp; <span class="key">"Functions"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Manual Address Entry"</span><span class="punct">,</span> <span class="str">"Zillow Verification"</span><span class="punct">,</span> <span class="str">"Property Data Population"</span><span class="punct">,</span> <span class="str">"Map Pin"</span><span class="punct">,</span> <span class="str">"Occupied Toggle"</span><span class="bracket">]</span></div>
+<div class="line indent-4">&nbsp; <span class="key">"Fields"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Address Line 1"</span><span class="punct">,</span> <span class="str">"Address Line 2"</span><span class="punct">,</span> <span class="str">"City"</span><span class="punct">,</span> <span class="str">"State"</span><span class="punct">,</span> <span class="str">"Zip"</span><span class="punct">,</span> <span class="str">"Occupied"</span><span class="bracket">]</span></div>
+<div class="line indent-4">&nbsp; <span class="key">"Ext_Fields"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Year Built"</span><span class="punct">,</span> <span class="str">"Beds"</span><span class="punct">,</span> <span class="str">"Baths"</span><span class="punct">,</span> <span class="str">"Num Systems"</span><span class="punct">,</span> <span class="str">"SqFt"</span><span class="punct">,</span> <span class="str">"Map"</span><span class="bracket">]</span></div>
+<div class="line indent-4"><span class="bracket">}</span><span class="punct">,</span></div>
+</div>
+<div class="line indent-4 collapsible" onclick="tog(this)"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Additional Details"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">2</span></div>
+<div class="collapsible-content">
+<div class="line indent-4">&nbsp; <span class="key">"Functions"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"System Selection (HP Standard, HP Cold Climate, Dual Fuel, Ductless)"</span><span class="punct">,</span> <span class="str">"Conditional: Dual Fuel → AFUE"</span><span class="punct">,</span> <span class="str">"Conditional: Ductless → Num Rooms"</span><span class="punct">,</span> <span class="str">"Ductwork (Yes/No)"</span><span class="bracket">]</span></div>
+<div class="line indent-4">&nbsp; <span class="key">"Fields"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"New HVAC System"</span><span class="punct">,</span> <span class="str">"Dual Fuel Efficiency"</span><span class="punct">,</span> <span class="str">"Num Rooms"</span><span class="punct">,</span> <span class="str">"Ductwork"</span><span class="bracket">]</span></div>
+<div class="line indent-4"><span class="bracket">}</span><span class="punct">,</span></div>
+</div>
+<div class="line indent-4 collapsible" onclick="tog(this)"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Summary"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">3</span></div>
+<div class="collapsible-content">
+<div class="line indent-4">&nbsp; <span class="key">"Functions"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Contacts Display (editable)"</span><span class="punct">,</span> <span class="str">"Recommended System (AHRI#, carousel)"</span><span class="punct">,</span> <span class="str">"Markup Pricing (Margin/Mark Up)"</span><span class="punct">,</span> <span class="str">"Price Visibility Toggle"</span><span class="punct">,</span> <span class="str">"Customer Notes"</span><span class="punct">,</span> <span class="str">"Property Details (editable)"</span><span class="bracket">]</span></div>
+<div class="line indent-4"><span class="bracket">}</span><span class="punct">,</span></div>
+</div>
+<div class="line indent-4"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Submission"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span> <span class="bracket">}</span><span class="punct">,</span></div>
+<div class="line indent-4"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Landing"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span> <span class="bracket">}</span></div>
+<div class="line indent-3"><span class="bracket">]</span><span class="punct">,</span></div>
+</div>
+
+<div class="line indent-3">&nbsp;</div>
+
+<!-- GREENTECH SJ -->
+<div class="line indent-3 collapsible" onclick="tog(this)"><span class="key">"SJModule"</span><span class="punct">:</span> <span class="bracket">[</span></div>
+<div class="collapsible-content">
+<div class="line indent-4"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Landing"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">0</span> <span class="bracket">}</span><span class="punct">,</span></div>
+<div class="line indent-4 collapsible" onclick="tog(this)"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"Submitted Work Proposals"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">1</span></div>
+<div class="collapsible-content">
+<div class="line indent-4">&nbsp; <span class="key">"Functions"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Email Search"</span><span class="punct">,</span> <span class="str">"Results Table"</span><span class="punct">,</span> <span class="str">"Pagination"</span><span class="bracket">]</span></div>
+<div class="line indent-4">&nbsp; <span class="key">"Columns"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Contact"</span><span class="punct">,</span> <span class="str">"Property Address"</span><span class="punct">,</span> <span class="str">"Submitted By"</span><span class="punct">,</span> <span class="str">"Created On"</span><span class="punct">,</span> <span class="str">"Total Price"</span><span class="punct">,</span> <span class="str">"View"</span><span class="bracket">]</span></div>
+<div class="line indent-4"><span class="bracket">}</span><span class="punct">,</span></div>
+</div>
+<div class="line indent-4 collapsible" onclick="tog(this)"><span class="bracket">{</span> <span class="key">"NameID"</span><span class="punct">:</span> <span class="str">"View Proposal"</span><span class="punct">,</span> <span class="key">"Display"</span><span class="punct">:</span> <span class="bool-true">true</span><span class="punct">,</span> <span class="key">"Sort"</span><span class="punct">:</span> <span class="num">2</span></div>
+<div class="collapsible-content">
+<div class="line indent-4">&nbsp; <span class="key">"readOnly"</span><span class="punct">:</span> <span class="bool-true">true</span></div>
+<div class="line indent-4">&nbsp; <span class="key">"Fields"</span><span class="punct">:</span> <span class="bracket">[</span><span class="str">"Contacts"</span><span class="punct">,</span> <span class="str">"Selected System"</span><span class="punct">,</span> <span class="str">"Additional Details"</span><span class="punct">,</span> <span class="str">"Price"</span><span class="punct">,</span> <span class="str">"Customer Notes"</span><span class="punct">,</span> <span class="str">"Property Details"</span><span class="bracket">]</span></div>
+<div class="line indent-4"><span class="bracket">}</span></div>
+</div>
+<div class="line indent-3"><span class="bracket">]</span></div>
+</div>
+
+<div class="line indent-2"><span class="bracket">}</span></div>
+</div>
+
+<div class="line indent-1"><span class="bracket">}</span></div>
+</div>
+
+<div class="line"><span class="bracket">}</span></div>
+
+<script>
+function tog(el) {
+  const content = el.nextElementSibling;
+  if (content && content.classList.contains('collapsible-content')) {
+    el.classList.toggle('collapsed');
+    content.classList.toggle('hidden');
+  }
+}
+</script>
+</body>
+</html>
