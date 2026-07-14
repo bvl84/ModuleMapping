@@ -38,6 +38,23 @@ export type SlotGroup = {
   defaultCollapsed?: boolean;
 };
 
+/**
+ * A single deeply-nested string value inside a passthrough slot that the GUI
+ * exposes as an editable text field (e.g. a button label or phone number buried
+ * several containers deep). The `path` is a sequence of object keys / array
+ * indices from the slot's `baseNode` down to the string leaf.
+ */
+export type DeepField = {
+  /** Stable id for the edits map. */
+  key: string;
+  /** Friendly label shown in the GUI. */
+  label: string;
+  /** Path from baseNode to the string value (keys + array indices). */
+  path: readonly (string | number)[];
+  /** Optional `tel:` href path to keep in sync (digits derived from the value). */
+  telHrefPath?: readonly (string | number)[];
+};
+
 export type SlotTemplate = {
   /** Stable id used for hydration/round-trip matching. */
   slotId: string;
@@ -59,6 +76,8 @@ export type SlotTemplate = {
   baseNode: ComponentNode;
   /** Curated editable fields for this slot. */
   editable: readonly EditableField[];
+  /** Deeply-nested string fields exposed as editable text inputs. */
+  deepFields?: readonly DeepField[];
 };
 
 export type StepTemplate = {
@@ -116,71 +135,32 @@ const basicInfo: StepTemplate = {
   defaultEnabled: true,
   stepperLabel: "Basic Information",
   heading: {
-    title: "HVAC Upgrade Tool",
-    subtitle: "Job Proposal",
     description:
-      "Before we get started, we'll need to verify your information and some basic details to personalize your upgrade options.",
+      "Before we get started, we need a few details to create your personalized solution.",
   },
   pageLayout: PAGE_LAYOUT_MAIN_NARROW,
   mainSlots: [
     slot({
       slotId: "basicInfo.infoBanner",
       displayName: "Info banner",
-      defaultEnabled: false,
-      hint: "Optional callout above the form (used by Solutions Builder).",
+      defaultEnabled: true,
+      hint: "Callout above the form.",
       baseNode: {
         component: "InfoBanner",
         properties: {
           content:
-            "Providing your information allows us to connect you with your local Pro.",
+            "Providing your information allows us to connect you with your local Daikin Pro.",
         },
       },
       editable: ["content"],
     }),
     slot({
-      slotId: "basicInfo.firstName",
-      displayName: "First name input",
+      slotId: "basicInfo.basicInformation",
+      displayName: "Basic information form",
       defaultEnabled: true,
-      baseNode: {
-        component: "TextInput",
-        properties: { label: "First name", required: true },
-        binding: "@contacts.contactForm.firstName",
-      },
-      editable: ["label", "required", "binding"],
-    }),
-    slot({
-      slotId: "basicInfo.lastName",
-      displayName: "Last name input",
-      defaultEnabled: true,
-      baseNode: {
-        component: "TextInput",
-        properties: { label: "Last name", required: true },
-        binding: "@contacts.contactForm.lastName",
-      },
-      editable: ["label", "required", "binding"],
-    }),
-    slot({
-      slotId: "basicInfo.email",
-      displayName: "Email input",
-      defaultEnabled: true,
-      baseNode: {
-        component: "TextInput",
-        properties: { type: "email", label: "Email", required: true },
-        binding: "@contacts.contactForm.email",
-      },
-      editable: ["label", "required", "binding"],
-    }),
-    slot({
-      slotId: "basicInfo.phone",
-      displayName: "Phone input",
-      defaultEnabled: true,
-      baseNode: {
-        component: "PhoneInput",
-        properties: { label: "Phone number", required: true },
-        binding: "@contacts.contactForm.phone",
-        styling: { core: "md:w-[180px]" },
-      },
-      editable: ["label", "required", "binding"],
+      hint: "Single component that collects first name, last name, email, and phone.",
+      baseNode: { component: "BasicInformation" },
+      editable: [],
     }),
   ],
   footerSlots: [
@@ -211,21 +191,14 @@ const propertyDetails: StepTemplate = {
   defaultEnabled: true,
   stepperLabel: "Property Details",
   heading: {
-    title: "HVAC Upgrade Tool",
-    subtitle: "Job Proposal",
-    description:
-      "Enter the property address for the upgrade so we can provide the most accurate options for your home.",
-  },
-  auth: {
-    required: true,
-    preAuthData: { email: "@contacts.contactForm.email" },
+    description: "Enter your property address so we can estimate your home's size.",
   },
   pageLayout: PAGE_LAYOUT_MAIN_NARROW_FOOTER_RR,
   mainSlots: [
     slot({
       slotId: "propertyDetails.infoBanner",
       displayName: "Info banner",
-      defaultEnabled: false,
+      defaultEnabled: true,
       baseNode: {
         component: "InfoBanner",
         properties: {
@@ -280,6 +253,7 @@ const propertyDetails: StepTemplate = {
       locked: true,
       baseNode: {
         component: "AddressVerificationPanel",
+        properties: { display: { numberOfSystems: false } },
         showWhen: {
           path: "@workflow.verifyHome.showVerifyHome",
           operator: "equals",
@@ -329,7 +303,7 @@ const propertyDetails: StepTemplate = {
 const hvacGoals: StepTemplate = {
   step: "hvacGoals",
   displayName: "Home Goals",
-  defaultEnabled: true,
+  defaultEnabled: false,
   stepperLabel: "Home Goals",
   heading: {
     title: "HVAC Upgrade Tool",
@@ -398,7 +372,7 @@ const hvacGoals: StepTemplate = {
 const currentSystem: StepTemplate = {
   step: "currentSystem",
   displayName: "Current System",
-  defaultEnabled: true,
+  defaultEnabled: false,
   stepperLabel: "Current System",
   heading: {
     title: "HVAC Upgrade Tool",
@@ -411,11 +385,18 @@ const currentSystem: StepTemplate = {
       slotId: "currentSystem.container",
       displayName: "Current system container",
       defaultEnabled: true,
-      hint: "Holds the client-specific current-system widget (e.g., CinchCurrentSystemInfo).",
+      hint: "Renders the system-upgrade widget tied to the user's property.",
       baseNode: {
-        component: "CurrentSystemContainer",
-        properties: {
-          children: [{ component: "CinchCurrentSystemInfo" }],
+        component: "SystemUpgradeContainer",
+        binding: {
+          requireSqFtPath: {
+            target: "@workflow.systemUpgrade.requireSqFt",
+            default: false,
+          },
+          showSqFtPath: {
+            target: "@workflow.systemUpgrade.showSqFt",
+            default: false,
+          },
         },
       },
       editable: [],
@@ -432,7 +413,7 @@ const currentSystem: StepTemplate = {
         styling: { core: "lg:w-[120px]" },
         actions: [{ type: "nextStep" }],
         disabledWhen: {
-          path: "@bundles.hasBundlesAndRequiredFields",
+          path: "@systemUpgrades.hasBundlesAndRequiredFields",
           operator: "equals",
           value: false,
         },
@@ -458,7 +439,7 @@ const currentSystem: StepTemplate = {
 const yourMatch: StepTemplate = {
   step: "yourMatch",
   displayName: "Your Match",
-  defaultEnabled: true,
+  defaultEnabled: false,
   stepperLabel: "Your Match",
   heading: { title: "Your HVAC Upgrade!", subtitle: "Job Proposal" },
   mainSlots: [
@@ -466,7 +447,7 @@ const yourMatch: StepTemplate = {
       slotId: "yourMatch.matchLayout",
       displayName: "Match summary layout",
       defaultEnabled: true,
-      hint: "Bundle card + price + contact + schedule button. Edit deep contents in code.",
+      hint: "System details + add-ons + price + contact info + Schedule/Go Back buttons. Passthrough — non-editable in the GUI.",
       baseNode: {
         component: "Container",
         styling: {
@@ -476,20 +457,37 @@ const yourMatch: StepTemplate = {
         properties: {
           children: [
             {
-              component: "SummaryBundleCard",
+              component: "SystemUpgradeDetails",
+              styling: { core: "flex-1 h-full" },
               binding: {
-                systemsDataPath: "@bundles.systems",
+                systemsDataPath: "@systemUpgrades.systems",
                 currentSystemIndexPath: {
-                  target: "@workflow.yourMatch.currentSystemIndex",
+                  target: "@workflow.summary.currentSystemIndex",
                   default: 0,
                 },
               },
-              styling: { core: "mb-10 flex-1" },
             },
             {
               component: "Container",
               properties: {
                 children: [
+                  {
+                    component: "AddonContainer",
+                    showWhen: {
+                      path: "@workflow.summary.hideAddonsContent",
+                      operator: "equals",
+                      value: false,
+                    },
+                    styling: { core: "lg:mt-0" },
+                  },
+                  {
+                    component: "MountingOptionContainer",
+                    showWhen: {
+                      path: "@workflow.summary.hideMountTypesContent",
+                      operator: "equals",
+                      value: false,
+                    },
+                  },
                   { component: "PriceBreakdown", binding: "@pricing.finalPrice" },
                   {
                     component: "ContactInfo",
@@ -539,25 +537,15 @@ const yourMatch: StepTemplate = {
       editable: [],
     }),
     slot({
-      slotId: "yourMatch.alternativeOptions",
-      displayName: "Alternative options",
-      defaultEnabled: true,
-      baseNode: { component: "SummaryBundleAlternativeOptions" },
-      editable: [],
-    }),
-    slot({
       slotId: "yourMatch.scheduleDrawer",
       displayName: "Schedule inspection drawer",
       defaultEnabled: true,
       baseNode: {
         component: "ScheduleDrawer",
-        properties: {
-          title: "Show Schedule Drawer",
-          containerContentType: "inspection",
-        },
+        properties: { containerContentType: "inspection" },
         binding: {
           timezonePath: "@propertyInfo.timezone",
-          appointmentsPath: "@bundles.inspectionSchedules",
+          appointmentsPath: "@systemUpgrades.inspectionSchedules",
         },
         showWhen: {
           path: "@workflow.yourMatch.showScheduleDrawer",
@@ -568,7 +556,7 @@ const yourMatch: StepTemplate = {
           {
             type: "moduleAction",
             name: "validateInspectionSchedule",
-            module: "bundles",
+            module: "systemUpgrades",
           },
           { type: "submitWorkOrderProposal" },
         ],
@@ -584,7 +572,7 @@ const yourMatch: StepTemplate = {
 const systemUpgrade: StepTemplate = {
   step: "systemUpgrade",
   displayName: "System Upgrade",
-  defaultEnabled: false,
+  defaultEnabled: true,
   stepperLabel: "System Upgrade",
   heading: { description: "Select the type of solution you are most interested in for your home." },
   pageLayout: PAGE_LAYOUT_FOOTER_RR,
@@ -593,7 +581,23 @@ const systemUpgrade: StepTemplate = {
       slotId: "systemUpgrade.container",
       displayName: "System upgrade container",
       defaultEnabled: true,
-      baseNode: { component: "SystemUpgradeContainer" },
+      baseNode: {
+        component: "SystemUpgradeContainer",
+        binding: {
+          requireSqFtPath: {
+            target: "@workflow.systemUpgrade.requireSqFt",
+            default: false,
+          },
+          showSqFtPath: {
+            target: "@workflow.systemUpgrade.showSqFt",
+            default: false,
+          },
+          enableMountTypeNaming: {
+            target: "@workflow.systemUpgrade.enableMountTypeNaming",
+            default: true,
+          },
+        },
+      },
       editable: [],
     }),
     slot({
@@ -604,11 +608,11 @@ const systemUpgrade: StepTemplate = {
       baseNode: {
         component: "OptInCommunication",
         properties: {
-          label: "I agree to receive communications.",
+          label: "I agree to receive communications from Daikin.",
           description:
-            "We respect your privacy. By submitting your information here, you agree that we may contact you about our current and future products and services.",
+            "Daikin respects your privacy. Our Privacy Policy outlines how we collect and use information. By submitting your information here, you agree that we may contact you about our current and future products and services and that you are directing us to provide your submitted information to independent dealers in your area that offer our products and services. Your agreement and consent are not required to make a purchase but help facilitate future communications about, and the purchase of, Daikin, Goodman, and Amana-brand products and services.",
           disclaimer:
-            "You can unsubscribe from these communications at any time. By clicking submit below, you consent to allow us to store and process the personal information submitted above to provide you the content requested.",
+            "You can unsubscribe from these communications at any time. For more information on how to unsubscribe, our privacy practices, and how we are committed to protecting and respecting your privacy, please review our Privacy Policy. \n By clicking submit below, you consent to allow Daikin to store and process the personal information submitted above to provide you the content requested.",
           required: true,
           default: false,
         },
@@ -635,7 +639,7 @@ const systemUpgrade: StepTemplate = {
         component: "Text",
         properties: {
           content:
-            "By clicking submit, you understand you will be contacted by your local Pro to review your personalized solution.",
+            "By clicking submit, you understand you will be contacted by your local Daikin Pro to review your personalized solution.",
         },
         styling: { core: "text-xs" },
       },
@@ -652,11 +656,6 @@ const systemUpgrade: StepTemplate = {
         properties: { label: "Submit" },
         disabledWhen: [
           {
-            path: "@systemUpgrades.hasBundlesAndRequiredFields",
-            operator: "equals",
-            value: false,
-          },
-          {
             path: "@workflow.reCaptchaVerified",
             operator: "not_equals",
             value: true,
@@ -668,6 +667,7 @@ const systemUpgrade: StepTemplate = {
           },
         ],
         actions: [
+          { type: "validateSystemUpgrades" },
           { type: "validateStep" },
           { type: "generateSalesforceWebToCase" },
           { type: "nextStep" },
@@ -697,8 +697,7 @@ const systemUpgrade: StepTemplate = {
 const summaryPageLayout: StepPageLayout = {
   main: {
     styling: {
-      core: "lg:gap-x-16",
-      layout: { lg: { type: "grid", columns: 2, items: "start" } },
+      core: "lg:gap-16",
     },
   },
 };
@@ -706,99 +705,236 @@ const summaryPageLayout: StepPageLayout = {
 const summary: StepTemplate = {
   step: "summary",
   displayName: "Summary",
-  defaultEnabled: false,
+  defaultEnabled: true,
   stepperLabel: "Summary",
   heading: {},
   pageLayout: summaryPageLayout,
   mainSlots: [
     slot({
-      slotId: "summary.upgradeDetails",
-      displayName: "Upgrade details container",
+      slotId: "summary.detailsLayout",
+      displayName: "System details + next steps",
       defaultEnabled: true,
+      hint: "System details, add-ons, mount options, next-steps copy, phone number, and the PDF/email buttons.",
       baseNode: {
         component: "Container",
-        styling: { core: "flex-1" },
+        styling: {
+          core: "lg:gap-x-16",
+          layout: { lg: { type: "flex", direction: "row" } },
+        },
         properties: {
           children: [
             {
-              component: "SummarySystemUpgradeDetails",
+              component: "SystemUpgradeDetails",
+              styling: { core: "flex-1 h-full" },
               binding: {
                 systemsDataPath: "@systemUpgrades.systems",
                 currentSystemIndexPath: {
-                  target: "@workflow.yourMatch.currentSystemIndex",
+                  target: "@workflow.summary.currentSystemIndex",
                   default: 0,
                 },
+              },
+            },
+            {
+              component: "Container",
+              styling: { core: "lg:flex-1" },
+              properties: {
+                children: [
+                  {
+                    component: "AddonContainer",
+                    styling: { core: "lg:mt-0" },
+                    showWhen: {
+                      path: "@workflow.summary.hideAddonsContent",
+                      operator: "equals",
+                      value: false,
+                    },
+                  },
+                  {
+                    component: "MountingOptionContainer",
+                    showWhen: {
+                      path: "@workflow.summary.hideMountTypesContent",
+                      operator: "equals",
+                      value: false,
+                    },
+                  },
+                  {
+                    component: "Container",
+                    styling: { core: "mt-2 gap-1" },
+                    properties: {
+                      children: [
+                        {
+                          component: "Text",
+                          properties: { content: "Next steps with your Daikin Pro" },
+                          styling: { core: "font-semibold text-gray-600" },
+                        },
+                        {
+                          component: "Text",
+                          properties: {
+                            content:
+                              "A trusted local Daikin Pro will be assigned to you shortly (Monday – Friday, 8 a.m. – 5 p.m. CST). You can expect to be contacted within 2 business days to schedule an in-home assessment to review the recommended solutions.",
+                          },
+                          styling: { core: "text-sm text-gray-600" },
+                        },
+                        {
+                          component: "Container",
+                          styling: {
+                            core: "gap-1 text-sm text-gray-600",
+                            layout: { default: { type: "flex", direction: "row", wrap: true } },
+                          },
+                          properties: {
+                            children: [
+                              {
+                                component: "Text",
+                                properties: { content: "If you have additional questions, please call " },
+                                styling: { core: "text-sm" },
+                              },
+                              {
+                                component: "Text",
+                                properties: { content: "833-803-1172", href: "tel:8338031172" },
+                                styling: { core: "text-sm" },
+                              },
+                            ],
+                          },
+                        },
+                      ],
+                    },
+                  },
+                  {
+                    component: "FluidButtonGroup",
+                    styling: {
+                      core: "my-6 lg:mb-0",
+                      layout: {
+                        default: { type: "flex", direction: "col-reverse" },
+                        lg: { type: "flex", direction: "row", justify: "end" },
+                      },
+                    },
+                    properties: {
+                      children: [
+                        {
+                          component: "Button",
+                          properties: { label: "Start Over", variant: "secondary" },
+                          actions: [{ type: "resetWorkflow" }],
+                        },
+                        {
+                          component: "Button",
+                          properties: { label: "Email", variant: "secondary", preIcon: "MailIcon" },
+                          actions: [{ type: "sendReportPDF" }],
+                        },
+                        {
+                          component: "Button",
+                          properties: { label: "Download PDF", preIcon: "PDFIcon", preIconColor: "white" },
+                          actions: [{ type: "generateReportPDF" }],
+                        },
+                      ],
+                    },
+                  },
+                ],
               },
             },
           ],
         },
       },
       editable: [],
+      deepFields: [
+        {
+          key: "phone",
+          label: "Support phone number",
+          path: [
+            "properties", "children", 1,
+            "properties", "children", 2,
+            "properties", "children", 2,
+            "properties", "children", 1,
+            "properties", "content",
+          ],
+          telHrefPath: [
+            "properties", "children", 1,
+            "properties", "children", 2,
+            "properties", "children", 2,
+            "properties", "children", 1,
+            "properties", "href",
+          ],
+        },
+        {
+          key: "btnStartOver",
+          label: "Button: Start Over",
+          path: [
+            "properties", "children", 1,
+            "properties", "children", 3,
+            "properties", "children", 0,
+            "properties", "label",
+          ],
+        },
+        {
+          key: "btnEmail",
+          label: "Button: Email",
+          path: [
+            "properties", "children", 1,
+            "properties", "children", 3,
+            "properties", "children", 1,
+            "properties", "label",
+          ],
+        },
+        {
+          key: "btnDownloadPdf",
+          label: "Button: Download PDF",
+          path: [
+            "properties", "children", 1,
+            "properties", "children", 3,
+            "properties", "children", 2,
+            "properties", "label",
+          ],
+        },
+      ],
     }),
     slot({
-      slotId: "summary.sideContainer",
-      displayName: "Side container (addons + contact + buttons)",
+      slotId: "summary.contactLayout",
+      displayName: "Contact + pricing + technology info",
       defaultEnabled: true,
-      hint: "Holds add-ons, contact info, property address, next-steps copy, and PDF/email buttons.",
+      hint: "Contact info, property address, pricing disclaimer, and technology details.",
       baseNode: {
         component: "Container",
-        styling: { core: "flex-1" },
+        styling: {
+          core: "lg:gap-x-16",
+          layout: {
+            default: { type: "flex", direction: "col-reverse" },
+            lg: { type: "flex", direction: "row" },
+          },
+        },
         properties: {
           children: [
             {
-              component: "SummaryAddonContainer",
-              showWhen: {
-                path: "@workflow.summary.hideAddonsContent",
-                operator: "equals",
-                value: false,
-              },
-              styling: { core: "mt-6 lg:mt-0" },
-            },
-            {
-              component: "ContactInfo",
-              binding: "@contacts.contactForm",
-              showWhen: {
-                path: "@workflow.summary.hideAddonsContent",
-                operator: "equals",
-                value: true,
-              },
-            },
-            {
-              component: "PropertyAddress",
-              showWhen: {
-                path: "@workflow.summary.hideAddonsContent",
-                operator: "equals",
-                value: true,
-              },
-            },
-            {
-              component: "FluidButtonGroup",
+              component: "Container",
+              styling: { core: "flex-1" },
               properties: {
                 children: [
+                  { component: "ContactInfo", binding: "@contacts.contactForm" },
+                  { component: "PropertyAddress" },
                   {
-                    component: "Button",
-                    properties: { label: "Restart Upgrade", variant: "secondary" },
-                    actions: [{ type: "resetWorkflow" }],
-                  },
-                  {
-                    component: "Button",
-                    properties: { label: "Email", variant: "secondary", preIcon: "MailIcon" },
-                    actions: [{ type: "sendReportPDF" }],
-                  },
-                  {
-                    component: "Button",
-                    properties: { label: "Download PDF", preIcon: "PDFIcon", preIconColor: "white" },
-                    actions: [{ type: "generateReportPDF" }],
+                    component: "Container",
+                    styling: { core: "gap-1" },
+                    properties: {
+                      children: [
+                        {
+                          component: "Text",
+                          properties: { content: "Pricing is finalized after an in-home assessment" },
+                          styling: { core: "text-gray-600 font-semibold" },
+                        },
+                        {
+                          component: "Text",
+                          properties: {
+                            content:
+                              "Equipment pricing can vary based on your home, installation requirements, and local contractor rates. A Daikin Comfort Pro will assess and confirm the appropriate system FIT.",
+                          },
+                          styling: { core: "text-sm text-gray-600" },
+                        },
+                      ],
+                    },
                   },
                 ],
               },
-              styling: {
-                core: "my-6",
-                layout: {
-                  default: { type: "flex", direction: "col-reverse" },
-                  lg: { type: "flex", direction: "row", justify: "end" },
-                },
-              },
+            },
+            {
+              component: "TechnologyAdditionalInfo",
+              styling: { core: "flex-1" },
             },
           ],
         },
@@ -812,11 +948,12 @@ const summary: StepTemplate = {
 export const SCHEMA_STEP_TEMPLATES: readonly StepTemplate[] = [
   basicInfo,
   propertyDetails,
+  systemUpgrade,
+  summary,
+  // Optional/legacy steps (default off) — PMs can toggle on and reorder.
   hvacGoals,
   currentSystem,
   yourMatch,
-  systemUpgrade,
-  summary,
 ];
 
 export function getStepTemplate(stepId: string): StepTemplate | undefined {

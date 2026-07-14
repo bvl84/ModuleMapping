@@ -195,11 +195,11 @@ export function LiveJsonOutput({
       className="flex min-h-0 w-full min-w-0 flex-1 basis-0 flex-col self-stretch"
       aria-label="Live config output"
     >
-      <div className="flex h-full min-h-[min(100dvh,28rem)] flex-1 flex-col overflow-hidden rounded-xl border-2 border-[#00BCFF] bg-[#1e1e1e] shadow-lg sm:min-h-[32rem] lg:min-h-0">
-        <div className="shrink-0 border-b border-gray-700 px-5 py-4 sm:px-6">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#6a9955]">Live output</p>
-          <p className="mt-0.5 text-sm font-medium text-[#d4d4d4]">{title}</p>
-          <p className="mt-1 text-xs text-gray-500">{subtitle}</p>
+      <div className="flex h-full min-h-[min(100dvh,28rem)] flex-1 flex-col overflow-hidden rounded-2xl border border-cyan-400/40 bg-[#050711]/90 shadow-[0_22px_80px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:min-h-[32rem] lg:min-h-0">
+        <div className="shrink-0 border-b border-cyan-400/15 px-5 py-4 sm:px-6">
+          <p className="eyebrow text-[0.68rem]">Live output</p>
+          <p className="mt-0.5 text-sm font-medium text-[#eef7ff]">{title}</p>
+          <p className="mt-1 text-xs text-slate-400">{subtitle}</p>
         </div>
         <div
           className="min-h-0 flex-1 overflow-auto p-5 sm:p-6"

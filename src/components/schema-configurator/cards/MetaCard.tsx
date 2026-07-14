@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  labelToStepId,
+  clientNameToId,
   type ConfiguratorState,
   type MetaState,
   type WorkflowSettingsState,
@@ -37,7 +37,7 @@ export function MetaCard({
 }) {
   const update = (patch: Partial<MetaState>) => onMetaChange({ ...meta, ...patch });
 
-  const derivedId = labelToStepId(meta.id);
+  const derivedId = clientNameToId(meta.id);
 
   return (
     <SectionCard
@@ -56,8 +56,8 @@ export function MetaCard({
           helperText="Used for the workflow ID in the URL and the proposed payload company ID."
         />
         {meta.id ? (
-          <p className="mt-1 text-[11px] text-gray-500">
-            ID: <span className="font-mono text-gray-700">{derivedId || meta.id}</span>
+          <p className="mt-1 text-[11px] text-slate-400">
+            ID: <span className="font-mono text-cyan-200">{derivedId || meta.id}</span>
           </p>
         ) : null}
       </div>
@@ -101,7 +101,7 @@ export function MetaCard({
         </div>
       </div>
 
-      <div className="border-t border-gray-100 pt-3">
+      <div className="border-t border-cyan-400/10 pt-3">
         <InlineToggle
           checked={includeDisplay}
           onChange={onIncludeDisplayChange}
@@ -109,7 +109,7 @@ export function MetaCard({
           helperText="Controls visibility of the page header, page footer, step header, and progress indicator."
         />
         {includeDisplay ? (
-          <div className="mt-3 space-y-2 rounded-md border border-dashed border-sky-300 bg-sky-50/40 p-3">
+          <div className="mt-3 space-y-2 rounded-md border border-dashed border-cyan-400/30 bg-cyan-400/5 p-3">
             <InlineToggle
               checked={display.pageHeader !== false}
               onChange={(v) => onDisplayChange({ ...display, pageHeader: v })}
@@ -143,7 +143,7 @@ export function MetaCard({
         ) : null}
       </div>
 
-      <div className="border-t border-gray-100 pt-3">
+      <div className="border-t border-cyan-400/10 pt-3">
         <InlineToggle
           checked={workflow.enableContactsModule}
           onChange={(v) => onWorkflowChange({ ...workflow, enableContactsModule: v })}
@@ -165,7 +165,7 @@ export function MetaCard({
         ) : null}
       </div>
 
-      <div className="space-y-2 border-t border-gray-100 pt-3">
+      <div className="space-y-2 border-t border-cyan-400/10 pt-3">
         <p className={CFG_LABEL}>Navigation</p>
         <InlineToggle
           checked={workflow.navigation.shouldSaveOnNext !== false}

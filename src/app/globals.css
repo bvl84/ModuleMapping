@@ -1,8 +1,13 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: dark;
   --background: #111111;
   --foreground: #e5e5e5;
+  --holo-cyan: #67e8f9;
+  --holo-cyan-bright: #53eafd;
+  --holo-gold: #f6d365;
+  --holo-panel: #0b1020;
 }
 
 @theme inline {
@@ -16,4 +21,148 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* ============================================================================
+   Holocron design system — deep-space holographic archive aesthetic.
+   Reference: TheHolocron/design.md. Applied per-page (holo pages only), not
+   globally, via .holo-bg / .holo-grid on the app shell.
+   ========================================================================== */
+
+/* 3. Background & atmosphere — layered radials + diagonal gradient. */
+.holo-bg {
+  color: #eef7ff;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(103, 232, 249, 0.14), transparent 28rem),
+    radial-gradient(circle at 85% 5%, rgba(246, 211, 101, 0.12), transparent 24rem),
+    linear-gradient(145deg, #050711 0%, #0b1020 48%, #050711 100%);
+  background-attachment: fixed;
+}
+
+/* Faint cyan graph-paper grid, masked to fade at the edges. */
+.holo-grid::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(103, 232, 249, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(103, 232, 249, 0.03) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: radial-gradient(circle at center, black, transparent 78%);
+  mask-image: radial-gradient(circle at center, black, transparent 78%);
+}
+
+/* Starfield — three rotated, scaled dotted layers for parallax depth. */
+.stars,
+.stars::before,
+.stars::after {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.95) 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(103, 232, 249, 0.8) 1px, transparent 1.6px);
+  background-position: 10px 20px, 80px 120px;
+  background-size: 160px 160px, 230px 230px;
+  opacity: 0.28;
+}
+.stars::before,
+.stars::after {
+  content: "";
+}
+.stars::before {
+  transform: rotate(12deg) scale(1.15);
+  opacity: 0.18;
+}
+.stars::after {
+  transform: rotate(-8deg) scale(1.35);
+  opacity: 0.12;
+}
+
+/* 4. Eyebrow — signature section kicker. */
+.eyebrow {
+  color: #67e8f9;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* 5.1 Pill button — primary CTA (cyan→gold gradient) and hover lift. */
+.holo-button {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.85rem 1.2rem;
+  font-weight: 800;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
+}
+.holo-button:hover:not(:disabled) {
+  transform: translateY(-3px);
+}
+.holo-button--primary {
+  background: linear-gradient(to bottom right, #67e8f9, #fde68a);
+  color: #020617;
+  box-shadow: 0 18px 48px rgba(103, 232, 249, 0.18);
+}
+.holo-button--ghost {
+  border: 1px solid rgba(103, 232, 249, 0.4);
+  color: #a5f3fc;
+}
+.holo-button--ghost:hover:not(:disabled) {
+  border-color: rgba(103, 232, 249, 0.7);
+  background: rgba(103, 232, 249, 0.08);
+}
+
+/* 5.2 Diamond accent mark. */
+.brand-mark {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(246, 211, 101, 0.7);
+  border-radius: 10px;
+  background:
+    linear-gradient(135deg, transparent 38%, rgba(246, 211, 101, 0.9) 40%, transparent 43%),
+    radial-gradient(circle, rgba(103, 232, 249, 0.35), transparent 60%);
+  box-shadow: 0 0 28px rgba(103, 232, 249, 0.35);
+  transform: rotate(45deg);
+}
+
+/* 5.4 Glass card with a decorative rotated diamond in the corner. */
+.site-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(103, 232, 249, 0.2);
+  background: rgba(10, 16, 32, 0.8);
+  box-shadow: 0 22px 80px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(20px);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
+}
+.site-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(103, 232, 249, 0.6);
+  background: rgba(13, 22, 43, 0.9);
+}
+.site-card::before {
+  content: "";
+  position: absolute;
+  top: -54px;
+  right: -54px;
+  width: 126px;
+  height: 126px;
+  border: 1px solid rgba(246, 211, 101, 0.18);
+  border-radius: 26px;
+  transform: rotate(45deg);
+  pointer-events: none;
 }

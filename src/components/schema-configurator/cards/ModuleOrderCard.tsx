@@ -88,20 +88,20 @@ export function ModuleOrderCard({
               onDragEnd={onDragEnd}
               aria-grabbed={isDragging}
               aria-label={`${template.displayName}, position ${i + 1} of ${stepOrder.length}`}
-              className={`flex items-center gap-3 rounded-lg border bg-white p-3 shadow-sm transition-all ${
+              className={`flex items-center gap-3 rounded-lg border bg-[#050711]/40 p-3 shadow-sm transition-all ${
                 isDragging ? "opacity-50" : ""
               } ${
-                isOver ? "border-sky-400 ring-2 ring-sky-300" : "border-gray-200"
+                isOver ? "border-cyan-400/60 ring-2 ring-cyan-400/30" : "border-cyan-400/15"
               }`}
             >
               <span
-                className="flex h-7 w-5 shrink-0 cursor-grab select-none items-center justify-center text-gray-400 hover:text-gray-700 active:cursor-grabbing"
+                className="flex h-7 w-5 shrink-0 cursor-grab select-none items-center justify-center text-slate-500 hover:text-slate-200 active:cursor-grabbing"
                 aria-hidden
                 title="Drag to reorder"
               >
                 ⋮⋮
               </span>
-              <span className="font-mono text-[11px] tabular-nums text-gray-500">
+              <span className="font-mono text-[11px] tabular-nums text-slate-400">
                 {String(i + 1).padStart(2, "0")}
               </span>
               <CheckboxButton
@@ -111,7 +111,7 @@ export function ModuleOrderCard({
               />
               <span
                 className={`flex-1 text-sm font-semibold ${
-                  step.enabled ? "text-gray-800" : "text-gray-400"
+                  step.enabled ? "text-slate-100" : "text-slate-500"
                 }`}
               >
                 {template.displayName}
@@ -121,7 +121,7 @@ export function ModuleOrderCard({
                   type="button"
                   onClick={() => move(stepId, -1)}
                   disabled={i === 0}
-                  className="rounded border border-gray-300 bg-white px-2 py-0.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-40"
+                  className="rounded border border-cyan-400/20 bg-white/5 px-2 py-0.5 text-xs font-semibold text-slate-300 hover:bg-white/10 disabled:opacity-40"
                   aria-label="Move up"
                 >
                   ↑
@@ -130,7 +130,7 @@ export function ModuleOrderCard({
                   type="button"
                   onClick={() => move(stepId, 1)}
                   disabled={i === stepOrder.length - 1}
-                  className="rounded border border-gray-300 bg-white px-2 py-0.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-40"
+                  className="rounded border border-cyan-400/20 bg-white/5 px-2 py-0.5 text-xs font-semibold text-slate-300 hover:bg-white/10 disabled:opacity-40"
                   aria-label="Move down"
                 >
                   ↓
@@ -140,7 +140,7 @@ export function ModuleOrderCard({
           );
         })}
       </ol>
-      <p className="text-[11px] text-gray-500">
+      <p className="text-[11px] text-slate-400">
         Tip: drag the dotted handle on the left, or use the up/down buttons. The wizard nav and the
         exported workflow steps follow this order.
       </p>

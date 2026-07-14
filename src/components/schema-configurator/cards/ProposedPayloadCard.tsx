@@ -31,9 +31,9 @@ export function ProposedPayloadCard({
     >
       {state.enabled ? (
         <>
-          <p className="text-[11px] text-gray-500">
+          <p className="text-[11px] text-slate-400">
             Advanced editor — leave as-is unless you know what you are changing. Values starting
-            with <span className="font-mono text-sky-700">@</span> are workflow references
+            with <span className="font-mono text-cyan-200">@</span> are workflow references
             evaluated at runtime.
           </p>
           <TextAreaField
@@ -44,15 +44,15 @@ export function ProposedPayloadCard({
             placeholder="{ ... }"
           />
           {parseError ? (
-            <p className="rounded-md border border-red-200 bg-red-50 px-2 py-1 font-mono text-[11px] text-red-700">
+            <p className="rounded-md border border-red-400/30 bg-red-500/10 px-2 py-1 font-mono text-[11px] text-red-300">
               JSON error: {parseError}
             </p>
           ) : (
-            <p className="text-[11px] italic text-gray-500">JSON parses cleanly.</p>
+            <p className="text-[11px] italic text-slate-400">JSON parses cleanly.</p>
           )}
         </>
       ) : (
-        <p className="text-xs italic text-gray-400">
+        <p className="text-xs italic text-slate-500">
           proposedPayload omitted from the export. Toggle the rail to include.
         </p>
       )}

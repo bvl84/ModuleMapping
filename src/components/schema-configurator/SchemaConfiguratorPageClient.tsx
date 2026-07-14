@@ -1,14 +1,17 @@
 "use client";
 
-import { useCallback, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { MapperAppShell } from "@/components/layout/MapperAppShell";
 import {
   buildStandardizedConfigFromState,
   createDefaultConfiguratorState,
+  hydrateStateFromStandardizedConfig,
   type ConfiguratorState,
   type StepState,
 } from "@/data/schema-configurator-model";
+import { takeCloneHandoff } from "@/data/clone-handoff";
 import { SCHEMA_STEP_TEMPLATES } from "@/data/schema-step-templates";
+import { useAuthHeader } from "@/lib/useAuthHeader";
 import { FaqsCard } from "./cards/FaqsCard";
 import { LandingPageCard } from "./cards/LandingPageCard";
 import { MetaCard } from "./cards/MetaCard";
@@ -27,6 +30,20 @@ const SECTION_ORDER = "module-order";
 const SECTION_PAYLOAD = "proposed-payload";
 const STEP_PREFIX = "step:";
 
+/** PIM workflow-service create/update endpoint (CORS-enabled, called from the browser). */
+const CREATE_URL =
+  "https://api.pim.motilidev.com/workflow-service/workflows/create?noAuthVar=MotiliWorkflow98528";
+
+type SubmitState =
+  | { status: "idle" }
+  | { status: "submitting" }
+  | { status: "success"; message: string }
+  | { status: "error"; message: string };
+
+function isRecord(v: unknown): v is Record<string, unknown> {
+  return !!v && typeof v === "object" && !Array.isArray(v);
+}
+
 type WizardEntry = {
   id: string;
   label: string;
@@ -38,8 +55,85 @@ type WizardEntry = {
 export function SchemaConfiguratorPageClient() {
   const [state, setState] = useState<ConfiguratorState>(() => createDefaultConfiguratorState());
   const [activeId, setActiveId] = useState<string>(SECTION_META);
+  /** Full workflow record handed off from a clone; the base for saving back. */
+  const [sourceRecord, setSourceRecord] = useState<Record<string, unknown> | null>(null);
+  const [submitState, setSubmitState] = useState<SubmitState>({ status: "idle" });
+  const authHeader = useAuthHeader();
+
+  // If we arrived here from a workflow clone, hydrate the form from that record.
+  useEffect(() => {
+    const handoff = takeCloneHandoff();
+    if (!isRecord(handoff)) return;
+    const outer = handoff.workflow;
+    const innerConfig = isRecord(outer) ? outer.workflow : undefined;
+    if (isRecord(innerConfig)) {
+      // Full record shape: hydrate from the inner config, keep record for saving.
+      setState(hydrateStateFromStandardizedConfig(innerConfig));
+      setSourceRecord(handoff);
+    } else {
+      // Bare standardized config.
+      setState(hydrateStateFromStandardizedConfig(handoff));
+    }
+  }, []);
 
   const exportConfig = useMemo(() => buildStandardizedConfigFromState(state), [state]);
+
+  const handleSubmitConfig = useCallback(async () => {
+    setSubmitState({ status: "submitting" });
+    try {
+      // Build the full record payload: GET-style record with the inner config
+      // swapped for the configurator's current output. companyId targets the row.
+      let payload: Record<string, unknown>;
+      if (sourceRecord) {
+        const baseWorkflow = isRecord(sourceRecord.workflow) ? sourceRecord.workflow : {};
+        payload = {
+          ...sourceRecord,
+          workflow: { ...baseWorkflow, workflow: exportConfig },
+        };
+      } else {
+        payload = {
+          companyId: exportConfig.id,
+          workflowType: exportConfig.type,
+          workflow: {
+            metadata: {
+              version: exportConfig.version,
+              companyId: exportConfig.id,
+              workflowType: exportConfig.type,
+            },
+            workflow: exportConfig,
+          },
+        };
+      }
+
+      const res = await fetch(CREATE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          ...(await authHeader()),
+        },
+        body: JSON.stringify([payload]),
+      });
+      if (!res.ok) {
+        let detail = "";
+        try {
+          detail = (await res.text()).slice(0, 400);
+        } catch {
+          /* ignore */
+        }
+        throw new Error(`Save failed (${res.status})${detail ? `: ${detail}` : ""}`);
+      }
+      setSubmitState({
+        status: "success",
+        message: `Saved configuration for “${exportConfig.id || "workflow"}”.`,
+      });
+    } catch (err) {
+      setSubmitState({
+        status: "error",
+        message: err instanceof Error ? err.message : "Save failed",
+      });
+    }
+  }, [authHeader, exportConfig, sourceRecord]);
 
   const updateStep = useCallback((stepId: string, next: StepState) => {
     setState((s) => ({ ...s, steps: { ...s.steps, [stepId]: next } }));
@@ -195,7 +289,7 @@ export function SchemaConfiguratorPageClient() {
   }, [entries]);
 
   return (
-    <MapperAppShell>
+    <MapperAppShell holo>
       <div className="mx-auto w-full max-w-[min(100%,1920px)] px-5 py-6 sm:px-8 lg:px-12 lg:py-8">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[16rem_minmax(0,1fr)_minmax(0,1fr)] lg:items-start xl:gap-8">
           <div className="lg:order-1">
@@ -203,13 +297,13 @@ export function SchemaConfiguratorPageClient() {
           </div>
 
           <div className="space-y-5 lg:order-2 lg:space-y-6">
-            <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+            <div className="rounded-2xl border border-cyan-400/20 bg-[#0a1020]/80 p-4 shadow-[0_22px_80px_rgba(0,0,0,0.32)] backdrop-blur-xl">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">
+                  <p className="eyebrow text-[0.68rem]">
                     Step {activeIndex + 1} of {entries.length}
                   </p>
-                  <h2 className="mt-0.5 text-lg font-bold tracking-tight text-gray-800">
+                  <h2 className="mt-0.5 text-lg font-bold tracking-tight text-[#eef7ff]">
                     {activeEntry?.label}
                   </h2>
                 </div>
@@ -218,7 +312,7 @@ export function SchemaConfiguratorPageClient() {
                     type="button"
                     onClick={() => prevEntry && setActiveId(prevEntry.id)}
                     disabled={!prevEntry}
-                    className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 disabled:opacity-40"
+                    className="rounded-full border border-cyan-400/25 bg-white/5 px-4 py-1.5 text-sm font-semibold text-slate-200 transition-colors hover:bg-cyan-400/10 disabled:opacity-40"
                   >
                     ← {prevEntry ? prevEntry.label : "Back"}
                   </button>
@@ -226,7 +320,7 @@ export function SchemaConfiguratorPageClient() {
                     type="button"
                     onClick={() => nextEntry && setActiveId(nextEntry.id)}
                     disabled={!nextEntry}
-                    className="rounded-md border border-sky-500 bg-sky-500 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-sky-600 disabled:opacity-40"
+                    className="holo-button holo-button--primary min-h-0 px-4 py-1.5 text-sm disabled:opacity-40"
                   >
                     {nextEntry ? nextEntry.label : "Done"} →
                   </button>
@@ -236,12 +330,12 @@ export function SchemaConfiguratorPageClient() {
 
             <div className="space-y-4">{activeEntry?.render()}</div>
 
-            <div className="flex flex-wrap items-center justify-between gap-2 border-t border-gray-200 pt-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-t border-cyan-400/10 pt-4">
               <button
                 type="button"
                 onClick={() => prevEntry && setActiveId(prevEntry.id)}
                 disabled={!prevEntry}
-                className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 disabled:opacity-40"
+                className="rounded-full border border-cyan-400/25 bg-white/5 px-4 py-1.5 text-sm font-semibold text-slate-200 transition-colors hover:bg-cyan-400/10 disabled:opacity-40"
               >
                 ← Previous
               </button>
@@ -249,11 +343,47 @@ export function SchemaConfiguratorPageClient() {
                 type="button"
                 onClick={() => nextEntry && setActiveId(nextEntry.id)}
                 disabled={!nextEntry}
-                className="rounded-md border border-sky-500 bg-sky-500 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-sky-600 disabled:opacity-40"
+                className="holo-button holo-button--primary min-h-0 px-4 py-1.5 text-sm disabled:opacity-40"
               >
                 Next →
               </button>
             </div>
+
+            {!nextEntry ? (
+              <div className="site-card p-5">
+                <div className="relative">
+                  <p className="eyebrow text-[0.68rem]">Publish</p>
+                  <h3 className="mt-1 text-base font-bold tracking-tight text-[#eef7ff]">
+                    Save configuration
+                  </h3>
+                  <p className="mt-1 text-sm text-slate-300/70">
+                    Push these configurations to the workflow tables. Updates the row matching{" "}
+                    <span className="font-semibold text-cyan-200">
+                      {exportConfig.id || "this workflow"}
+                    </span>
+                    .
+                  </p>
+                  <div className="mt-4 flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={handleSubmitConfig}
+                      disabled={submitState.status === "submitting"}
+                      className="holo-button holo-button--primary px-5 text-sm disabled:opacity-60"
+                    >
+                      {submitState.status === "submitting" ? "Submitting…" : "Submit configuration"}
+                    </button>
+                    {submitState.status === "success" ? (
+                      <span className="text-sm font-medium text-cyan-200">
+                        ✓ {submitState.message}
+                      </span>
+                    ) : null}
+                    {submitState.status === "error" ? (
+                      <span className="text-sm font-medium text-red-300">{submitState.message}</span>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+            ) : null}
           </div>
 
           <div className="lg:order-3 lg:sticky lg:top-4 lg:max-h-[calc(100dvh-2rem)]">

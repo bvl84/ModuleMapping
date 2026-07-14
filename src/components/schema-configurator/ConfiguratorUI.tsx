@@ -3,25 +3,25 @@
 import type { ChangeEvent, ReactNode } from "react";
 
 export const accent = {
-  railOn: "bg-sky-400",
-  railOff: "bg-gray-200",
-  pillOn: "border-sky-400 bg-sky-50 text-sky-700",
-  pillOff: "border-gray-300 bg-white text-gray-500",
+  railOn: "bg-cyan-400",
+  railOff: "bg-white/10",
+  pillOn: "border-cyan-400/60 bg-cyan-400/15 text-cyan-100",
+  pillOff: "border-cyan-400/20 bg-white/5 text-slate-400",
 };
 
-export const CFG_LABEL = "text-[10px] font-semibold uppercase tracking-wide text-sky-800/90";
+export const CFG_LABEL = "text-[10px] font-semibold uppercase tracking-wide text-cyan-300/80";
 
 export function ModuleCheckbox({ selected }: { selected: boolean }) {
   return (
     <span
-      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 bg-white ${
-        selected ? "border-sky-500" : "border-gray-400"
+      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 ${
+        selected ? "border-cyan-400 bg-cyan-400/20" : "border-slate-500 bg-transparent"
       }`}
       aria-hidden
     >
       {selected ? (
         <svg
-          className="h-3 w-3 text-sky-500"
+          className="h-3 w-3 text-cyan-300"
           fill="none"
           viewBox="0 0 12 12"
           stroke="currentColor"
@@ -53,7 +53,7 @@ export function CheckboxButton({
       aria-label={ariaLabel}
       disabled={disabled}
       onClick={() => onChange(!checked)}
-      className="rounded p-0.5 transition-opacity hover:opacity-90 focus-visible:outline focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
+      className="rounded p-0.5 transition-opacity hover:opacity-90 focus-visible:outline focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
     >
       <ModuleCheckbox selected={checked} />
     </button>
@@ -76,7 +76,7 @@ export function SectionCard({
   enabledLabel?: string;
 }) {
   return (
-    <div className="flex overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+    <div className="flex overflow-hidden rounded-2xl border border-cyan-400/20 bg-[#0a1020]/80 shadow-[0_22px_80px_rgba(0,0,0,0.32)] backdrop-blur-xl">
       <div
         className={`flex w-12 shrink-0 flex-col items-center justify-center py-5 ${
           enabled ? accent.railOn : accent.railOff
@@ -89,7 +89,7 @@ export function SectionCard({
             aria-checked={enabled}
             aria-label={enabledLabel ?? `${title}: ${enabled ? "on" : "off"}`}
             onClick={() => onToggleEnabled(!enabled)}
-            className="flex min-h-[2.5rem] w-full flex-1 flex-col items-center justify-center bg-transparent p-1 transition-opacity hover:opacity-90 focus-visible:outline focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-inset"
+            className="flex min-h-[2.5rem] w-full flex-1 flex-col items-center justify-center bg-transparent p-1 transition-opacity hover:opacity-90 focus-visible:outline focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-inset"
           >
             <ModuleCheckbox selected={enabled} />
           </button>
@@ -98,8 +98,8 @@ export function SectionCard({
         )}
       </div>
       <div className="min-w-0 flex-1 px-4 py-4">
-        <h2 className="text-base font-bold tracking-tight text-gray-800">{title}</h2>
-        {subtitle ? <p className="mt-0.5 text-xs text-gray-400">{subtitle}</p> : null}
+        <h2 className="text-base font-bold tracking-tight text-[#eef7ff]">{title}</h2>
+        {subtitle ? <p className="mt-0.5 text-xs text-slate-400">{subtitle}</p> : null}
         <div className="mt-3 space-y-3">{children}</div>
       </div>
     </div>
@@ -116,15 +116,15 @@ export function FieldLabel({
   children: ReactNode;
 }) {
   return (
-    <label htmlFor={htmlFor} className="font-mono text-xs font-semibold text-sky-800">
+    <label htmlFor={htmlFor} className="font-mono text-xs font-semibold text-cyan-200">
       {children}
-      {required ? <span className="text-red-600"> *</span> : null}
+      {required ? <span className="text-amber-300"> *</span> : null}
     </label>
   );
 }
 
 export const inputClass =
-  "mt-1 w-full rounded-md border border-gray-300 bg-white px-2.5 py-1.5 font-mono text-sm text-gray-800 shadow-sm placeholder:text-gray-400 focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400 disabled:bg-gray-100";
+  "mt-1 w-full rounded-md border border-cyan-400/20 bg-[#050711]/60 px-2.5 py-1.5 font-mono text-sm text-slate-100 shadow-sm placeholder:text-slate-600 focus:border-cyan-400/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/40 disabled:bg-white/5 disabled:text-slate-400";
 
 export function TextField({
   id,
@@ -171,7 +171,7 @@ export function TextField({
         max={max}
         className={inputClass}
       />
-      {helperText ? <p className="mt-1 text-[11px] text-gray-500">{helperText}</p> : null}
+      {helperText ? <p className="mt-1 text-[11px] text-slate-400">{helperText}</p> : null}
     </div>
   );
 }
@@ -213,11 +213,11 @@ export function TextAreaField({
         disabled={disabled}
         required={required}
         aria-required={required}
-        className={`mt-1 w-full rounded-md border border-gray-300 bg-white px-2.5 py-1.5 ${
+        className={`mt-1 w-full rounded-md border border-cyan-400/20 bg-[#050711]/60 px-2.5 py-1.5 ${
           monospace ? "font-mono text-sm" : "text-sm"
-        } text-gray-800 shadow-sm placeholder:text-gray-400 focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400 disabled:bg-gray-100`}
+        } text-slate-100 shadow-sm placeholder:text-slate-600 focus:border-cyan-400/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/40 disabled:bg-white/5 disabled:text-slate-400`}
       />
-      {helperText ? <p className="mt-1 text-[11px] text-gray-500">{helperText}</p> : null}
+      {helperText ? <p className="mt-1 text-[11px] text-slate-400">{helperText}</p> : null}
     </div>
   );
 }
@@ -241,7 +241,7 @@ export function PillToggle<V extends string>({
           type="button"
           aria-pressed={value === opt.value}
           onClick={() => onChange(opt.value)}
-          className={`inline-flex max-w-full rounded-full border px-3 py-1 text-sm font-medium leading-tight transition-colors focus-visible:outline focus-visible:ring-2 focus-visible:ring-sky-400 ${
+          className={`inline-flex max-w-full rounded-full border px-3 py-1 text-sm font-medium leading-tight transition-colors focus-visible:outline focus-visible:ring-2 focus-visible:ring-cyan-400 ${
             value === opt.value ? accent.pillOn : accent.pillOff
           }`}
         >
@@ -270,11 +270,11 @@ export function InlineToggle({
       <CheckboxButton checked={checked} onChange={onChange} ariaLabel={label} disabled={disabled} />
       <div className="min-w-0">
         <span
-          className={`text-sm font-semibold ${checked ? "text-gray-800" : "text-gray-400"}`}
+          className={`text-sm font-semibold ${checked ? "text-slate-100" : "text-slate-500"}`}
         >
           {label}
         </span>
-        {helperText ? <p className="mt-0.5 text-[11px] text-gray-500">{helperText}</p> : null}
+        {helperText ? <p className="mt-0.5 text-[11px] text-slate-400">{helperText}</p> : null}
       </div>
     </div>
   );

@@ -30,7 +30,12 @@ import {
   type WorkflowStep,
   type WorkflowType,
 } from "./standardized-schema";
-import { SCHEMA_STEP_TEMPLATES, type SlotTemplate, type StepTemplate } from "./schema-step-templates";
+import {
+  SCHEMA_STEP_TEMPLATES,
+  type DeepField,
+  type SlotTemplate,
+  type StepTemplate,
+} from "./schema-step-templates";
 
 /* -------------------------------------------------------------- */
 /* State shape                                                     */
@@ -47,6 +52,8 @@ export type SlotEdits = {
   selectionRules?: { minimum: number; maximum: number };
   key?: string;
   keyName?: string;
+  /** Values for deeply-nested editable fields, keyed by DeepField.key. */
+  deep?: Record<string, string>;
 };
 
 export type SlotState = {
@@ -161,12 +168,19 @@ const DEFAULT_PROPOSED_PAYLOAD = {
     companyId: "",
     summaryName: "@contacts.contactForm.firstName",
     contacts: "@contacts.proposalFormatted.contacts",
+    systems: "@systemUpgrades.proposalFormatted.systems",
+    pdfSummary: "@systemUpgrades.proposalFormatted.pdfSummary",
+    selectedAddOns: "@systemUpgrades.proposalFormatted.selectedAddOns",
     property: "@propertyInfo.proposalFormatted",
   },
 };
 
 function emptySlotState(slot: SlotTemplate): SlotState {
-  return { slotId: slot.slotId, enabled: slot.defaultEnabled, edits: {} };
+  const edits: SlotEdits = {};
+  if (slot.deepFields && slot.deepFields.length > 0) {
+    edits.deep = readDeepFields(slot.baseNode, slot.deepFields);
+  }
+  return { slotId: slot.slotId, enabled: slot.defaultEnabled, edits };
 }
 
 /**
@@ -189,6 +203,28 @@ export function labelToStepId(label: string): string {
     .slice(1)
     .map((t) => t.charAt(0).toUpperCase() + t.slice(1).toLowerCase())
     .join("");
+  return head + tail;
+}
+
+/**
+ * Convert a client name into the emitted workflow `id`.
+ *
+ * Unlike {@link labelToStepId}, this preserves the internal casing of each
+ * token so an already-camelCased value like "solutionsBuilder" stays
+ * "solutionsBuilder" (only the very first character is lowercased). Multi-word
+ * input is still camelCased: "Fidelity Home Warranty" → "fidelityHomeWarranty".
+ */
+export function clientNameToId(name: string): string {
+  const tokens = name
+    .normalize("NFKD")
+    .replace(/[^A-Za-z0-9]+/g, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (tokens.length === 0) return "";
+  const [first, ...rest] = tokens;
+  const head = first.charAt(0).toLowerCase() + first.slice(1);
+  const tail = rest.map((t) => t.charAt(0).toUpperCase() + t.slice(1)).join("");
   return head + tail;
 }
 
@@ -228,7 +264,7 @@ export function createDefaultConfiguratorState(): ConfiguratorState {
       type: "B2C",
     },
     includeDisplay: true,
-    display: { pageHeader: true, pageFooter: true, stepHeader: true },
+    display: { pageHeader: false, pageFooter: false, stepHeader: false },
     theme: {
       enablePrimary: true,
       primary: { ...DEFAULT_PRIMARY_PALETTE },
@@ -274,6 +310,63 @@ function isPlainObject(v: unknown): v is Record<string, unknown> {
 }
 
 /** Apply a slot's edits onto a deep clone of its base node. */
+/** Read a value at a keys/indices path, or undefined if any hop is missing. */
+function getAtPath(root: unknown, path: readonly (string | number)[]): unknown {
+  let cur: unknown = root;
+  for (const seg of path) {
+    if (Array.isArray(cur) && typeof seg === "number") cur = cur[seg];
+    else if (isPlainObject(cur) && typeof seg === "string") cur = cur[seg];
+    else return undefined;
+  }
+  return cur;
+}
+
+/** Set a value at a keys/indices path if every parent hop exists. */
+function setAtPath(root: unknown, path: readonly (string | number)[], value: unknown): void {
+  if (path.length === 0) return;
+  let cur: unknown = root;
+  for (let i = 0; i < path.length - 1; i++) {
+    const seg = path[i];
+    if (Array.isArray(cur) && typeof seg === "number") cur = cur[seg];
+    else if (isPlainObject(cur) && typeof seg === "string") cur = cur[seg];
+    else return;
+  }
+  const last = path[path.length - 1];
+  if (Array.isArray(cur) && typeof last === "number") cur[last] = value;
+  else if (isPlainObject(cur) && typeof last === "string") cur[last] = value;
+}
+
+/** Read current string values for a slot's deep fields (for GUI prefill). */
+function readDeepFields(
+  node: ComponentNode,
+  fields: readonly DeepField[],
+): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const f of fields) {
+    const v = getAtPath(node, f.path);
+    if (typeof v === "string") out[f.key] = v;
+  }
+  return out;
+}
+
+/** Overlay deep-field edits onto a cloned node, keeping any tel: href in sync. */
+function applyDeepEdits(
+  node: ComponentNode,
+  fields: readonly DeepField[] | undefined,
+  deep: Record<string, string> | undefined,
+): void {
+  if (!fields || !deep) return;
+  for (const f of fields) {
+    const v = deep[f.key];
+    if (v === undefined) continue;
+    setAtPath(node, f.path, v);
+    if (f.telHrefPath) {
+      const digits = v.replace(/[^0-9+]/g, "");
+      setAtPath(node, f.telHrefPath, `tel:${digits}`);
+    }
+  }
+}
+
 function applySlotEdits(base: ComponentNode, edits: SlotEdits): ComponentNode {
   const node = structuredClone(base) as ComponentNode;
   const props: Record<string, unknown> = isPlainObject(node.properties)
@@ -298,7 +391,9 @@ function applySlotEdits(base: ComponentNode, edits: SlotEdits): ComponentNode {
 
 function applySlotEditsOrImported(slot: SlotState, template: SlotTemplate): ComponentNode {
   const base = slot.importedNode ?? template.baseNode;
-  return applySlotEdits(base, slot.edits);
+  const node = applySlotEdits(base, slot.edits);
+  applyDeepEdits(node, template.deepFields, slot.edits.deep);
+  return node;
 }
 
 /**
@@ -410,7 +505,7 @@ function applyStepRenamesDeep(value: unknown, renames: Map<string, string>): unk
 
 export function buildStandardizedConfigFromState(state: ConfiguratorState): StandardizedConfig {
   const out: StandardizedConfig = {
-    id: labelToStepId(state.meta.id) || state.meta.id,
+    id: clientNameToId(state.meta.id) || state.meta.id,
     title: state.meta.title,
     description: state.meta.description,
     version: state.meta.version,
@@ -562,6 +657,10 @@ function readSlotEditsFromNode(node: ComponentNode, slotTemplate: SlotTemplate):
     nodeProps.keyName !== baseProps.keyName
   ) {
     edits.keyName = nodeProps.keyName;
+  }
+
+  if (slotTemplate.deepFields && slotTemplate.deepFields.length > 0) {
+    edits.deep = readDeepFields(node, slotTemplate.deepFields);
   }
 
   return edits;
@@ -816,7 +915,9 @@ export function getSlotTemplate(stepId: string, slotId: string): SlotTemplate | 
 export function previewSlotNode(stepId: string, slotState: SlotState): ComponentNode | undefined {
   const tpl = getSlotTemplate(stepId, slotState.slotId);
   if (!tpl) return undefined;
-  return applySlotEdits(slotState.importedNode ?? tpl.baseNode, slotState.edits);
+  const node = applySlotEdits(slotState.importedNode ?? tpl.baseNode, slotState.edits);
+  applyDeepEdits(node, tpl.deepFields, slotState.edits.deep);
+  return node;
 }
 
 export type { ConditionExpression };

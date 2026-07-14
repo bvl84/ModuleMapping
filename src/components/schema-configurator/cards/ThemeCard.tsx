@@ -100,20 +100,20 @@ function PaletteEditor({
   return (
     <div>
       <p className={CFG_LABEL}>{title}</p>
-      <p className="mt-1 text-[11px] text-gray-500">
-        Set the 500 base color and click <span className="font-semibold">Generate</span> — the
+      <p className="mt-1 text-[11px] text-slate-400">
+        Set the 500 base color and click <span className="font-semibold text-slate-200">Generate</span> — the
         configurator fills 100–900 for you. You can tweak any shade afterward.
       </p>
 
-      <div className="mt-2 flex flex-wrap items-center gap-2 rounded-md border border-sky-300 bg-sky-50/50 px-2 py-1.5 shadow-sm">
+      <div className="mt-2 flex flex-wrap items-center gap-2 rounded-md border border-cyan-400/30 bg-cyan-400/5 px-2 py-1.5 shadow-sm">
         <input
           type="color"
           value={baseHex || "#ffffff"}
           onChange={(e) => onChange({ ...palette, "500": e.target.value })}
           aria-label={`${title} 500 base color`}
-          className="h-8 w-8 shrink-0 cursor-pointer rounded border border-white shadow ring-1 ring-sky-300"
+          className="h-8 w-8 shrink-0 cursor-pointer rounded border border-white/20 shadow ring-1 ring-cyan-400/40"
         />
-        <span className="font-mono text-[10px] font-semibold uppercase tracking-wide text-sky-800">
+        <span className="font-mono text-[10px] font-semibold uppercase tracking-wide text-cyan-200">
           500 · base
         </span>
         <input
@@ -121,20 +121,20 @@ function PaletteEditor({
           value={baseHex}
           onChange={(e) => onChange({ ...palette, "500": e.target.value })}
           placeholder="#0C60ED"
-          className="w-24 rounded border border-gray-300 bg-white px-1.5 py-0.5 font-mono text-xs text-gray-800 shadow-sm focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400"
+          className="w-24 rounded border border-cyan-400/20 bg-[#050711]/60 px-1.5 py-0.5 font-mono text-xs text-slate-100 shadow-sm focus:border-cyan-400/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/40"
         />
         <button
           type="button"
           onClick={onGenerate}
           disabled={!canGenerate}
-          className="ml-auto rounded-md border border-sky-500 bg-sky-500 px-2.5 py-1 text-xs font-semibold text-white shadow-sm hover:bg-sky-600 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-300"
+          className="ml-auto rounded-md border border-cyan-400/60 bg-cyan-400/90 px-2.5 py-1 text-xs font-semibold text-[#04121a] shadow-sm hover:bg-cyan-300 disabled:cursor-not-allowed disabled:border-white/10 disabled:bg-white/10 disabled:text-slate-500"
           title="Generate 100–900 from the 500 hex"
         >
           Generate 100–900 →
         </button>
       </div>
 
-      <p className="mt-3 font-mono text-[10px] uppercase tracking-wide text-gray-400">
+      <p className="mt-3 font-mono text-[10px] uppercase tracking-wide text-slate-400">
         Derived shades
       </p>
       <div className="mt-1 grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -143,17 +143,17 @@ function PaletteEditor({
           return (
             <div
               key={shade}
-              className="flex items-center gap-2 rounded-md border border-gray-200 bg-white p-2"
+              className="flex items-center gap-2 rounded-md border border-cyan-400/15 bg-[#050711]/40 p-2"
             >
               <input
                 type="color"
                 value={value || "#ffffff"}
                 onChange={(e) => onChange({ ...palette, [shade]: e.target.value })}
                 aria-label={`${title} ${shade}`}
-                className="h-7 w-7 shrink-0 cursor-pointer rounded border border-gray-300 bg-white"
+                className="h-7 w-7 shrink-0 cursor-pointer rounded border border-cyan-400/20 bg-transparent"
               />
               <div className="min-w-0 flex-1">
-                <p className="font-mono text-[10px] uppercase tracking-wide text-gray-500">
+                <p className="font-mono text-[10px] uppercase tracking-wide text-slate-400">
                   {shade}
                 </p>
                 <input
@@ -161,7 +161,7 @@ function PaletteEditor({
                   value={value}
                   onChange={(e) => onChange({ ...palette, [shade]: e.target.value })}
                   placeholder="#000000"
-                  className="w-full rounded border border-gray-200 bg-white px-1.5 py-0.5 font-mono text-[11px] text-gray-800 shadow-sm focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400"
+                  className="w-full rounded border border-cyan-400/20 bg-[#050711]/60 px-1.5 py-0.5 font-mono text-[11px] text-slate-100 shadow-sm focus:border-cyan-400/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/40"
                 />
               </div>
             </div>
@@ -202,7 +202,7 @@ function GradientEditor({
     .join(", ")})`;
 
   return (
-    <div className="space-y-3 rounded-md border border-dashed border-sky-300 bg-sky-50/40 p-3">
+    <div className="space-y-3 rounded-md border border-dashed border-cyan-400/30 bg-cyan-400/5 p-3">
       <div className="flex flex-wrap items-end gap-3">
         <TextField
           id="bg-angle"
@@ -215,35 +215,35 @@ function GradientEditor({
           onChange={(v) => onChange({ ...background, angle: Number.parseFloat(v) || 0 })}
           helperText="Increments by 45°."
         />
-        <div className="h-10 flex-1 min-w-[8rem] rounded-md border border-gray-300 shadow-inner" style={{ background: previewCss }} />
+        <div className="h-10 flex-1 min-w-[8rem] rounded-md border border-cyan-400/20 shadow-inner" style={{ background: previewCss }} />
       </div>
       <div className="space-y-2">
         {background.stops.map((stop, i) => (
-          <div key={i} className="flex flex-wrap items-end gap-2 rounded-md border border-gray-200 bg-white p-2">
+          <div key={i} className="flex flex-wrap items-end gap-2 rounded-md border border-cyan-400/15 bg-[#050711]/40 p-2">
             <div className="flex-1 min-w-[12rem]">
-              <p className="font-mono text-[10px] uppercase tracking-wide text-gray-500">Color</p>
+              <p className="font-mono text-[10px] uppercase tracking-wide text-slate-400">Color</p>
               <input
                 type="text"
                 value={stop.color}
                 onChange={(e) => onStopChange(i, { color: e.target.value })}
                 placeholder="rgba(...) or #hex"
-                className="mt-0.5 w-full rounded border border-gray-200 bg-white px-1.5 py-1 font-mono text-xs text-gray-800 shadow-sm focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400"
+                className="mt-0.5 w-full rounded border border-cyan-400/20 bg-[#050711]/60 px-1.5 py-1 font-mono text-xs text-slate-100 shadow-sm focus:border-cyan-400/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/40"
               />
             </div>
             <div className="w-24">
-              <p className="font-mono text-[10px] uppercase tracking-wide text-gray-500">Position</p>
+              <p className="font-mono text-[10px] uppercase tracking-wide text-slate-400">Position</p>
               <input
                 type="text"
                 value={stop.position}
                 onChange={(e) => onStopChange(i, { position: e.target.value })}
                 placeholder="0%"
-                className="mt-0.5 w-full rounded border border-gray-200 bg-white px-1.5 py-1 font-mono text-xs text-gray-800 shadow-sm focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400"
+                className="mt-0.5 w-full rounded border border-cyan-400/20 bg-[#050711]/60 px-1.5 py-1 font-mono text-xs text-slate-100 shadow-sm focus:border-cyan-400/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/40"
               />
             </div>
             <button
               type="button"
               onClick={() => removeStop(i)}
-              className="rounded-md border border-red-200 bg-white px-2 py-1 text-xs font-semibold text-red-600 hover:bg-red-50"
+              className="rounded-md border border-red-400/30 bg-white/5 px-2 py-1 text-xs font-semibold text-red-300 hover:bg-red-500/10"
             >
               Remove
             </button>
@@ -252,7 +252,7 @@ function GradientEditor({
         <button
           type="button"
           onClick={addStop}
-          className="rounded-md border border-sky-300 bg-white px-3 py-1 text-xs font-semibold text-sky-700 hover:bg-sky-50"
+          className="rounded-md border border-cyan-400/30 bg-white/5 px-3 py-1 text-xs font-semibold text-cyan-200 hover:bg-cyan-400/10"
         >
           + Add stop
         </button>
@@ -289,7 +289,7 @@ export function ThemeCard({
         />
       </div>
 
-      <div className="space-y-3 border-t border-gray-100 pt-3">
+      <div className="space-y-3 border-t border-cyan-400/10 pt-3">
         <InlineToggle
           checked
           onChange={() => {}}
@@ -304,7 +304,7 @@ export function ThemeCard({
         />
       </div>
 
-      <div className="space-y-3 border-t border-gray-100 pt-3">
+      <div className="space-y-3 border-t border-cyan-400/10 pt-3">
         <InlineToggle
           checked={theme.enableBackground}
           onChange={(v) => onChange({ ...theme, enableBackground: v })}
@@ -319,7 +319,7 @@ export function ThemeCard({
         ) : null}
       </div>
 
-      <div className="space-y-3 border-t border-gray-100 pt-3">
+      <div className="space-y-3 border-t border-cyan-400/10 pt-3">
         <InlineToggle
           checked={theme.enableBackgroundImage}
           onChange={(v) => onChange({ ...theme, enableBackgroundImage: v })}
@@ -327,7 +327,7 @@ export function ThemeCard({
           helperText="Optional decorative image anchored to the bottom-right of the workflow."
         />
         {theme.enableBackgroundImage ? (
-          <div className="space-y-3 rounded-md border border-dashed border-sky-300 bg-sky-50/40 p-3">
+          <div className="space-y-3 rounded-md border border-dashed border-cyan-400/30 bg-cyan-400/5 p-3">
             <TextField
               id="bg-image-src"
               label="Image URL"
@@ -343,11 +343,11 @@ export function ThemeCard({
               helperText="Anchored to the bottom-right of the workflow."
             />
             <div>
-              <p className="font-mono text-[10px] uppercase tracking-wide text-gray-500">
+              <p className="font-mono text-[10px] uppercase tracking-wide text-slate-400">
                 Preview
               </p>
               <div
-                className="mt-1 h-32 w-full rounded-md border border-gray-200 bg-white shadow-inner"
+                className="mt-1 h-32 w-full rounded-md border border-cyan-400/15 bg-[#050711]/40 shadow-inner"
                 style={{
                   backgroundImage: theme.backgroundImage.src
                     ? `url(${theme.backgroundImage.src})`
@@ -358,7 +358,7 @@ export function ThemeCard({
                 }}
               >
                 {!theme.backgroundImage.src ? (
-                  <div className="flex h-full w-full items-center justify-center text-[11px] text-gray-400">
+                  <div className="flex h-full w-full items-center justify-center text-[11px] text-slate-500">
                     Add an image URL above to preview
                   </div>
                 ) : null}

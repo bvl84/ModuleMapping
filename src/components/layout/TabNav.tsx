@@ -9,6 +9,7 @@ export type TabId =
   | "solutions"
   | "comparison"
   | "future-state"
+  | "workflows"
   | "schema-configurator";
 
 export const TAB_ROUTES: Record<TabId, string> = {
@@ -17,15 +18,14 @@ export const TAB_ROUTES: Record<TabId, string> = {
   solutions: "/solutions-builder",
   comparison: "/comparison",
   "future-state": "/future-state",
+  workflows: "/workflows",
   "schema-configurator": "/schema-configurator",
 };
 
-const TABS: { id: TabId; label: string }[] = [
-  { id: "cinch", label: "Cinch" },
-  { id: "greentech", label: "GreenTech" },
-  { id: "solutions", label: "Solutions Builder" },
-  { id: "comparison", label: "Comparison" },
-  { id: "future-state", label: "Future State" },
+/** Tabs shown in the primary nav. Legacy/reference pages live in the hidden TOC. */
+const VISIBLE_TABS: { id: TabId; label: string }[] = [
+  { id: "workflows", label: "Workflows" },
+  { id: "schema-configurator", label: "Schema Configurator" },
 ];
 
 const tabLinkClass = (active: boolean) =>
@@ -38,46 +38,15 @@ export function TabNav() {
 
   return (
     <div className="mb-0 flex flex-wrap items-end gap-0 border-b border-gray-600">
-      {TABS.map((tab) =>
-        tab.id === "future-state" ? (
-          <div key={tab.id} className="mr-0 flex items-end gap-0">
-            <Link
-              href={TAB_ROUTES["future-state"]}
-              className={tabLinkClass(pathname === TAB_ROUTES["future-state"])}
-            >
-              {tab.label}
-            </Link>
-            <Link
-              href="/future-state-visual"
-              className={`ml-4 border-b-2 px-1 pb-3 text-sm font-medium transition-colors ${
-                pathname === "/future-state-visual"
-                  ? "border-gray-100 text-gray-100"
-                  : "border-transparent text-gray-500 hover:text-gray-300"
-              }`}
-            >
-              Future State Visual
-            </Link>
-            <Link
-              href={TAB_ROUTES["schema-configurator"]}
-              className={`ml-4 border-b-2 px-1 pb-3 text-sm font-medium transition-colors ${
-                pathname === TAB_ROUTES["schema-configurator"]
-                  ? "border-gray-100 text-gray-100"
-                  : "border-transparent text-gray-500 hover:text-gray-300"
-              }`}
-            >
-              Schema Configurator
-            </Link>
-          </div>
-        ) : (
-          <Link
-            key={tab.id}
-            href={TAB_ROUTES[tab.id]}
-            className={tabLinkClass(pathname === TAB_ROUTES[tab.id])}
-          >
-            {tab.label}
-          </Link>
-        ),
-      )}
+      {VISIBLE_TABS.map((tab) => (
+        <Link
+          key={tab.id}
+          href={TAB_ROUTES[tab.id]}
+          className={tabLinkClass(pathname === TAB_ROUTES[tab.id])}
+        >
+          {tab.label}
+        </Link>
+      ))}
     </div>
   );
 }

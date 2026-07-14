@@ -162,19 +162,20 @@ Each row maps a slot in the GUI to its emitted JSON path. `[…]` indicates the 
 
 | Slot | Component | Emit path |
 | --- | --- | --- |
-| `currentSystem.container` | `CurrentSystemContainer` | `workflow.steps[currentSystem].main[…]` |
+| `currentSystem.container` | `SystemUpgradeContainer` | `workflow.steps[currentSystem].main[…]` |
 | `currentSystem.viewUpgradeButton` | `Button` | `workflow.steps[currentSystem].footer[…]` |
 | `currentSystem.backButton` | `Button` | `workflow.steps[currentSystem].footer[…]` |
 
-> Note: the inner `CinchCurrentSystemInfo` child is preserved from the template snapshot. Other client-specific child components (e.g., a hypothetical `GreentechCurrentSystemInfo`) need to be wired in here or pasted via the JSON import path.
+> Note: emits with `binding.requireSqFtPath` and `binding.showSqFtPath` referencing `@workflow.systemUpgrade.*`. The View Upgrade button is disabled until `@systemUpgrades.hasBundlesAndRequiredFields` is true.
 
 ### `yourMatch`
 
 | Slot | Component | Emit path |
 | --- | --- | --- |
 | `yourMatch.matchLayout` | `Container` (deeply nested) | `workflow.steps[yourMatch].main[…]` |
-| `yourMatch.alternativeOptions` | `SummaryBundleAlternativeOptions` | `workflow.steps[yourMatch].main[…]` |
 | `yourMatch.scheduleDrawer` | `ScheduleDrawer` | `workflow.steps[yourMatch].main[…]` |
+
+> The `matchLayout` slot is a non-editable passthrough containing `SystemUpgradeDetails`, optional `AddonContainer` / `MountingOptionContainer`, `PriceBreakdown`, `ContactInfo`, and the Schedule / Go Back button cluster. The `ScheduleDrawer` reads inspection appointments from `@systemUpgrades.inspectionSchedules` and submits via `submitWorkOrderProposal`.
 
 ### `systemUpgrade`
 

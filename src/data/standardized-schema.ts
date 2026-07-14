@@ -91,6 +91,7 @@ export type ConditionExpression = ConditionRule | ConditionRule[];
 
 export type ActionType =
   | "validateStep"
+  | "validateSystemUpgrades"
   | "nextStep"
   | "previousStep"
   | "flipBool"
@@ -235,6 +236,7 @@ export type PaletteShade = (typeof PALETTE_SHADE_KEYS)[number];
 /** Curated set of action types observed across the three reference JSONs. */
 export const KNOWN_ACTION_TYPES = [
   "validateStep",
+  "validateSystemUpgrades",
   "nextStep",
   "previousStep",
   "flipBool",
