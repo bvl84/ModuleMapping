@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { APP_CONFIG } from "@/lib/auth0-config";
 
 /**
  * Server-side proxy that returns the FULL workflow record for a single guid.
@@ -12,8 +13,7 @@ import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-const UPSTREAM_URL =
-  "https://api.pim.motilidev.com/workflow-service/workflows/companies/all?noAuthVar=MotiliWorkflow98528";
+const UPSTREAM_URL = `${APP_CONFIG.API_URL}/workflow-service/workflows/companies/all`;
 
 export async function GET(
   req: Request,
@@ -21,12 +21,14 @@ export async function GET(
 ) {
   const { guid } = await params;
   try {
-    // Forward the caller's Auth0 Bearer token (if present) to the upstream API.
     const authHeader = req.headers.get("authorization");
+    if (!authHeader) {
+      return NextResponse.json({ error: "Not signed in" }, { status: 401 });
+    }
     const res = await fetch(UPSTREAM_URL, {
       headers: {
         Accept: "application/json",
-        ...(authHeader ? { Authorization: authHeader } : {}),
+        Authorization: authHeader,
       },
       cache: "no-store",
     });

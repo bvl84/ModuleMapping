@@ -6,6 +6,7 @@ import { MapperAppShell } from "@/components/layout/MapperAppShell";
 import type { WorkflowSummary } from "@/app/api/workflows/route";
 import { stashCloneHandoff } from "@/data/clone-handoff";
 import { pimClientUrl } from "@/data/pim-client-urls";
+import { APP_CONFIG } from "@/lib/auth0-config";
 import { useAuthHeader } from "@/lib/useAuthHeader";
 import {
   CloneWorkflowModal,
@@ -14,8 +15,7 @@ import {
 } from "./CloneWorkflowModal";
 
 /** PIM workflow-service clone endpoint (CORS-enabled, called directly from the browser). */
-const CLONE_URL =
-  "https://api.pim.motilidev.com/workflow-service/workflows/clone?noAuthVar=MotiliWorkflow98528";
+const CLONE_URL = `${APP_CONFIG.API_URL}/workflow-service/workflows/clone`;
 
 /**
  * Turn a camelCase / kebab / snake identifier into spaced Title Case.

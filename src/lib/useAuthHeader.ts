@@ -8,18 +8,19 @@ import { useCallback } from "react";
  * Auth0 access token (the JWT from the /oauth/token exchange, retrieved via
  * getAccessTokenSilently).
  *
- * Returns an empty object when there is no session/token so callers can still
- * fall back to the existing noAuthVar bypass without throwing.
+ * Throws when there is no session or token so callers never send an
+ * unauthenticated PIM request.
  */
 export function useAuthHeader(): () => Promise<Record<string, string>> {
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
   return useCallback(async (): Promise<Record<string, string>> => {
-    if (!isAuthenticated) return {};
-    try {
-      const token = await getAccessTokenSilently();
-      return token ? { Authorization: `Bearer ${token}` } : {};
-    } catch {
-      return {};
+    if (!isAuthenticated) {
+      throw new Error("Not signed in");
     }
+    const token = await getAccessTokenSilently();
+    if (!token) {
+      throw new Error("Not signed in");
+    }
+    return { Authorization: `Bearer ${token}` };
   }, [getAccessTokenSilently, isAuthenticated]);
 }

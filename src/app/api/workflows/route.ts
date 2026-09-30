@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { APP_CONFIG } from "@/lib/auth0-config";
 
 /**
  * Server-side proxy for the PIM workflow-service listing endpoint.
@@ -11,8 +12,7 @@ import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-const UPSTREAM_URL =
-  "https://api.pim.motilidev.com/workflow-service/workflows/companies/all?noAuthVar=MotiliWorkflow98528";
+const UPSTREAM_URL = `${APP_CONFIG.API_URL}/workflow-service/workflows/companies/all`;
 
 export type WorkflowSummary = {
   id: number;
@@ -67,12 +67,14 @@ function toSummary(raw: unknown): WorkflowSummary | null {
 
 export async function GET(request: Request) {
   try {
-    // Forward the caller's Auth0 Bearer token (if present) to the upstream API.
     const authHeader = request.headers.get("authorization");
+    if (!authHeader) {
+      return NextResponse.json({ error: "Not signed in" }, { status: 401 });
+    }
     const res = await fetch(UPSTREAM_URL, {
       headers: {
         Accept: "application/json",
-        ...(authHeader ? { Authorization: authHeader } : {}),
+        Authorization: authHeader,
       },
       cache: "no-store",
     });

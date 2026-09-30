@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { MapperAppShell } from "@/components/layout/MapperAppShell";
 import {
@@ -11,6 +12,7 @@ import {
 } from "@/data/schema-configurator-model";
 import { takeCloneHandoff } from "@/data/clone-handoff";
 import { SCHEMA_STEP_TEMPLATES } from "@/data/schema-step-templates";
+import { APP_CONFIG } from "@/lib/auth0-config";
 import { useAuthHeader } from "@/lib/useAuthHeader";
 import { FaqsCard } from "./cards/FaqsCard";
 import { LandingPageCard } from "./cards/LandingPageCard";
@@ -30,9 +32,57 @@ const SECTION_ORDER = "module-order";
 const SECTION_PAYLOAD = "proposed-payload";
 const STEP_PREFIX = "step:";
 
+const navButtonClass =
+  "inline-flex h-11 max-w-full items-center justify-center rounded-full px-4 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-40";
+
+function StepNavBar({
+  prevLabel,
+  currentLabel,
+  nextLabel,
+  onPrev,
+  onNext,
+  prevDisabled,
+  nextDisabled,
+}: {
+  prevLabel: string;
+  currentLabel: string;
+  nextLabel: string;
+  onPrev: () => void;
+  onNext: () => void;
+  prevDisabled: boolean;
+  nextDisabled: boolean;
+}) {
+  return (
+    <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3">
+      <div className="min-w-0 justify-self-start">
+        <button
+          type="button"
+          onClick={onPrev}
+          disabled={prevDisabled}
+          className={`${navButtonClass} border border-cyan-400/25 bg-white/5 text-slate-200 hover:bg-cyan-400/10`}
+        >
+          <span className="truncate">← {prevLabel}</span>
+        </button>
+      </div>
+      <h2 className="px-2 text-center text-lg font-bold tracking-tight text-[#eef7ff]">
+        {currentLabel}
+      </h2>
+      <div className="min-w-0 justify-self-end">
+        <button
+          type="button"
+          onClick={onNext}
+          disabled={nextDisabled}
+          className={`${navButtonClass} bg-gradient-to-br from-cyan-300 to-amber-200 text-slate-950 shadow-[0_18px_48px_rgba(103,232,249,0.18)]`}
+        >
+          <span className="truncate">{nextLabel} →</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /** PIM workflow-service create/update endpoint (CORS-enabled, called from the browser). */
-const CREATE_URL =
-  "https://api.pim.motilidev.com/workflow-service/workflows/create?noAuthVar=MotiliWorkflow98528";
+const CREATE_URL = `${APP_CONFIG.API_URL}/workflow-service/workflows/create`;
 
 type SubmitState =
   | { status: "idle" }
@@ -53,6 +103,7 @@ type WizardEntry = {
 };
 
 export function SchemaConfiguratorPageClient() {
+  const router = useRouter();
   const [state, setState] = useState<ConfiguratorState>(() => createDefaultConfiguratorState());
   const [activeId, setActiveId] = useState<string>(SECTION_META);
   /** Full workflow record handed off from a clone; the base for saving back. */
@@ -294,59 +345,40 @@ export function SchemaConfiguratorPageClient() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[16rem_minmax(0,1fr)_minmax(0,1fr)] lg:items-start xl:gap-8">
           <div className="lg:order-1">
             <WizardNav groups={groups} activeId={activeEntry?.id ?? SECTION_META} onSelect={setActiveId} />
+            <button
+              type="button"
+              onClick={() => router.push("/workflows")}
+              className={`${navButtonClass} mt-[10px] w-full border border-cyan-400/25 bg-white/5 text-slate-200 hover:bg-cyan-400/10`}
+            >
+              Cancel
+            </button>
           </div>
 
           <div className="space-y-5 lg:order-2 lg:space-y-6">
             <div className="rounded-2xl border border-cyan-400/20 bg-[#0a1020]/80 p-4 shadow-[0_22px_80px_rgba(0,0,0,0.32)] backdrop-blur-xl">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <p className="eyebrow text-[0.68rem]">
-                    Step {activeIndex + 1} of {entries.length}
-                  </p>
-                  <h2 className="mt-0.5 text-lg font-bold tracking-tight text-[#eef7ff]">
-                    {activeEntry?.label}
-                  </h2>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => prevEntry && setActiveId(prevEntry.id)}
-                    disabled={!prevEntry}
-                    className="rounded-full border border-cyan-400/25 bg-white/5 px-4 py-1.5 text-sm font-semibold text-slate-200 transition-colors hover:bg-cyan-400/10 disabled:opacity-40"
-                  >
-                    ← {prevEntry ? prevEntry.label : "Back"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => nextEntry && setActiveId(nextEntry.id)}
-                    disabled={!nextEntry}
-                    className="holo-button holo-button--primary min-h-0 px-4 py-1.5 text-sm disabled:opacity-40"
-                  >
-                    {nextEntry ? nextEntry.label : "Done"} →
-                  </button>
-                </div>
-              </div>
+              <StepNavBar
+                prevLabel={prevEntry ? prevEntry.label : "Back"}
+                currentLabel={activeEntry?.label ?? ""}
+                nextLabel={nextEntry ? nextEntry.label : "Done"}
+                prevDisabled={!prevEntry}
+                nextDisabled={!nextEntry}
+                onPrev={() => prevEntry && setActiveId(prevEntry.id)}
+                onNext={() => nextEntry && setActiveId(nextEntry.id)}
+              />
             </div>
 
             <div className="space-y-4">{activeEntry?.render()}</div>
 
-            <div className="flex flex-wrap items-center justify-between gap-2 border-t border-cyan-400/10 pt-4">
-              <button
-                type="button"
-                onClick={() => prevEntry && setActiveId(prevEntry.id)}
-                disabled={!prevEntry}
-                className="rounded-full border border-cyan-400/25 bg-white/5 px-4 py-1.5 text-sm font-semibold text-slate-200 transition-colors hover:bg-cyan-400/10 disabled:opacity-40"
-              >
-                ← Previous
-              </button>
-              <button
-                type="button"
-                onClick={() => nextEntry && setActiveId(nextEntry.id)}
-                disabled={!nextEntry}
-                className="holo-button holo-button--primary min-h-0 px-4 py-1.5 text-sm disabled:opacity-40"
-              >
-                Next →
-              </button>
+            <div className="rounded-2xl border border-cyan-400/20 bg-[#0a1020]/80 p-4 shadow-[0_22px_80px_rgba(0,0,0,0.32)] backdrop-blur-xl">
+              <StepNavBar
+                prevLabel={prevEntry ? prevEntry.label : "Back"}
+                currentLabel={activeEntry?.label ?? ""}
+                nextLabel={nextEntry ? nextEntry.label : "Done"}
+                prevDisabled={!prevEntry}
+                nextDisabled={!nextEntry}
+                onPrev={() => prevEntry && setActiveId(prevEntry.id)}
+                onNext={() => nextEntry && setActiveId(nextEntry.id)}
+              />
             </div>
 
             {!nextEntry ? (

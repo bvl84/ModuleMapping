@@ -12,8 +12,19 @@ function clean(value: string): string {
   return value.replace(/\s+/g, "");
 }
 
+/** Shared public config. Env vars override these defaults. */
+export const APP_CONFIG = {
+  API_URL: clean(process.env.NEXT_PUBLIC_API_URL ?? "https://api.pim.motilidev.com").replace(
+    /\/+$/,
+    "",
+  ),
+  AUTH0_DOMAIN: "login.motilidev.com",
+  AUTH0_CLIENT_ID: "hDyMndAoNb2bLD1EK1W8OvolBOf644Kg",
+  AUTH0_AUDIENCE: "https://api.pim.motilidev.com",
+} as const;
+
 const rawIssuer = clean(
-  process.env.NEXT_PUBLIC_AUTH0_ISSUER ?? "https://login.motilidev.com",
+  process.env.NEXT_PUBLIC_AUTH0_ISSUER ?? `https://${APP_CONFIG.AUTH0_DOMAIN}`,
 );
 
 /** Bare host for the SDK's `domain` prop (no scheme, no trailing slash). */
@@ -25,21 +36,18 @@ function toDomain(issuerOrDomain: string): string {
 
 export const AUTH0_CONFIG = {
   issuer: rawIssuer,
-  domain: toDomain(process.env.NEXT_PUBLIC_AUTH0_DOMAIN ?? rawIssuer),
+  domain: toDomain(process.env.NEXT_PUBLIC_AUTH0_DOMAIN ?? APP_CONFIG.AUTH0_DOMAIN),
   clientId: clean(
-    process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID ?? "hDyMndAoNb2bLD1EK1W8OvolBOf644Kg",
+    process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID ?? APP_CONFIG.AUTH0_CLIENT_ID,
   ),
   /** Scopes auth to the organization; added to the /authorize redirect. */
   organization: clean(
     process.env.NEXT_PUBLIC_AUTH0_ORGANIZATION ?? "org_8eLgTLpNbWzHM7fF",
   ),
   /**
-   * API audience for the PIM workflow service. When set, Auth0 mints a JWT
-   * access token for this API (instead of an opaque token), which is what we
-   * forward as the Bearer Authorization header on API calls. Leave unset to use
-   * the tenant's Default Audience.
+   * API audience for the PIM workflow service. Auth0 mints a JWT access token
+   * for this API, which is forwarded as the Bearer Authorization header.
+   * No trailing slash: Auth0 rejected `https://api.pim.motilidev.com/`.
    */
-  audience: process.env.NEXT_PUBLIC_AUTH0_AUDIENCE
-    ? clean(process.env.NEXT_PUBLIC_AUTH0_AUDIENCE)
-    : undefined,
+  audience: clean(process.env.NEXT_PUBLIC_AUTH0_AUDIENCE ?? APP_CONFIG.AUTH0_AUDIENCE),
 } as const;
